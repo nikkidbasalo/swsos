@@ -6,17 +6,16 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 // Types
-import type { ProgramTypes } from '@/types'
+import type { AnnouncementTypes } from '@/types'
 
 // Redux imports
-import { programsTypes } from '@/constants'
 import { updateList } from '@/GlobalRedux/Features/listSlice'
 import { updateResultCounter } from '@/GlobalRedux/Features/resultsCounterSlice'
 import { useDispatch, useSelector } from 'react-redux'
 
 interface ModalProps {
   hideModal: () => void
-  editData: ProgramTypes | null
+  editData: AnnouncementTypes | null
 }
 
 const AddEditModal = ({ hideModal, editData }: ModalProps) => {
@@ -34,11 +33,11 @@ const AddEditModal = ({ hideModal, editData }: ModalProps) => {
     formState: { errors },
     reset,
     handleSubmit
-  } = useForm<ProgramTypes>({
+  } = useForm<AnnouncementTypes>({
     mode: 'onSubmit'
   })
 
-  const onSubmit = async (formdata: ProgramTypes) => {
+  const onSubmit = async (formdata: AnnouncementTypes) => {
     if (saving) return
 
     setSaving(true)
@@ -50,25 +49,22 @@ const AddEditModal = ({ hideModal, editData }: ModalProps) => {
     }
   }
 
-  const handleCreate = async (formdata: ProgramTypes) => {
+  const handleCreate = async (formdata: AnnouncementTypes) => {
     const newData = {
-      name: formdata.name,
-      description: formdata.description,
-      type: formdata.type,
-      funds: formdata.funds,
-      allow_applicants: formdata.allow_applicants
+      title: formdata.title,
+      description: formdata.description
     }
 
     try {
       const { data, error } = await supabase
-        .from('sws_programs')
+        .from('sws_announcements')
         .insert(newData)
         .select()
 
       if (error) {
         void logError(
-          'Create Program',
-          'sws_programs',
+          'Create Announcement',
+          'sws_announcements',
           JSON.stringify(newData),
           error.message
         )
@@ -108,27 +104,24 @@ const AddEditModal = ({ hideModal, editData }: ModalProps) => {
     }
   }
 
-  const handleUpdate = async (formdata: ProgramTypes) => {
+  const handleUpdate = async (formdata: AnnouncementTypes) => {
     if (!editData) return
 
     const newData = {
-      name: formdata.name,
-      description: formdata.description,
-      type: formdata.type,
-      funds: formdata.funds,
-      allow_applicants: formdata.allow_applicants
+      title: formdata.title,
+      description: formdata.description
     }
 
     try {
       const { error } = await supabase
-        .from('sws_programs')
+        .from('sws_announcements')
         .update(newData)
         .eq('id', editData.id)
 
       if (error) {
         void logError(
-          'Update program',
-          'sws_programs',
+          'Update annoucement',
+          'sws_announcements',
           JSON.stringify(newData),
           error.message
         )
@@ -166,11 +159,8 @@ const AddEditModal = ({ hideModal, editData }: ModalProps) => {
   // manually set the defaultValues of use-form-hook whenever the component receives new props.
   useEffect(() => {
     reset({
-      name: editData ? editData.name : '',
-      description: editData ? editData.description : '',
-      type: editData ? editData.type : '',
-      funds: editData ? editData.funds : '',
-      allow_applicants: editData ? editData.allow_applicants : false
+      title: editData ? editData.title : '',
+      description: editData ? editData.description : ''
     })
   }, [editData, reset])
 
@@ -180,9 +170,7 @@ const AddEditModal = ({ hideModal, editData }: ModalProps) => {
         <div className="app__modal_wrapper2">
           <div className="app__modal_wrapper3">
             <div className="app__modal_header">
-              <h5 className="app__modal_header_text">
-                Scholarship Program Details
-              </h5>
+              <h5 className="app__modal_header_text">Announcement Details</h5>
               <CustomButton
                 containerStyles="app__btn_gray"
                 title="Close"
@@ -197,12 +185,12 @@ const AddEditModal = ({ hideModal, editData }: ModalProps) => {
                   <div className="app__label_standard">Title</div>
                   <div>
                     <input
-                      {...register('name', { required: true })}
+                      {...register('title', { required: true })}
                       className="app__input_standard"
                     />
-                    {errors.name && (
+                    {errors.title && (
                       <div className="app__error_message">
-                        Scholarship title is required
+                        Title is required
                       </div>
                     )}
                   </div>
@@ -224,83 +212,8 @@ const AddEditModal = ({ hideModal, editData }: ModalProps) => {
                   </div>
                 </div>
               </div>
-              <div className="app__form_field_container">
-                <div className="w-full">
-                  <div className="app__label_standard">Type</div>
-                  <div>
-                    <select
-                      {...register('type', { required: true })}
-                      className="app__select_standard"
-                    >
-                      <option value="">Select</option>
-                      {Object.entries(programsTypes).map(([key, value]) => (
-                        <option key={key} value={key}>
-                          {value}
-                        </option>
-                      ))}
-                    </select>
-                    {errors.type && (
-                      <div className="app__error_message">Type is required</div>
-                    )}
-                  </div>
-                </div>
-              </div>
-              <div className="app__form_field_container">
-                <div className="w-full">
-                  <div className="app__label_standard">Total Funds</div>
-                  <div>
-                    <input
-                      {...register('funds', { required: true })}
-                      type="number"
-                      step="any"
-                      className="app__input_standard"
-                    />
-                    {errors.funds && (
-                      <div className="app__error_message">
-                        Funds is required
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-              <div className="app__form_field_container">
-                <div className="w-full">
-                  <div className="app__label_standard">
-                    <label className="flex items-center space-x-1">
-                      <input
-                        {...register('allow_applicants')}
-                        type="checkbox"
-                        className=""
-                      />
-                      <span className="font-normal">
-                        Allow online applicants
-                      </span>
-                    </label>
-                  </div>
-                </div>
-              </div>
 
               <hr className="my-6" />
-              <div className="w-full">
-                <div className="app__label_standard">
-                  <label className="flex items-center space-x-1">
-                    <input
-                      {...register('confirmed', { required: true })}
-                      type="checkbox"
-                      className=""
-                    />
-                    <span className="font-normal text-xs">
-                      By checking this box, you acknowledge that all information
-                      is accurate.
-                    </span>
-                  </label>
-                  {errors.confirmed && (
-                    <div className="app__error_message">
-                      Confirmation is required
-                    </div>
-                  )}
-                </div>
-              </div>
               <div className="app__modal_footer">
                 <button type="submit" className="app__btn_green_sm">
                   {saving ? 'Saving..' : 'Save'}

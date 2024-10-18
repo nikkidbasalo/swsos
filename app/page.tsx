@@ -1,5 +1,6 @@
 'use client'
-import { LoginBox, TopBarDark } from '@/components/index'
+import { Announcements, Jobs, TopBarDark } from '@/components/index'
+import TrackerBox from '@/components/TrackerBox'
 import { useSupabase } from '@/context/SupabaseProvider'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -31,8 +32,16 @@ export default function Page() {
         {!loading && (
           <>
             <TopBarDark isGuest={isLoggedIn ? false : true} />
-            <div className="h-screen bg-gray-700 pb-10 pt-32 px-6 md:flex items-start md:space-x-4 justify-center">
-              {!isLoggedIn && <LoginBox />}
+            <div className="bg-gray-700 pb-10 pt-32 px-6 md:flex items-start md:space-x-4 justify-center">
+              <div className="bg-gray-100 p-4 rounded-lg border md:w-[420px] md:max-w-[420px]">
+                <Jobs />
+              </div>
+              <div className="bg-gray-100 p-4 rounded-lg border mt-10 md:mt-0 md:max-w-[420px] lg:w-[620px] lg:max-w-[620px]">
+                <Announcements />
+              </div>
+            </div>
+            <div className="border-b">
+              <TrackerBox />
             </div>
           </>
         )}

@@ -2,7 +2,12 @@
 'use client'
 import { useFilter } from '@/context/FilterContext'
 import { useSupabase } from '@/context/SupabaseProvider'
-import { HomeIcon, UserIcon } from '@heroicons/react/20/solid'
+import {
+  AcademicCapIcon,
+  ListBulletIcon,
+  TableCellsIcon,
+  UserIcon
+} from '@heroicons/react/20/solid'
 import Link from 'next/link'
 
 const MainMenu = () => {
@@ -18,12 +23,40 @@ const MainMenu = () => {
             <Link href="/modules">
               <div className="app__menu_item">
                 <div className="pt-1">
-                  <HomeIcon className="w-8 h-8" />
+                  <AcademicCapIcon className="w-8 h-8" />
                 </div>
                 <div>
                   <div className="app__menu_item_label">Modules</div>
                   <div className="app__menu_item_label_description">
                     Scholarship Programs
+                  </div>
+                </div>
+              </div>
+            </Link>
+            <Link href="/modules">
+              <div className="app__menu_item">
+                <div className="pt-1">
+                  <TableCellsIcon className="w-8 h-8" />
+                </div>
+                <div>
+                  <div className="app__menu_item_label">Applications</div>
+                  <div className="app__menu_item_label_description">
+                    Scholarship Applications
+                  </div>
+                </div>
+              </div>
+            </Link>
+            <Link href="/modules">
+              <div className="app__menu_item">
+                <div className="pt-1">
+                  <ListBulletIcon className="w-8 h-8" />
+                </div>
+                <div>
+                  <div className="app__menu_item_label">
+                    Evaluation & Monitoring
+                  </div>
+                  <div className="app__menu_item_label_description">
+                    Evaluation & Monitoring
                   </div>
                 </div>
               </div>

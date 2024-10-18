@@ -89,9 +89,17 @@ export interface Employee {
 export interface ProgramTypes {
   id: string
   name: string
+  description: string
   type: string
   funds: string
+  allow_applicants: boolean
   confirmed: string
+}
+
+export interface AnnouncementTypes {
+  id: string
+  title: string
+  description: string
 }
 
 export interface GranteeTypes {

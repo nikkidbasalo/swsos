@@ -1,39 +1,50 @@
+import { useSupabase } from '@/context/SupabaseProvider'
+import type { ProgramTypes } from '@/types'
 import Link from 'next/link'
-import React from 'react'
-import uuid from 'react-uuid'
+import { useEffect, useState } from 'react'
 
-const items = [
-  {
-    id: 1,
-    title: 'Teacher I - Elementary',
-    school: 'Alegeria Elementary School'
-  },
-  {
-    id: 2,
-    title: 'Teacher II - Elementary',
-    school: 'A. Romero Elementary School'
+export default function Jobs() {
+  const { supabase } = useSupabase()
+  const [list, setList] = useState<ProgramTypes[]>([])
+
+  const fetchData = async () => {
+    try {
+      const { data } = await supabase
+        .from('sws_programs')
+        .select()
+        .eq('allow_applicants', true)
+
+      setList(data)
+    } catch (e) {
+      console.error(e)
+    }
   }
-]
-export default function Jobs () {
+
+  // Featch data
+  useEffect(() => {
+    setList([])
+    void fetchData()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   return (
-    <div className=''>
-      <h4 className="text-xl font-semibold mb-6">Vacant Items:</h4>
-      {
-        items.map((item, index) => (
-          <div key={uuid()} className='flex items-start text-sm space-x-4 mb-8'>
+    <div className="">
+      <h4 className="text-lg font-semibold mb-6">Apply For Scholarship</h4>
+      {list.length > 0 &&
+        list.map((item, index) => (
+          <div key={index} className="flex items-start text-sm space-x-4 mb-8">
             <div>{index + 1}.</div>
-            <div className='flex flex-col space-y-1'>
-              <div className='font-bold'>{item.title}</div>
-              <div>{item.school}</div>
-              <div className='pt-2'>
-                <Link href="#" className="app__btn_green">
+            <div className="flex flex-col space-y-1">
+              <div className="font-bold">{item.name}</div>
+              <div className="text-sm">{item.description}</div>
+              <div className="pt-2">
+                <Link href={`/apply/${item.id}`} className="app__btn_green">
                   Apply Now
                 </Link>
               </div>
             </div>
           </div>
-        ))
-      }
+        ))}
     </div>
   )
 }
