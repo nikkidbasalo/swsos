@@ -60,9 +60,9 @@ const Page: React.FC = () => {
                 />
                 <ChooseUsers
                   multiple={true}
-                  type="evaluators"
+                  type="staff"
                   users={users}
-                  title="Evaluators"
+                  title="Staff"
                 />
               </>
             )}
