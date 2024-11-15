@@ -12,8 +12,9 @@ import { updateList } from '@/GlobalRedux/Features/listSlice'
 import { useDispatch, useSelector } from 'react-redux'
 
 // Types
-import type { Employee } from '@/types'
+import type { AccountTypes } from '@/types'
 import CustomButton from './CustomButton'
+import LoginSettings from './LoginSettings'
 
 interface ModalProps {
   hideModal: () => void
@@ -27,8 +28,6 @@ const AccountDetails = ({ hideModal, shouldUpdateRedux, id }: ModalProps) => {
 
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
-
-  const [showItemModal, setShowItemModal] = useState(false)
 
   // Redux staff
   const globallist = useSelector((state: any) => state.list.value)
@@ -44,17 +43,17 @@ const AccountDetails = ({ hideModal, shouldUpdateRedux, id }: ModalProps) => {
     formState: { errors },
     reset,
     handleSubmit
-  } = useForm<Employee>({
+  } = useForm<AccountTypes>({
     mode: 'onSubmit'
   })
 
-  const onSubmit = async (formdata: Employee) => {
+  const onSubmit = async (formdata: AccountTypes) => {
     if (loading || saving) return
 
     void handleUpdate(formdata)
   }
 
-  const handleUpdate = async (formdata: Employee) => {
+  const handleUpdate = async (formdata: AccountTypes) => {
     setSaving(true)
 
     const newData = {
@@ -143,7 +142,7 @@ const AccountDetails = ({ hideModal, shouldUpdateRedux, id }: ModalProps) => {
   return (
     <>
       <div className="app__modal_wrapper">
-        <div className="app__modal_wrapper2_large">
+        <div className="app__modal_wrapper2">
           <div className="app__modal_wrapper3">
             <div className="app__modal_header">
               <h5 className="app__modal_header_text">Account Details</h5>
@@ -158,90 +157,102 @@ const AccountDetails = ({ hideModal, shouldUpdateRedux, id }: ModalProps) => {
 
             {/* Modal Content */}
             <div className="app__modal_body">
-              {loading && <OneColLayoutLoading rows={3} />}
+              {loading && <OneColLayoutLoading />}
               {!loading && (
-                <form onSubmit={handleSubmit(onSubmit)} className="">
-                  <div className="flex flex-col lg:flex-row w-full items-start justify-between text-xs dark:text-gray-400">
-                    {/* Begin First Column */}
+                <>
+                  <form onSubmit={handleSubmit(onSubmit)} className="">
+                    <div className="flex flex-col lg:flex-row w-full items-start justify-between text-xs dark:text-gray-400">
+                      {/* Begin First Column */}
+                      <div className="w-full px-4">
+                        <div className="app__form_field_container">
+                          <div className="w-full">
+                            <div className="app__label_standard">
+                              First Name:
+                            </div>
+                            <div>
+                              <input
+                                {...register('firstname', { required: true })}
+                                type="text"
+                                className="app__input_standard"
+                              />
+                              {errors.firstname && (
+                                <div className="app__error_message">
+                                  First Name is required
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="app__form_field_container">
+                          <div className="w-full">
+                            <div className="app__label_standard">
+                              Middle Name:
+                            </div>
+                            <div>
+                              <input
+                                {...register('middlename')}
+                                type="text"
+                                className="app__input_standard"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                        <div className="app__form_field_container">
+                          <div className="w-full">
+                            <div className="app__label_standard">
+                              Last Name:
+                            </div>
+                            <div>
+                              <input
+                                {...register('lastname', { required: true })}
+                                type="text"
+                                className="app__input_standard"
+                              />
+                              {errors.lastname && (
+                                <div className="app__error_message">
+                                  Last Name is required
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      {/* End First Column */}
+                    </div>
                     <div className="w-full px-4">
-                      <div className="app__form_field_container">
-                        <div className="w-full">
-                          <div className="app__label_standard">First Name:</div>
-                          <div>
-                            <input
-                              {...register('firstname', { required: true })}
-                              type="text"
-                              className="app__input_standard"
-                            />
-                            {errors.firstname && (
-                              <div className="app__error_message">
-                                First Name is required
-                              </div>
-                            )}
+                      <div className="app__label_standard">
+                        <label className="flex items-center space-x-1">
+                          <input
+                            {...register('confirmed', { required: true })}
+                            type="checkbox"
+                            className=""
+                          />
+                          <span className="font-normal text-xs">
+                            By checking this box, you acknowledge that all
+                            information is accurate and up-to-date.
+                          </span>
+                        </label>
+                        {errors.confirmed && (
+                          <div className="app__error_message">
+                            Confirmation is required
                           </div>
-                        </div>
-                      </div>
-                      <div className="app__form_field_container">
-                        <div className="w-full">
-                          <div className="app__label_standard">
-                            Middle Name:
-                          </div>
-                          <div>
-                            <input
-                              {...register('middlename')}
-                              type="text"
-                              className="app__input_standard"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                      <div className="app__form_field_container">
-                        <div className="w-full">
-                          <div className="app__label_standard">Last Name:</div>
-                          <div>
-                            <input
-                              {...register('lastname', { required: true })}
-                              type="text"
-                              className="app__input_standard"
-                            />
-                            {errors.lastname && (
-                              <div className="app__error_message">
-                                Last Name is required
-                              </div>
-                            )}
-                          </div>
-                        </div>
+                        )}
                       </div>
                     </div>
-                    {/* End First Column */}
-                  </div>
-                  <hr className="my-6 mx-4" />
-                  <div className="w-full px-4">
-                    <div className="app__label_standard">
-                      <label className="flex items-center space-x-1">
-                        <input
-                          {...register('confirmed', { required: true })}
-                          type="checkbox"
-                          className=""
-                        />
-                        <span className="font-normal text-xs">
-                          By checking this box, you acknowledge that all
-                          information is accurate and up-to-date.
-                        </span>
-                      </label>
-                      {errors.confirmed && (
-                        <div className="app__error_message">
-                          Confirmation is required
-                        </div>
-                      )}
+                    <div className="px-4 mt-4">
+                      <button type="submit" className="app__btn_green_sm">
+                        {saving ? 'Saving..' : 'Save'}
+                      </button>
                     </div>
+                  </form>
+                  <div className="p-4">
+                    <hr />
+                    <h2 className="my-4 text-gray-600 font-bold">
+                      Change Password
+                    </h2>
+                    <LoginSettings userId={id} />
                   </div>
-                  <div className="app__modal_footer">
-                    <button type="submit" className="app__btn_green_sm">
-                      {saving ? 'Saving..' : 'Save'}
-                    </button>
-                  </div>
-                </form>
+                </>
               )}
             </div>
           </div>

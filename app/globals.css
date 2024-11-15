@@ -149,11 +149,17 @@ body {
 .app__dropdown_item {
   @apply flex items-center space-x-2 cursor-pointer hover:bg-gray-100 text-gray-700 hover:text-gray-900 px-4 py-2 text-xs;
 }
+.app__dropdown_item2 {
+  @apply flex items-center space-x-2 px-4 py-2;
+}
 .app__dropdown_item_disabled {
   @apply flex items-center space-x-2 text-gray-400 px-4 py-2 text-xs;
 }
 .app__btn_red {
   @apply bg-red-500 hover:bg-red-600 active:bg-red-500 border border-red-600 font-bold px-2 py-1 text-xs text-white rounded-sm;
+}
+.app__btn_red_xs {
+  @apply bg-red-500 hover:bg-red-600 active:bg-red-500 border border-red-600 px-1 py-px text-xs text-white rounded-sm;
 }
 .app__btn_red_large {
   @apply bg-red-500 hover:bg-red-600 active:bg-red-500 border border-red-600 text-sm font-bold px-2 py-1 text-white rounded-sm;

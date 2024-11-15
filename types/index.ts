@@ -11,7 +11,7 @@ export interface SelectUserNamesProps {
 export interface UserAccessTypes {
   user_id: string
   type: string
-  sws_user: Employee
+  sws_user: AccountTypes
 }
 
 export interface searchUser {
@@ -53,37 +53,11 @@ export interface NotificationTypes {
   is_read: boolean
 }
 
-export interface Employee {
-  id: string
-  firstname: string
-  middlename: string
-  lastname: string
-  gender: string
-  password: string
-  email: string
-  status?: string
-  confirmed: string
-}
-
 export interface AccountDetailsForm {
   firstname: string
   middlename: string
   lastname: string
   email: string
-}
-
-export interface Employee {
-  id: string
-  firstname: string
-  middlename: string
-  lastname: string
-  gender: string
-  password: string
-  email: string
-  status?: string
-  type: string
-  avatar_url: string
-  confirmed: string
 }
 
 export interface ProgramTypes {
@@ -110,8 +84,34 @@ export interface GranteeTypes {
   year_granted: string
   program: ProgramTypes
   confirmed: string
+  control_number: string
+  lastname: string
+  firstname: string
+  middlename: string
+  tes_award_number: string
+  gender: string
+  birthday: string
+  degree_program: string
+  year_level_status: string
+  remarks: string
 }
 
 export interface excludedItemsTypes {
   id: string
+}
+
+export interface AccountTypes {
+  id: string
+  firstname: string
+  middlename: string
+  lastname: string
+  status: string
+  password: string
+  department: string
+  avatar_url: string
+  email: string
+  org_id: string
+  created_by: string
+  temp_password: string
+  confirmed: string
 }

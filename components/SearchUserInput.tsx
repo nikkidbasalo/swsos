@@ -1,7 +1,7 @@
 'use client'
 
 import { useSupabase } from '@/context/SupabaseProvider'
-import type { Employee } from '@/types'
+import type { AccountTypes } from '@/types'
 import { XMarkIcon } from '@heroicons/react/20/solid'
 import React, { useEffect, useState } from 'react'
 import UserBlock from './UserBlock'
@@ -12,8 +12,8 @@ interface PropTypes {
   clear?: boolean
   nonTeachingOnly?: boolean
   teachingOnly?: boolean
-  handleSelectedUsers: (users: Employee[] | []) => void
-  selectedUsers?: Employee[] | []
+  handleSelectedUsers: (users: AccountTypes[] | []) => void
+  selectedUsers?: AccountTypes[] | []
   excludedIds?: string[] | []
 }
 
@@ -28,12 +28,12 @@ export default function SearchUserInput({
   excludedIds
 }: PropTypes) {
   const [searchHead, setSearchHead] = useState('')
-  const [searchResults, setSearchResults] = useState<Employee[] | []>([])
-  const [selectedItems, setSelectedItems] = useState<Employee[] | []>(
+  const [searchResults, setSearchResults] = useState<AccountTypes[] | []>([])
+  const [selectedItems, setSelectedItems] = useState<AccountTypes[] | []>(
     selectedUsers ?? []
   )
 
-  const { systemUsers }: { systemUsers: Employee[] } = useSupabase()
+  const { systemUsers }: { systemUsers: AccountTypes[] } = useSupabase()
 
   const handleSearchUser = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const searchTerm = e.target.value
@@ -62,7 +62,7 @@ export default function SearchUserInput({
     setSearchResults(results)
   }
 
-  const handleSelected = (item: Employee) => {
+  const handleSelected = (item: AccountTypes) => {
     if (isMultiple) {
       setSelectedItems([...selectedItems, item])
       handleSelectedUsers([...selectedItems, item])
@@ -111,7 +111,7 @@ export default function SearchUserInput({
 
         {searchResults.length > 0 && (
           <div className="app__search_user_results_container">
-            {searchResults.map((item: Employee, index) => (
+            {searchResults.map((item: AccountTypes, index) => (
               <div
                 key={index}
                 onClick={() => handleSelected(item)}

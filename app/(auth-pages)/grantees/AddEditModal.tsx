@@ -17,9 +17,10 @@ interface ModalProps {
   hideModal: () => void
   editData: GranteeTypes | null
   programs: ProgramTypes[] | []
+  type: string
 }
 
-const AddEditModal = ({ hideModal, editData, programs }: ModalProps) => {
+const AddEditModal = ({ hideModal, editData, programs, type }: ModalProps) => {
   const { setToast } = useFilter()
   const { supabase } = useSupabase()
   const [saving, setSaving] = useState(false)
@@ -53,9 +54,17 @@ const AddEditModal = ({ hideModal, editData, programs }: ModalProps) => {
   const handleCreate = async (formdata: GranteeTypes) => {
     const newData = {
       program_id: formdata.program_id,
-      fullname: formdata.fullname,
       id_number: formdata.id_number,
-      year_granted: formdata.year_granted
+      year_granted: formdata.year_granted,
+      lastname: formdata.lastname,
+      firstname: formdata.firstname,
+      middlename: formdata.middlename,
+      tes_award_number: formdata.tes_award_number,
+      gender: formdata.gender,
+      birthday: formdata.birthday || null,
+      degree_program: formdata.degree_program,
+      year_level_status: formdata.year_level_status,
+      remarks: formdata.remarks
     }
 
     try {
@@ -112,9 +121,17 @@ const AddEditModal = ({ hideModal, editData, programs }: ModalProps) => {
 
     const newData = {
       program_id: formdata.program_id,
-      fullname: formdata.fullname,
       id_number: formdata.id_number,
-      year_granted: formdata.year_granted
+      year_granted: formdata.year_granted,
+      lastname: formdata.lastname,
+      firstname: formdata.firstname,
+      middlename: formdata.middlename,
+      tes_award_number: formdata.tes_award_number,
+      gender: formdata.gender,
+      birthday: formdata.birthday || null,
+      degree_program: formdata.degree_program,
+      year_level_status: formdata.year_level_status,
+      remarks: formdata.remarks
     }
 
     try {
@@ -165,9 +182,18 @@ const AddEditModal = ({ hideModal, editData, programs }: ModalProps) => {
   useEffect(() => {
     reset({
       program_id: editData ? editData.program_id : '',
-      fullname: editData ? editData.fullname : '',
       id_number: editData ? editData.id_number : '',
-      year_granted: editData ? editData.year_granted : ''
+      year_granted: editData ? editData.year_granted : '',
+      control_number: editData ? editData.control_number : '',
+      lastname: editData ? editData.lastname : '',
+      firstname: editData ? editData.firstname : '',
+      middlename: editData ? editData.middlename : '',
+      tes_award_number: editData ? editData.tes_award_number : '',
+      gender: editData ? editData.gender : '',
+      birthday: editData ? editData.birthday : '',
+      degree_program: editData ? editData.degree_program : '',
+      year_level_status: editData ? editData.year_level_status : '',
+      remarks: editData ? editData.remarks : ''
     })
   }, [editData, reset])
 
@@ -189,15 +215,16 @@ const AddEditModal = ({ hideModal, editData, programs }: ModalProps) => {
             <form onSubmit={handleSubmit(onSubmit)} className="app__modal_body">
               <div className="app__form_field_container">
                 <div className="w-full">
-                  <div className="app__label_standard">Fullname</div>
+                  <div className="app__label_standard">Firstname</div>
                   <div>
                     <input
-                      {...register('fullname', { required: true })}
+                      placeholder="Firstname."
+                      {...register('firstname', { required: true })}
                       className="app__input_standard"
                     />
-                    {errors.fullname && (
+                    {errors.firstname && (
                       <div className="app__error_message">
-                        Fullname is required
+                        Firstname is required
                       </div>
                     )}
                   </div>
@@ -205,9 +232,44 @@ const AddEditModal = ({ hideModal, editData, programs }: ModalProps) => {
               </div>
               <div className="app__form_field_container">
                 <div className="w-full">
-                  <div className="app__label_standard">ID Number</div>
+                  <div className="app__label_standard">Middlename</div>
                   <div>
                     <input
+                      placeholder="Middlename"
+                      {...register('middlename', { required: true })}
+                      className="app__input_standard"
+                    />
+                    {errors.middlename && (
+                      <div className="app__error_message">
+                        Middlename is required
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div className="app__form_field_container">
+                <div className="w-full">
+                  <div className="app__label_standard">Lastname</div>
+                  <div>
+                    <input
+                      placeholder="Lastname"
+                      {...register('lastname', { required: true })}
+                      className="app__input_standard"
+                    />
+                    {errors.lastname && (
+                      <div className="app__error_message">
+                        Lastname is required
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div className="app__form_field_container">
+                <div className="w-full">
+                  <div className="app__label_standard">Student ID No.</div>
+                  <div>
+                    <input
+                      placeholder="Student ID No."
                       {...register('id_number', { required: true })}
                       className="app__input_standard"
                     />
@@ -219,6 +281,136 @@ const AddEditModal = ({ hideModal, editData, programs }: ModalProps) => {
                   </div>
                 </div>
               </div>
+              {type === 'external-grant' && (
+                <>
+                  <div className="app__form_field_container">
+                    <div className="w-full">
+                      <div className="app__label_standard">Control No.</div>
+                      <div>
+                        <input
+                          placeholder="Control No."
+                          {...register('control_number', { required: true })}
+                          className="app__input_standard"
+                        />
+                        {errors.control_number && (
+                          <div className="app__error_message">
+                            Control No. is required
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="app__form_field_container">
+                    <div className="w-full">
+                      <div className="app__label_standard">TES Award No.</div>
+                      <div>
+                        <input
+                          placeholder="TES Award No."
+                          {...register('tes_award_number', { required: true })}
+                          className="app__input_standard"
+                        />
+                        {errors.tes_award_number && (
+                          <div className="app__error_message">
+                            TES Award No. is required
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="app__form_field_container">
+                    <div className="w-full">
+                      <div className="app__label_standard">Gender</div>
+                      <div>
+                        <select
+                          {...register('gender', { required: true })}
+                          className="app__select_standard"
+                        >
+                          <option value="">Select Gender</option>
+                          <option value="Male">Male</option>
+                          <option value="Female">Female</option>
+                        </select>
+                        {errors.gender && (
+                          <div className="app__error_message">
+                            Gender is required
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="app__form_field_container">
+                    <div className="w-full">
+                      <div className="app__label_standard">Birthday</div>
+                      <div>
+                        <input
+                          type="date"
+                          placeholder="Birthday"
+                          {...register('birthday', { required: true })}
+                          className="app__input_standard"
+                        />
+                        {errors.birthday && (
+                          <div className="app__error_message">
+                            Birthday is required
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="app__form_field_container">
+                    <div className="w-full">
+                      <div className="app__label_standard">Degree Program</div>
+                      <div>
+                        <input
+                          placeholder="Degree Program"
+                          {...register('degree_program', { required: true })}
+                          className="app__input_standard"
+                        />
+                        {errors.degree_program && (
+                          <div className="app__error_message">
+                            Degree Program is required
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="app__form_field_container">
+                    <div className="w-full">
+                      <div className="app__label_standard">
+                        Year Level / Status
+                      </div>
+                      <div>
+                        <input
+                          placeholder="Year Level / Status"
+                          {...register('year_level_status', { required: true })}
+                          className="app__input_standard"
+                        />
+                        {errors.year_level_status && (
+                          <div className="app__error_message">
+                            Year Level / Status is required
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="app__form_field_container">
+                    <div className="w-full">
+                      <div className="app__label_standard">Remarks</div>
+                      <div>
+                        <input
+                          placeholder="Remarks"
+                          {...register('remarks', { required: true })}
+                          className="app__input_standard"
+                        />
+                        {errors.remarks && (
+                          <div className="app__error_message">
+                            Remarks is required
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
               <div className="app__form_field_container">
                 <div className="w-full">
                   <div className="app__label_standard">Type</div>
@@ -248,6 +440,7 @@ const AddEditModal = ({ hideModal, editData, programs }: ModalProps) => {
                   <div className="app__label_standard">Year Granted</div>
                   <div>
                     <input
+                      placeholder="Year Granted"
                       {...register('year_granted', { required: true })}
                       className="app__input_standard"
                     />

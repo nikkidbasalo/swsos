@@ -4,6 +4,7 @@ import { useFilter } from '@/context/FilterContext'
 import { useSupabase } from '@/context/SupabaseProvider'
 import {
   AcademicCapIcon,
+  Cog6ToothIcon,
   ListBulletIcon,
   TableCellsIcon,
   UserIcon
@@ -66,10 +67,23 @@ const MainMenu = () => {
             </div>
             {hasAccess('settings') && (
               <>
-                <Link href="/settings/system">
+                <Link href="/accounts">
                   <div className="app__menu_item">
                     <div className="pt-1">
                       <UserIcon className="w-8 h-8" />
+                    </div>
+                    <div>
+                      <div className="app__menu_item_label">User Accounts</div>
+                      <div className="app__menu_item_label_description">
+                        User Accounts
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+                <Link href="/settings/system">
+                  <div className="app__menu_item">
+                    <div className="pt-1">
+                      <Cog6ToothIcon className="w-8 h-8" />
                     </div>
                     <div>
                       <div className="app__menu_item_label">

@@ -3,10 +3,10 @@ import Image from 'next/image'
 import Avatar from 'react-avatar'
 
 // types
-import type { Employee } from '@/types'
+import type { AccountTypes } from '@/types'
 
 interface PropTypes {
-  user: Employee
+  user: AccountTypes
 }
 
 const UserBlock = ({ user }: PropTypes) => {

@@ -1,4 +1,4 @@
-import type { excludedItemsTypes } from '@/types'
+import type { AccountTypes, excludedItemsTypes } from '@/types'
 import { createBrowserClient } from '@supabase/ssr'
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -170,6 +170,45 @@ export async function fetchErrorLogs(perPageCount: number, rangeFrom: number) {
     if (error) {
       throw new Error(error.message)
     }
+
+    return { data, count }
+  } catch (error) {
+    console.error('fetch error', error)
+    return { data: [], count: 0 }
+  }
+}
+
+export async function fetchAccounts(
+  filters: { filterStatus?: string },
+  perPageCount: number,
+  rangeFrom: number
+) {
+  try {
+    let query = supabase.from('sws_users').select('*', { count: 'exact' })
+    // .neq('email', 'berlcamp@gmail.com')
+
+    // filter status
+    if (filters.filterStatus && filters.filterStatus !== '') {
+      query = query.eq('status', filters.filterStatus)
+    }
+
+    // Per Page from context
+    const from = rangeFrom
+    const to = from + (perPageCount - 1)
+
+    // Per Page from context
+    query = query.range(from, to)
+
+    // Order By
+    query = query.order('id', { ascending: false })
+
+    const { data: userData, error, count } = await query
+
+    if (error) {
+      throw new Error(error.message)
+    }
+
+    const data: AccountTypes[] = userData
 
     return { data, count }
   } catch (error) {

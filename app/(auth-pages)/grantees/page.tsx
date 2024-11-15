@@ -18,7 +18,12 @@ import { updateResultCounter } from '@/GlobalRedux/Features/resultsCounterSlice'
 import { GranteeTypes, ProgramTypes } from '@/types'
 import { fetchGrantees, fetchPrograms } from '@/utils/fetchApi'
 import { Menu, Transition } from '@headlessui/react'
-import { ChevronDownIcon, PencilSquareIcon } from '@heroicons/react/20/solid'
+import {
+  ArrowLeftIcon,
+  ChevronDownIcon,
+  PencilSquareIcon
+} from '@heroicons/react/20/solid'
+import Link from 'next/link'
 import { notFound, useSearchParams } from 'next/navigation'
 import React, { Fragment, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -144,6 +149,13 @@ const Page: React.FC = () => {
       <div className="app__main">
         <div>
           <div className="app__title">
+            <Link
+              href={`programs?type=${type}`}
+              className="app__btn_gray flex items-center space-x-1"
+            >
+              <ArrowLeftIcon className="w-4 h-4" />
+              <span>Back</span>
+            </Link>
             <Title title="Grantees" />
             <CustomButton
               containerStyles="app__btn_green"
@@ -213,8 +225,15 @@ const Page: React.FC = () => {
                           </Transition>
                         </Menu>
                       </td>
-                      <th className="app__th_firstcol">{item.fullname}</th>
-                      <td className="app__td">{item.id_number}</td>
+                      <th className="app__th_firstcol">
+                        <div>
+                          {item.firstname} {item.middlename} {item.lastname}
+                        </div>
+                      </th>
+                      <td className="app__td">
+                        ID: {item.id_number}{' '}
+                        {item.control_number && `/ ${item.control_number}`}
+                      </td>
                       <td className="app__td">{item.program.name}</td>
                       <td className="app__td">{item.year_granted}</td>
                     </tr>
@@ -235,6 +254,7 @@ const Page: React.FC = () => {
           {/* Add/Edit Modal */}
           {showAddModal && (
             <AddEditModal
+              type={type}
               editData={editData}
               programs={programs}
               hideModal={() => setShowAddModal(false)}

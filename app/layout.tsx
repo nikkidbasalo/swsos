@@ -7,7 +7,7 @@ import { Toaster } from 'react-hot-toast'
 import 'server-only'
 import './globals.css'
 
-import type { Employee, UserAccessTypes } from '@/types'
+import type { AccountTypes, UserAccessTypes } from '@/types'
 import { logError } from '@/utils/fetchApi'
 import type { Metadata } from 'next'
 
@@ -30,7 +30,7 @@ export default async function RootLayout({
     data: { session }
   } = await supabase.auth.getSession()
 
-  let sysUsers: Employee[] | null = []
+  let sysUsers: AccountTypes[] | null = []
   let sysAccess: UserAccessTypes[] | null = []
 
   if (session) {

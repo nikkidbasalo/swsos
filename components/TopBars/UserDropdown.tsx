@@ -11,7 +11,7 @@ import { Fragment, useState } from 'react'
 import Avatar from 'react-avatar'
 
 // types
-import type { Employee } from '@/types'
+import type { AccountTypes } from '@/types'
 import { GrDocumentUser } from 'react-icons/gr'
 
 interface propTypes {
@@ -34,7 +34,7 @@ const UserDropdown = ({ darkMode }: propTypes) => {
     }
   }
 
-  const user: Employee = systemUsers.find(
+  const user: AccountTypes = systemUsers.find(
     (u: { id: string }) => u.id === session.user.id
   )
 

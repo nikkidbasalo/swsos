@@ -1,8 +1,14 @@
-import React from 'react'
-
 import type { CustomButtonTypes } from '@/types'
 
-function CustomButton ({ isDisabled, btnType, containerStyles, textStyles, title, rightIcon, handleClick }: CustomButtonTypes) {
+function CustomButton({
+  isDisabled,
+  btnType,
+  containerStyles,
+  textStyles,
+  title,
+  rightIcon,
+  handleClick
+}: CustomButtonTypes) {
   return (
     <button
       disabled={isDisabled}
@@ -10,9 +16,9 @@ function CustomButton ({ isDisabled, btnType, containerStyles, textStyles, title
       className={`custom-btn ${containerStyles ?? ''}`}
       onClick={handleClick}
     >
-      <span className={`flex-1 ${textStyles ?? ''}`}>{title}</span>
       {rightIcon && rightIcon}
-  </button>
+      <span className={`flex-1 ${textStyles ?? ''}`}>{title}</span>
+    </button>
   )
 }
 

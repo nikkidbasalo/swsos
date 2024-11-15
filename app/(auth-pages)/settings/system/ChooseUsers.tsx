@@ -2,7 +2,7 @@
 import { ConfirmModal, UserBlock } from '@/components/index'
 import { useFilter } from '@/context/FilterContext'
 import { useSupabase } from '@/context/SupabaseProvider'
-import type { Employee, UserAccessTypes } from '@/types'
+import type { AccountTypes, UserAccessTypes } from '@/types'
 import { logError } from '@/utils/fetchApi'
 import { XMarkIcon } from '@heroicons/react/24/solid'
 import { useRouter } from 'next/navigation'
@@ -25,7 +25,7 @@ export default function ChooseUsers({
   const [searchManager, setSearchManager] = useState('')
   const [selectedId, setSelectedId] = useState('')
   const [searchManagersResults, setSearchManagersResults] = useState<
-    Employee[] | []
+    AccountTypes[] | []
   >([])
   const [selectedManagers, setSelectedManagers] = useState<
     UserAccessTypes[] | []
@@ -33,8 +33,10 @@ export default function ChooseUsers({
 
   const [showConfirmRemoveModal, setShowConfirmRemoveModal] = useState(false)
 
-  const { systemUsers, supabase }: { systemUsers: Employee[]; supabase: any } =
-    useSupabase()
+  const {
+    systemUsers,
+    supabase
+  }: { systemUsers: AccountTypes[]; supabase: any } = useSupabase()
   const { setToast } = useFilter()
 
   const router = useRouter()
@@ -62,13 +64,13 @@ export default function ChooseUsers({
 
       const fullName =
         `${user.lastname} ${user.firstname} ${user.middlename}`.toLowerCase()
-      return searchWords.every((word) => fullName.includes(word))
+      return searchWords.every((word) => fullName.includes(word.toLowerCase()))
     })
 
     setSearchManagersResults(results)
   }
 
-  const handleSelected = async (item: Employee) => {
+  const handleSelected = async (item: AccountTypes) => {
     // Update database
     try {
       if (!multiple) {
@@ -162,7 +164,7 @@ export default function ChooseUsers({
       setToast('error', 'Error saving, please reload the page and try again.')
     } else {
       const updatedItems = selectedManagers?.filter(
-        (item: UserAccessTypes) => item.user_id.toString() !== selectedId
+        (item) => item.user_id.toString() !== selectedId
       )
       setSelectedManagers(updatedItems)
       setSelectedId('')
@@ -207,7 +209,7 @@ export default function ChooseUsers({
 
             {searchManagersResults.length > 0 && (
               <div className="app__search_user_results_container">
-                {searchManagersResults.map((item: Employee, index) => (
+                {searchManagersResults.map((item: AccountTypes, index) => (
                   <div
                     key={index}
                     onClick={async () => await handleSelected(item)}

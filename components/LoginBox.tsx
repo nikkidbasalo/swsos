@@ -46,7 +46,7 @@ export default function LoginBox() {
         // router.push(`/profile/${signInData.user.id}`)
         await supabase.auth.refreshSession()
 
-        router.push('/modules')
+        router.push('/')
       }
     } else {
       setError('This is account is currently inactive.')
