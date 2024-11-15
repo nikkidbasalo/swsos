@@ -68,9 +68,9 @@ const MainMenu = () => {
                   <TableCellsIcon className="w-8 h-8" />
                 </div>
                 <div>
-                  <div className="app__menu_item_label">Liquidation</div>
+                  <div className="app__menu_item_label">Liquidations</div>
                   <div className="app__menu_item_label_description">
-                    Liquidation
+                    Liquidations
                   </div>
                 </div>
               </div>
