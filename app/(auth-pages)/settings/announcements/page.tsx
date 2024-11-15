@@ -38,6 +38,8 @@ const Page: React.FC = () => {
   const [list, setList] = useState<AnnouncementTypes[]>([])
 
   const [perPageCount, setPerPageCount] = useState<number>(10)
+  const [showingCount, setShowingCount] = useState<number>(0)
+  const [resultsCount, setResultsCount] = useState<number>(0)
   const [editData, setEditData] = useState<AnnouncementTypes | null>(null)
 
   // Redux staff
@@ -230,8 +232,12 @@ const Page: React.FC = () => {
           {/* Delete Modal */}
           {showDeleteModal && (
             <DeleteModal
-              id={selectedId}
               table="sws_announcements"
+              selectedId={selectedId}
+              showingCount={showingCount}
+              setShowingCount={setShowingCount}
+              resultsCount={resultsCount}
+              setResultsCount={setResultsCount}
               hideModal={() => setShowDeleteModal(false)}
             />
           )}

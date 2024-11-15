@@ -69,6 +69,12 @@ export interface ProgramTypes {
   allow_applicants: boolean
   confirmed: string
 }
+export interface LiquidationTypes {
+  id: string
+  description: string
+  file_path: string
+  confirmed: string
+}
 
 export interface AnnouncementTypes {
   id: string

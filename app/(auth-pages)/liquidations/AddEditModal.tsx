@@ -6,20 +6,20 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 // Types
-import type { ProgramTypes } from '@/types'
+import type { LiquidationTypes } from '@/types'
 
 // Redux imports
 import { updateList } from '@/GlobalRedux/Features/listSlice'
 import { updateResultCounter } from '@/GlobalRedux/Features/resultsCounterSlice'
+import { PaperClipIcon } from '@heroicons/react/20/solid'
 import { useDispatch, useSelector } from 'react-redux'
 
 interface ModalProps {
   hideModal: () => void
-  editData: ProgramTypes | null
-  type: string
+  editData: LiquidationTypes | null
 }
 
-const AddEditModal = ({ hideModal, editData, type }: ModalProps) => {
+const AddEditModal = ({ hideModal, editData }: ModalProps) => {
   const { setToast } = useFilter()
   const { supabase } = useSupabase()
   const [saving, setSaving] = useState(false)
@@ -29,17 +29,24 @@ const AddEditModal = ({ hideModal, editData, type }: ModalProps) => {
   const resultsCounter = useSelector((state: any) => state.results.value)
   const dispatch = useDispatch()
 
+  const [file, setFile] = useState<File | null>(null)
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0] || null
+    setFile(selectedFile)
+  }
+
   const {
     register,
     formState: { errors },
     reset,
     setError,
     handleSubmit
-  } = useForm<ProgramTypes>({
+  } = useForm<LiquidationTypes>({
     mode: 'onSubmit'
   })
 
-  const onSubmit = async (formdata: ProgramTypes) => {
+  const onSubmit = async (formdata: LiquidationTypes) => {
     if (saving) return
 
     setSaving(true)
@@ -51,38 +58,36 @@ const AddEditModal = ({ hideModal, editData, type }: ModalProps) => {
     }
   }
 
-  const validateName = async (name: string) => {
-    if (editData) return
-
-    const { data } = await supabase
-      .from('sws_programs')
-      .select('id', { count: 'exact' })
-      .eq('type', type)
-      .ilike('name', name)
-
-    if (data && data.length > 0) {
-      setError('name', { type: 'manual', message: 'Program already exists' })
-    }
-  }
-  const handleCreate = async (formdata: ProgramTypes) => {
-    const newData = {
-      name: formdata.name,
-      description: formdata.description,
-      type,
-      funds: formdata.funds,
-      allow_applicants: formdata.allow_applicants
-    }
-
+  const handleCreate = async (formdata: LiquidationTypes) => {
     try {
+      let filePath: string | null = null
+
+      // Upload file if it exists
+      if (file) {
+        const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, '_')
+        const fileName = `${Date.now()}_${sanitizedFileName}`
+        const { data: fileData, error: fileError } = await supabase.storage
+          .from('sws_public') // Replace with your storage bucket name
+          .upload(`liquidations/${fileName}`, file)
+
+        if (fileError) throw new Error(fileError.message)
+        filePath = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/sws_public/${fileData.path}` // Get the path of the uploaded file
+      }
+
+      const newData = {
+        description: formdata.description,
+        file_path: filePath
+      }
+
       const { data, error } = await supabase
-        .from('sws_programs')
+        .from('sws_liquidations')
         .insert(newData)
         .select()
 
       if (error) {
         void logError(
-          'Create Program',
-          'sws_programs',
+          'Create Liquidations',
+          'sws_liquidations',
           JSON.stringify(newData),
           error.message
         )
@@ -122,26 +127,38 @@ const AddEditModal = ({ hideModal, editData, type }: ModalProps) => {
     }
   }
 
-  const handleUpdate = async (formdata: ProgramTypes) => {
+  const handleUpdate = async (formdata: LiquidationTypes) => {
     if (!editData) return
 
-    const newData = {
-      name: formdata.name,
-      description: formdata.description,
-      funds: formdata.funds,
-      allow_applicants: formdata.allow_applicants
-    }
-
     try {
+      let filePath: string | null = null
+
+      // Upload file if it exists
+      if (file) {
+        const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, '_')
+        const fileName = `${Date.now()}_${sanitizedFileName}`
+        const { data: fileData, error: fileError } = await supabase.storage
+          .from('sws_public') // Replace with your storage bucket name
+          .upload(`liquidations/${fileName}`, file)
+
+        if (fileError) throw new Error(fileError.message)
+        filePath = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/sws_public/${fileData.path}` // Get the path of the uploaded file
+      }
+
+      const newData = {
+        description: formdata.description,
+        file_path: filePath
+      }
+
       const { error } = await supabase
-        .from('sws_programs')
+        .from('sws_liquidations')
         .update(newData)
         .eq('id', editData.id)
 
       if (error) {
         void logError(
-          'Update program',
-          'sws_programs',
+          'Update Liquidations',
+          'sws_liquidations',
           JSON.stringify(newData),
           error.message
         )
@@ -179,10 +196,7 @@ const AddEditModal = ({ hideModal, editData, type }: ModalProps) => {
   // manually set the defaultValues of use-form-hook whenever the component receives new props.
   useEffect(() => {
     reset({
-      name: editData ? editData.name : '',
-      description: editData ? editData.description : '',
-      funds: editData ? editData.funds : '',
-      allow_applicants: editData ? editData.allow_applicants : false
+      description: editData ? editData.description : ''
     })
   }, [editData, reset])
 
@@ -192,9 +206,7 @@ const AddEditModal = ({ hideModal, editData, type }: ModalProps) => {
         <div className="app__modal_wrapper2">
           <div className="app__modal_wrapper3">
             <div className="app__modal_header">
-              <h5 className="app__modal_header_text">
-                Scholarship Program Details
-              </h5>
+              <h5 className="app__modal_header_text">Liquidations Details</h5>
               <CustomButton
                 containerStyles="app__btn_gray"
                 title="Close"
@@ -204,23 +216,6 @@ const AddEditModal = ({ hideModal, editData, type }: ModalProps) => {
               />
             </div>
             <form onSubmit={handleSubmit(onSubmit)} className="app__modal_body">
-              <div className="app__form_field_container">
-                <div className="w-full">
-                  <div className="app__label_standard">Title</div>
-                  <div>
-                    <input
-                      {...register('name', { required: 'Title is required' })}
-                      onBlur={(e) => validateName(e.target.value)}
-                      className="app__input_standard"
-                    />
-                    {errors.name && (
-                      <div className="app__error_message">
-                        {errors.name.message}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
               <div className="app__form_field_container">
                 <div className="w-full">
                   <div className="app__label_standard">Description</div>
@@ -239,39 +234,37 @@ const AddEditModal = ({ hideModal, editData, type }: ModalProps) => {
               </div>
               <div className="app__form_field_container">
                 <div className="w-full">
-                  <div className="app__label_standard">Total Funds</div>
-                  <div>
-                    <input
-                      {...register('funds', { required: true })}
-                      type="number"
-                      step="any"
-                      className="app__input_standard"
-                    />
-                    {errors.funds && (
-                      <div className="app__error_message">
-                        Funds is required
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-              <div className="app__form_field_container">
-                <div className="w-full">
-                  <div className="app__label_standard">
-                    <label className="flex items-center space-x-1">
+                  <div className="mt-2 flex flex-col space-y-2 items-start">
+                    {/* File Input Wrapper */}
+                    <div className="relative">
                       <input
-                        {...register('allow_applicants')}
-                        type="checkbox"
-                        className=""
+                        type="file"
+                        accept=".pdf, .doc, .docx, .xls, .xlsx, .png, .jpg, .jpeg, .gif"
+                        onChange={handleFileChange}
+                        className="hidden" // Hides the default file input
+                        id="fileUpload"
                       />
-                      <span className="font-normal">
-                        Allow online applicants
-                      </span>
-                    </label>
+
+                      {/* Custom Button for File Input */}
+                      <label
+                        htmlFor="fileUpload"
+                        className="cursor-pointer flex items-start space-x-2"
+                      >
+                        <span className="text-sm text-gray-600">
+                          Attachment
+                        </span>
+                        <PaperClipIcon className="w-4 h-4" />
+                      </label>
+
+                      {file && (
+                        <span className="mt-1 text-xs text-gray-600 dark:text-gray-400">
+                          Selected: {file.name}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
-
               <hr className="my-6" />
               <div className="w-full">
                 <div className="app__label_standard">

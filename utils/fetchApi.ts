@@ -38,6 +38,37 @@ export async function fetchPrograms(
   }
 }
 
+export async function fetchLiquidations(
+  perPageCount: number,
+  rangeFrom: number
+) {
+  try {
+    let query = supabase
+      .from('sws_liquidations')
+      .select('*', { count: 'exact' })
+
+    // Per Page from context
+    const from = rangeFrom
+    const to = from + (perPageCount - 1)
+
+    // Per Page from context
+    query = query.range(from, to)
+
+    // Order By
+    query = query.order('id', { ascending: false })
+
+    const { data, error, count } = await query
+
+    if (error) {
+      throw new Error(error.message)
+    }
+    return { data, count }
+  } catch (error) {
+    console.error('fetch liquidations error', error)
+    return { data: [], count: 0 }
+  }
+}
+
 export async function fetchGrantees(
   ref: string,
   perPageCount: number,
