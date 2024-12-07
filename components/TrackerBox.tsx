@@ -1,12 +1,12 @@
 'use client'
 
-import { AnnouncementTypes } from '@/types'
+import { ApplicationTypes } from '@/types'
 import { createBrowserClient } from '@supabase/ssr'
 import { useState } from 'react'
 
 export default function TrackerBox() {
   const [routingNo, setRoutingNo] = useState('')
-  const [documentData, setDocumentData] = useState<AnnouncementTypes | null>(
+  const [documentData, setDocumentData] = useState<ApplicationTypes | null>(
     null
   )
   const [notFound, setNotFound] = useState(false)
@@ -27,7 +27,7 @@ export default function TrackerBox() {
     }
 
     const { data } = await supabase
-      .from('hrm_request_trackers')
+      .from('sws_applications')
       .select()
       .eq('reference_code', routingNo.toUpperCase())
       .limit(1)
@@ -74,15 +74,31 @@ export default function TrackerBox() {
       <div className="w-full px-10 my-10 pb-20">
         {documentData && (
           <>
-            <div className="pl-4 mb-2">
-              <span className="text-gray-700 text-sm">Request Type: </span>
-              <span className="font-bold text-sm">{documentData.title}</span>
-            </div>
-            <div className="pl-4 mb-2">
-              <span className="text-gray-700 text-sm">Current Status: </span>
-              <span className="font-bold text-sm">
-                {documentData.description}{' '}
-              </span>
+            <div className="text-center mb-2">
+              <div>
+                <span className="text-gray-700 text-lg">Current Status: </span>
+                <span className="font-bold text-lg">{documentData.status}</span>
+              </div>
+              {documentData.status === 'Approved' && (
+                <div className="space-y-1">
+                  <div>
+                    <span className="text-gray-700 text-sm">Username:</span>
+                    <span className="font-bold text-sm">
+                      {' '}
+                      {documentData.email}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-gray-700 text-sm">
+                      Temporary Password:
+                    </span>
+                    <span className="font-bold text-sm">
+                      {' '}
+                      {documentData.temporary_password}
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
           </>
         )}

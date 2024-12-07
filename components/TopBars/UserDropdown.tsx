@@ -12,6 +12,8 @@ import Avatar from 'react-avatar'
 
 // types
 import type { AccountTypes } from '@/types'
+import { UserIcon } from '@heroicons/react/20/solid'
+import Link from 'next/link'
 import { GrDocumentUser } from 'react-icons/gr'
 
 interface propTypes {
@@ -71,7 +73,7 @@ const UserDropdown = ({ darkMode }: propTypes) => {
             <div className="py-1">
               <Menu.Item>
                 <div className="px-4 py-2">
-                  {/* <Link
+                  <Link
                     href={`/profile/${session.user.id}`}
                     className="app__user_menu_items"
                   >
@@ -79,7 +81,7 @@ const UserDropdown = ({ darkMode }: propTypes) => {
                     <div className="text-sm font-semibold text-gray-700">
                       My Profile
                     </div>
-                  </Link> */}
+                  </Link>
                   <div
                     onClick={() => setShowAccountDetailsModal(true)}
                     className="app__user_menu_items"

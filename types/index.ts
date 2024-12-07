@@ -91,6 +91,8 @@ export interface GranteeTypes {
   program: ProgramTypes
   confirmed: string
   control_number: string
+  employee_number: string
+  function: string
   lastname: string
   firstname: string
   middlename: string
@@ -120,4 +122,49 @@ export interface AccountTypes {
   created_by: string
   temp_password: string
   confirmed: string
+}
+
+export interface ApplicationTypes {
+  id: string
+  program_id: string
+  program: ProgramTypes
+  lastname: string
+  firstname: string
+  middlename: string
+  name_ext: string
+  birthday: string
+  age: string
+  gender: string
+  civil_status: string
+  contact_number: string
+  present_address: string
+  permanent_address: string
+  father: string
+  mother: string
+  guardian: string
+  parent_address: string
+  father_occupation: string
+  mother_occupation: string
+  guardian_occupation: string
+  shs: string
+  shs_principal: string
+  shs_address: string
+  shs_school_type: string
+  shs_year_graduated: string
+  shs_honor: string
+  reference_name_1: string
+  reference_name_2: string
+  reference_name_3: string
+  reference_address_1: string
+  reference_address_2: string
+  reference_address_3: string
+  reference_contact_1: string
+  reference_contact_2: string
+  reference_contact_3: string
+  file_path: string
+  status: string
+  reference_code: string
+  email: string
+  temporary_password: string
+  confirm: string
 }

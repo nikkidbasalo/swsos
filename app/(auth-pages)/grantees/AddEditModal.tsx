@@ -59,6 +59,9 @@ const AddEditModal = ({ hideModal, editData, programs, type }: ModalProps) => {
       lastname: formdata.lastname,
       firstname: formdata.firstname,
       middlename: formdata.middlename,
+      employee_number: formdata.employee_number,
+      function: formdata.function,
+      control_number: formdata.control_number,
       tes_award_number: formdata.tes_award_number,
       gender: formdata.gender,
       birthday: formdata.birthday || null,
@@ -126,6 +129,8 @@ const AddEditModal = ({ hideModal, editData, programs, type }: ModalProps) => {
       lastname: formdata.lastname,
       firstname: formdata.firstname,
       middlename: formdata.middlename,
+      employee_number: formdata.middlename,
+      function: formdata.function,
       tes_award_number: formdata.tes_award_number,
       gender: formdata.gender,
       birthday: formdata.birthday || null,
@@ -188,6 +193,8 @@ const AddEditModal = ({ hideModal, editData, programs, type }: ModalProps) => {
       lastname: editData ? editData.lastname : '',
       firstname: editData ? editData.firstname : '',
       middlename: editData ? editData.middlename : '',
+      employee_number: editData ? editData.employee_number : '',
+      function: editData ? editData.function : '',
       tes_award_number: editData ? editData.tes_award_number : '',
       gender: editData ? editData.gender : '',
       birthday: editData ? editData.birthday : '',
@@ -264,23 +271,70 @@ const AddEditModal = ({ hideModal, editData, programs, type }: ModalProps) => {
                   </div>
                 </div>
               </div>
-              <div className="app__form_field_container">
-                <div className="w-full">
-                  <div className="app__label_standard">Student ID No.</div>
-                  <div>
-                    <input
-                      placeholder="Student ID No."
-                      {...register('id_number', { required: true })}
-                      className="app__input_standard"
-                    />
-                    {errors.id_number && (
-                      <div className="app__error_message">
-                        ID Number is required
-                      </div>
-                    )}
+              {type !== 'internal-grant' && (
+                <div className="app__form_field_container">
+                  <div className="w-full">
+                    <div className="app__label_standard">Student ID No.</div>
+                    <div>
+                      <input
+                        placeholder="Student ID No."
+                        {...register('id_number', { required: true })}
+                        className="app__input_standard"
+                      />
+                      {errors.id_number && (
+                        <div className="app__error_message">
+                          ID Number is required
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
+              {type === 'internal-grant' && (
+                <>
+                  <div className="app__form_field_container">
+                    <div className="w-full">
+                      <div className="app__label_standard">Serial No.</div>
+                      <div>
+                        <input
+                          placeholder="Serial No."
+                          {...register('control_number', { required: true })}
+                          className="app__input_standard"
+                        />
+                        {errors.control_number && (
+                          <div className="app__error_message">
+                            Serial No. is required
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="app__form_field_container">
+                    <div className="w-full">
+                      <div className="app__label_standard">Employee ID No.</div>
+                      <div>
+                        <input
+                          placeholder="Employee ID No."
+                          {...register('employee_number')}
+                          className="app__input_standard"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="app__form_field_container">
+                    <div className="w-full">
+                      <div className="app__label_standard">Function</div>
+                      <div>
+                        <input
+                          placeholder="Function"
+                          {...register('function')}
+                          className="app__input_standard"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
               {type === 'external-grant' && (
                 <>
                   <div className="app__form_field_container">
@@ -300,7 +354,6 @@ const AddEditModal = ({ hideModal, editData, programs, type }: ModalProps) => {
                       </div>
                     </div>
                   </div>
-
                   <div className="app__form_field_container">
                     <div className="w-full">
                       <div className="app__label_standard">TES Award No.</div>
@@ -441,14 +494,9 @@ const AddEditModal = ({ hideModal, editData, programs, type }: ModalProps) => {
                   <div>
                     <input
                       placeholder="Year Granted"
-                      {...register('year_granted', { required: true })}
+                      {...register('year_granted')}
                       className="app__input_standard"
                     />
-                    {errors.year_granted && (
-                      <div className="app__error_message">
-                        Year Granted is required
-                      </div>
-                    )}
                   </div>
                 </div>
               </div>
