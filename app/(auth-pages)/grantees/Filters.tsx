@@ -59,9 +59,8 @@ const Filters = ({
               className="app__filter_select"
             >
               <option value="">Choose Status</option>
-              <option value="Pending Approval">Pending Approval</option>
-              <option value="Approved">Approved</option>
-              <option value="Disapproved">Disapproved</option>
+              <option value="Active">Active</option>
+              <option value="Archived">Archived</option>
             </select>
           </div>
         </form>

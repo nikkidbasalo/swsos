@@ -1,42 +1,55 @@
 import { CustomButton } from '@/components/index'
+import { ProgramTypes } from '@/types'
+import { fetchPrograms } from '@/utils/fetchApi'
 import { MagnifyingGlassIcon, TagIcon } from '@heroicons/react/20/solid'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 interface FilterDistrictTypes {
   setFilterKeyword: (keyword: string) => void
-  setFilterStatus: (status: string) => void
+  setFilterProgram: (status: string) => void
 }
 
 const Filters = ({
   setFilterKeyword,
-  setFilterStatus
+  setFilterProgram
 }: FilterDistrictTypes) => {
   const [keyword, setKeyword] = useState<string>('')
-  const [selectedStatus, setSelectedStatus] = useState<string>('')
+  const [selectedProgram, setSelectedProgram] = useState<string>('')
+
+  const [programs, setPrograms] = useState<ProgramTypes[]>([])
 
   const handleApply = () => {
-    if (keyword.trim() === '' && selectedStatus.trim() === '') return
+    if (keyword.trim() === '' && selectedProgram.trim() === '') return
 
     setFilterKeyword(keyword) // pass keyword to parent
-    setFilterStatus(selectedStatus) // pass keyword to parent
+    setFilterProgram(selectedProgram) // pass keyword to parent
   }
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
-    if (keyword.trim() === '' && selectedStatus.trim() === '') return
+    if (keyword.trim() === '' && selectedProgram.trim() === '') return
 
     setFilterKeyword(keyword) // pass keyword to parent
-    setFilterStatus(selectedStatus) // pass keyword to parent
+    setFilterProgram(selectedProgram) // pass keyword to parent
   }
 
   // clear all filters
   const handleClear = () => {
     setFilterKeyword('')
     setKeyword('')
-    setFilterStatus('')
-    setSelectedStatus('')
+    setFilterProgram('')
+    setSelectedProgram('')
   }
+
+  // Featch data
+  useEffect(() => {
+    ;(async () => {
+      const result = await fetchPrograms('', 999, 0)
+      setPrograms(result.data)
+    })()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <div className="">
@@ -54,14 +67,16 @@ const Filters = ({
           <div className="app__filter_container">
             <TagIcon className="w-4 h-4 mr-1 text-gray-500" />
             <select
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
+              value={selectedProgram}
+              onChange={(e) => setSelectedProgram(e.target.value)}
               className="app__filter_select"
             >
-              <option value="">Choose Status</option>
-              <option value="Pending Approval">Pending Approval</option>
-              <option value="Approved">Approved</option>
-              <option value="Disapproved">Disapproved</option>
+              <option value="">Choose Scholarship Program</option>
+              {programs?.map((p, i) => (
+                <option key={i} value={p.id}>
+                  {p.name}
+                </option>
+              ))}
             </select>
           </div>
         </form>

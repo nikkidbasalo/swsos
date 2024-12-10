@@ -229,13 +229,12 @@ const Page: React.FC = () => {
             <table className="app__table">
               <thead className="app__thead">
                 <tr>
-                  <th className="hidden md:table-cell app__th pl-4"></th>
-                  <th className="hidden md:table-cell app__th">Name</th>
-                  <th className="hidden md:table-cell app__th">Email</th>
-                  <th className="hidden md:table-cell app__th">
-                    Temporary Password
-                  </th>
-                  <th className="hidden md:table-cell app__th">Status</th>
+                  <th className="app__th pl-4"></th>
+                  <th className="app__th">Name</th>
+                  <th className="app__th">Email</th>
+                  <th className="app__th">Account Type</th>
+                  <th className="app__th">Temporary Password</th>
+                  <th className="app__th">Status</th>
                 </tr>
               </thead>
               <tbody>
@@ -308,43 +307,17 @@ const Page: React.FC = () => {
                       </td>
                       <th className="app__th_firstcol">
                         <UserBlock user={item} />
-                        {/* Mobile View */}
-                        <div>
-                          <div className="md:hidden app__td_mobile">
-                            <div>
-                              <span className="app_td_mobile_label">
-                                Email:
-                              </span>{' '}
-                              {item.email}
-                            </div>
-                            <div>
-                              <span className="app_td_mobile_label">
-                                Temp Password:
-                              </span>{' '}
-                              {item.temp_password}
-                            </div>
-                            <div>
-                              {item.status === 'Inactive' ? (
-                                <span className="app__status_container_red">
-                                  Inactive
-                                </span>
-                              ) : (
-                                <span className="app__status_container_green">
-                                  Active
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                        {/* End - Mobile View */}
                       </th>
-                      <td className="hidden md:table-cell app__td">
+                      <td className="app__td">
                         <div>{item.email}</div>
                       </td>
-                      <td className="hidden md:table-cell app__td">
+                      <td className="app__td">
+                        <div>{item.type}</div>
+                      </td>
+                      <td className="app__td">
                         <div>{item.temp_password}</div>
                       </td>
-                      <td className="hidden md:table-cell app__td">
+                      <td className="app__td">
                         {item.status === 'Inactive' ? (
                           <span className="app__status_container_red">
                             Inactive

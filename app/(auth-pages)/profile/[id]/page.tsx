@@ -1,10 +1,12 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 'use client'
 
-import { Sidebar, Title, TopBar } from '@/components'
+import { Sidebar, Title, TopBar } from '@/components/index'
 import TwoColTableLoading from '@/components/Loading/TwoColTableLoading'
+import LoginSettings from '@/components/LoginSettings'
 import Grades from '@/components/Profile/Grades'
 import ProfileDashboard from '@/components/Profile/ProfileDashboard'
+import { useFilter } from '@/context/FilterContext'
 import { useSupabase } from '@/context/SupabaseProvider'
 import { AccountTypes } from '@/types'
 import { generateReferenceCode } from '@/utils/text-helper'
@@ -32,6 +34,7 @@ export default function Page({ params }: { params: { id: string } }) {
   const [myctoCount, setMyctoCount] = useState('')
 
   const { supabase, session } = useSupabase()
+  const { hasAccess } = useFilter()
 
   const router = useRouter()
 
@@ -222,34 +225,24 @@ export default function Page({ params }: { params: { id: string } }) {
                     }`}
                   >
                     <span className="flex-1 ml-3 whitespace-nowrap">
-                      Upload Grades
-                    </span>
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href={`/profile/${userId}?page=evaluations`}
-                    className={`app__profile_menu_link ${
-                      page === 'evaluations' ? 'bg-gray-700' : ''
-                    }`}
-                  >
-                    <span className="flex-1 ml-3 whitespace-nowrap">
                       Scholar Evaluations
                     </span>
                   </Link>
                 </li>
-                <li>
-                  <Link
-                    href={`/profile/${userId}?page=feedback`}
-                    className={`app__profile_menu_link ${
-                      page === 'feedback' ? 'bg-gray-700' : ''
-                    }`}
-                  >
-                    <span className="flex-1 ml-3 whitespace-nowrap">
-                      Scholarship Office Feedback
-                    </span>
-                  </Link>
-                </li>
+                {(hasAccess('settings') || userId === session.user.id) && (
+                  <li>
+                    <Link
+                      href={`/profile/${userId}?page=loginsettings`}
+                      className={`app__profile_menu_link ${
+                        page === 'loginsettings' ? 'bg-gray-700' : ''
+                      }`}
+                    >
+                      <span className="flex-1 ml-3 whitespace-nowrap">
+                        Login Settings
+                      </span>
+                    </Link>
+                  </li>
+                )}
               </ul>
             </div>
           </>
@@ -266,10 +259,20 @@ export default function Page({ params }: { params: { id: string } }) {
             {page && page === 'grades' && (
               <>
                 <div className="app__title">
-                  <Title title="Upload Grades" />
+                  <Title title="Scholar Evaluations" />
                 </div>
                 <div className="mt-4 mx-2">
                   {userData && <Grades userData={userData} />}
+                </div>
+              </>
+            )}
+            {page && page === 'loginsettings' && userId === session.user.id && (
+              <>
+                <div className="app__title">
+                  <Title title="Update Password" />
+                </div>
+                <div className="mt-4 mx-2">
+                  <LoginSettings userId={userId} />
                 </div>
               </>
             )}

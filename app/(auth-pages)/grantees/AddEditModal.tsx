@@ -1,7 +1,7 @@
-import { CustomButton } from '@/components'
+import { CustomButton } from '@/components/index'
 import { useFilter } from '@/context/FilterContext'
 import { useSupabase } from '@/context/SupabaseProvider'
-import { logError } from '@/utils/fetchApi'
+import { fetchPrograms, logError } from '@/utils/fetchApi'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
@@ -10,20 +10,22 @@ import type { GranteeTypes, ProgramTypes } from '@/types'
 
 // Redux imports
 import { updateList } from '@/GlobalRedux/Features/listSlice'
-import { updateResultCounter } from '@/GlobalRedux/Features/resultsCounterSlice'
+import axios from 'axios'
 import { useDispatch, useSelector } from 'react-redux'
 
 interface ModalProps {
   hideModal: () => void
   editData: GranteeTypes | null
-  programs: ProgramTypes[] | []
+  programId: string
   type: string
 }
 
-const AddEditModal = ({ hideModal, editData, programs, type }: ModalProps) => {
+const AddEditModal = ({ hideModal, editData, programId, type }: ModalProps) => {
   const { setToast } = useFilter()
   const { supabase } = useSupabase()
   const [saving, setSaving] = useState(false)
+
+  const [programs, setPrograms] = useState<ProgramTypes[]>([])
 
   // Redux staff
   const globallist = useSelector((state: any) => state.list.value)
@@ -34,6 +36,8 @@ const AddEditModal = ({ hideModal, editData, programs, type }: ModalProps) => {
     register,
     formState: { errors },
     reset,
+    setError,
+    clearErrors,
     handleSubmit
   } = useForm<GranteeTypes>({
     mode: 'onSubmit'
@@ -42,23 +46,30 @@ const AddEditModal = ({ hideModal, editData, programs, type }: ModalProps) => {
   const onSubmit = async (formdata: GranteeTypes) => {
     if (saving) return
 
-    setSaving(true)
-
     if (editData) {
+      setSaving(true)
       void handleUpdate(formdata)
     } else {
+      const emailCheck = await handleCheckEmail(formdata.email)
+      if (!emailCheck) return
+
+      setSaving(true)
       void handleCreate(formdata)
     }
   }
 
   const handleCreate = async (formdata: GranteeTypes) => {
+    // zz
+    const tempPassword = Math.floor(Math.random() * 8999) + 1000
+
     const newData = {
-      program_id: formdata.program_id,
+      program_id: programId,
       id_number: formdata.id_number,
       year_granted: formdata.year_granted,
       lastname: formdata.lastname,
       firstname: formdata.firstname,
       middlename: formdata.middlename,
+      email: formdata.email,
       employee_number: formdata.employee_number,
       function: formdata.function,
       control_number: formdata.control_number,
@@ -67,54 +78,57 @@ const AddEditModal = ({ hideModal, editData, programs, type }: ModalProps) => {
       birthday: formdata.birthday || null,
       degree_program: formdata.degree_program,
       year_level_status: formdata.year_level_status,
-      remarks: formdata.remarks
+      remarks: formdata.remarks,
+      type: 'Scholar',
+      temp_password: tempPassword.toString()
     }
 
     try {
-      const { data, error } = await supabase
-        .from('sws_grantees')
-        .insert(newData)
-        .select()
-
-      if (error) {
-        void logError(
-          'Create Grantee',
-          'sws_grantees',
-          JSON.stringify(newData),
-          error.message
-        )
-        setToast(
-          'error',
-          'Saving failed, please reload the page and try again.'
-        )
-        throw new Error(error.message)
-      }
-
-      const updatedData = {
-        ...newData,
-        id: data[0].id
-      }
-      dispatch(updateList([updatedData, ...globallist]))
-
-      // pop up the success message
-      setToast('success', 'Successfully saved.')
-
-      // Updating showing text in redux
-      dispatch(
-        updateResultCounter({
-          showing: Number(resultsCounter.showing) + 1,
-          results: Number(resultsCounter.results) + 1
+      // Sign up the user on the server side to fix pkce issue https://github.com/supabase/auth-helpers/issues/569
+      axios
+        .post('/api/signup', {
+          item: newData
         })
-      )
+        .then(async function (response) {
+          if (response.data.error_message === '') {
+            const { error: error2 } = await supabase
+              .from('sws_users')
+              .insert({ ...newData, id: response.data.insert_id })
 
-      setSaving(false)
+            if (error2) throw new Error(error2.message)
 
-      // hide the modal
-      hideModal()
+            const updatedData = {
+              ...newData,
+              program: programs.find(
+                (p) => p.id.toString() === programId.toString()
+              ),
+              id: response.data.insert_id
+            }
+            dispatch(updateList([updatedData, ...globallist]))
 
-      // reset all form fields
-      reset()
+            // pop up the success message
+            setToast('success', 'Successfully saved.')
+
+            // hide the modal
+            hideModal()
+
+            setSaving(false)
+          } else {
+            setSaving(false)
+            throw new Error(response.data.error_message)
+          }
+        })
+        .catch(function (error) {
+          setToast(
+            'error',
+            `Something went wrong, please reload the page': ${error}`
+          )
+          console.error(error)
+        })
     } catch (e) {
+      // pop up the success message
+      setToast('success', 'Something went wrong, please reload the page')
+
       console.error(e)
     }
   }
@@ -123,12 +137,12 @@ const AddEditModal = ({ hideModal, editData, programs, type }: ModalProps) => {
     if (!editData) return
 
     const newData = {
-      program_id: formdata.program_id,
       id_number: formdata.id_number,
       year_granted: formdata.year_granted,
       lastname: formdata.lastname,
       firstname: formdata.firstname,
       middlename: formdata.middlename,
+      email: formdata.email,
       employee_number: formdata.middlename,
       function: formdata.function,
       tes_award_number: formdata.tes_award_number,
@@ -141,14 +155,14 @@ const AddEditModal = ({ hideModal, editData, programs, type }: ModalProps) => {
 
     try {
       const { error } = await supabase
-        .from('sws_grantees')
+        .from('sws_users')
         .update(newData)
         .eq('id', editData.id)
 
       if (error) {
         void logError(
           'Update grantee',
-          'sws_grantees',
+          'sws_users',
           JSON.stringify(newData),
           error.message
         )
@@ -183,16 +197,46 @@ const AddEditModal = ({ hideModal, editData, programs, type }: ModalProps) => {
     }
   }
 
+  const handleCheckEmail = async (email: string) => {
+    // Prepopulate Tin No
+    const { data } = await supabase
+      .from('sws_users')
+      .select()
+      .eq('email', email)
+      .limit(1)
+      .maybeSingle()
+
+    if (data) {
+      setError('email', {
+        type: 'manual',
+        message: 'This email already exist'
+      })
+      return false
+    } else {
+      clearErrors('email')
+      return true
+    }
+  }
+
+  // Featch data
+  useEffect(() => {
+    ;(async () => {
+      const result = await fetchPrograms(type, 999, 0)
+      setPrograms(result.data)
+    })()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   // manually set the defaultValues of use-form-hook whenever the component receives new props.
   useEffect(() => {
     reset({
-      program_id: editData ? editData.program_id : '',
       id_number: editData ? editData.id_number : '',
       year_granted: editData ? editData.year_granted : '',
       control_number: editData ? editData.control_number : '',
       lastname: editData ? editData.lastname : '',
       firstname: editData ? editData.firstname : '',
       middlename: editData ? editData.middlename : '',
+      email: editData ? editData.email : '',
       employee_number: editData ? editData.employee_number : '',
       function: editData ? editData.function : '',
       tes_award_number: editData ? editData.tes_award_number : '',
@@ -271,6 +315,80 @@ const AddEditModal = ({ hideModal, editData, programs, type }: ModalProps) => {
                   </div>
                 </div>
               </div>
+              <div className="app__form_field_container">
+                <div className="w-full">
+                  <div className="app__label_standard">Email</div>
+                  <div>
+                    <input
+                      {...register('email', {
+                        required: 'Email is required'
+                      })}
+                      type="email"
+                      className="app__input_standard"
+                    />
+                    {errors.email && (
+                      <div className="app__error_message">
+                        {errors.email.message}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div className="app__form_field_container">
+                <div className="w-full">
+                  <div className="app__label_standard">Gender</div>
+                  <div>
+                    <select
+                      {...register('gender', { required: true })}
+                      className="app__select_standard"
+                    >
+                      <option value="">Select Gender</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                    </select>
+                    {errors.gender && (
+                      <div className="app__error_message">
+                        Gender is required
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div className="app__form_field_container">
+                <div className="w-full">
+                  <div className="app__label_standard">Birthday</div>
+                  <div>
+                    <input
+                      type="date"
+                      placeholder="Birthday"
+                      {...register('birthday')}
+                      className="app__input_standard"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="app__form_field_container">
+                <div className="w-full">
+                  <div className="app__label_standard">Year Level</div>
+                  <div>
+                    <select
+                      {...register('year_level_status', { required: true })}
+                      className="app__select_standard"
+                    >
+                      <option value="">Select Gender</option>
+                      <option value="1st Year">1st Year</option>
+                      <option value="2nd Year">2nd Year</option>
+                      <option value="3rd Year">3rd Year</option>
+                      <option value="4th Year">4th Year</option>
+                    </select>
+                    {errors.year_level_status && (
+                      <div className="app__error_message">
+                        Year Level / Status is required
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
               {type !== 'internal-grant' && (
                 <div className="app__form_field_container">
                   <div className="w-full">
@@ -278,14 +396,9 @@ const AddEditModal = ({ hideModal, editData, programs, type }: ModalProps) => {
                     <div>
                       <input
                         placeholder="Student ID No."
-                        {...register('id_number', { required: true })}
+                        {...register('id_number')}
                         className="app__input_standard"
                       />
-                      {errors.id_number && (
-                        <div className="app__error_message">
-                          ID Number is required
-                        </div>
-                      )}
                     </div>
                   </div>
                 </div>
@@ -298,14 +411,9 @@ const AddEditModal = ({ hideModal, editData, programs, type }: ModalProps) => {
                       <div>
                         <input
                           placeholder="Serial No."
-                          {...register('control_number', { required: true })}
+                          {...register('control_number')}
                           className="app__input_standard"
                         />
-                        {errors.control_number && (
-                          <div className="app__error_message">
-                            Serial No. is required
-                          </div>
-                        )}
                       </div>
                     </div>
                   </div>
@@ -343,14 +451,9 @@ const AddEditModal = ({ hideModal, editData, programs, type }: ModalProps) => {
                       <div>
                         <input
                           placeholder="Control No."
-                          {...register('control_number', { required: true })}
+                          {...register('control_number')}
                           className="app__input_standard"
                         />
-                        {errors.control_number && (
-                          <div className="app__error_message">
-                            Control No. is required
-                          </div>
-                        )}
                       </div>
                     </div>
                   </div>
@@ -360,134 +463,40 @@ const AddEditModal = ({ hideModal, editData, programs, type }: ModalProps) => {
                       <div>
                         <input
                           placeholder="TES Award No."
-                          {...register('tes_award_number', { required: true })}
+                          {...register('tes_award_number')}
                           className="app__input_standard"
                         />
-                        {errors.tes_award_number && (
-                          <div className="app__error_message">
-                            TES Award No. is required
-                          </div>
-                        )}
                       </div>
                     </div>
                   </div>
-                  <div className="app__form_field_container">
-                    <div className="w-full">
-                      <div className="app__label_standard">Gender</div>
-                      <div>
-                        <select
-                          {...register('gender', { required: true })}
-                          className="app__select_standard"
-                        >
-                          <option value="">Select Gender</option>
-                          <option value="Male">Male</option>
-                          <option value="Female">Female</option>
-                        </select>
-                        {errors.gender && (
-                          <div className="app__error_message">
-                            Gender is required
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="app__form_field_container">
-                    <div className="w-full">
-                      <div className="app__label_standard">Birthday</div>
-                      <div>
-                        <input
-                          type="date"
-                          placeholder="Birthday"
-                          {...register('birthday', { required: true })}
-                          className="app__input_standard"
-                        />
-                        {errors.birthday && (
-                          <div className="app__error_message">
-                            Birthday is required
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
+
                   <div className="app__form_field_container">
                     <div className="w-full">
                       <div className="app__label_standard">Degree Program</div>
                       <div>
                         <input
                           placeholder="Degree Program"
-                          {...register('degree_program', { required: true })}
+                          {...register('degree_program')}
                           className="app__input_standard"
                         />
-                        {errors.degree_program && (
-                          <div className="app__error_message">
-                            Degree Program is required
-                          </div>
-                        )}
                       </div>
                     </div>
                   </div>
-                  <div className="app__form_field_container">
-                    <div className="w-full">
-                      <div className="app__label_standard">
-                        Year Level / Status
-                      </div>
-                      <div>
-                        <input
-                          placeholder="Year Level / Status"
-                          {...register('year_level_status', { required: true })}
-                          className="app__input_standard"
-                        />
-                        {errors.year_level_status && (
-                          <div className="app__error_message">
-                            Year Level / Status is required
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
+
                   <div className="app__form_field_container">
                     <div className="w-full">
                       <div className="app__label_standard">Remarks</div>
                       <div>
                         <input
                           placeholder="Remarks"
-                          {...register('remarks', { required: true })}
+                          {...register('remarks')}
                           className="app__input_standard"
                         />
-                        {errors.remarks && (
-                          <div className="app__error_message">
-                            Remarks is required
-                          </div>
-                        )}
                       </div>
                     </div>
                   </div>
                 </>
               )}
-              <div className="app__form_field_container">
-                <div className="w-full">
-                  <div className="app__label_standard">Type</div>
-                  <div>
-                    <select
-                      {...register('program_id', { required: true })}
-                      className="app__select_standard"
-                    >
-                      <option value="">Select</option>
-                      {programs.length > 0 &&
-                        programs.map((item, index) => (
-                          <option key={index} value={item.id}>
-                            {item.name}
-                          </option>
-                        ))}
-                    </select>
-                    {errors.program_id && (
-                      <div className="app__error_message">
-                        Program is required
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
               <div className="app__form_field_container">
                 <div className="w-full">
                   <div className="app__label_standard">Year Granted</div>

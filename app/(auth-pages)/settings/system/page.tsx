@@ -64,6 +64,12 @@ const Page: React.FC = () => {
                   users={users}
                   title="Staff"
                 />
+                <ChooseUsers
+                  multiple={true}
+                  type="evaluator"
+                  users={users}
+                  title="Evaluator"
+                />
               </>
             )}
           </div>

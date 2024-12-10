@@ -1,7 +1,6 @@
 'use client'
 import {
   CustomButton,
-  DeleteModal,
   PerPage,
   ShowMore,
   TableRowLoading,
@@ -12,14 +11,10 @@ import { useFilter } from '@/context/FilterContext'
 import { useSupabase } from '@/context/SupabaseProvider'
 import { updateList } from '@/GlobalRedux/Features/listSlice'
 import { updateResultCounter } from '@/GlobalRedux/Features/resultsCounterSlice'
-import { AccountTypes, LiquidationTypes } from '@/types'
+import { AccountTypes, GradeTypes } from '@/types'
 import { fetchGrades } from '@/utils/fetchApi'
 import { Menu, Transition } from '@headlessui/react'
-import {
-  ChevronDownIcon,
-  PencilSquareIcon,
-  TrashIcon
-} from '@heroicons/react/20/solid'
+import { ChevronDownIcon, PencilSquareIcon } from '@heroicons/react/20/solid'
 import Link from 'next/link'
 import { Fragment, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -35,12 +30,12 @@ export default function Grades({ userData }: { userData: AccountTypes }) {
   const [selectedId, setSelectedId] = useState<string>('')
   const [showDeleteModal, setShowDeleteModal] = useState(false)
 
-  const [list, setList] = useState<LiquidationTypes[]>([])
+  const [list, setList] = useState<GradeTypes[]>([])
 
   const [perPageCount, setPerPageCount] = useState<number>(10)
   const [showingCount, setShowingCount] = useState<number>(0)
   const [resultsCount, setResultsCount] = useState<number>(0)
-  const [editData, setEditData] = useState<LiquidationTypes | null>(null)
+  const [editData, setEditData] = useState<GradeTypes | null>(null)
 
   // Redux staff
   const globallist = useSelector((state: any) => state.list.value)
@@ -51,7 +46,7 @@ export default function Grades({ userData }: { userData: AccountTypes }) {
     setLoading(true)
 
     try {
-      const result = await fetchGrades(perPageCount, 0)
+      const result = await fetchGrades(userData.id, perPageCount, 0)
       // update the list in redux
       dispatch(updateList(result.data))
 
@@ -77,7 +72,7 @@ export default function Grades({ userData }: { userData: AccountTypes }) {
     setLoading(true)
 
     try {
-      const result = await fetchGrades(perPageCount, list.length)
+      const result = await fetchGrades(userData.id, perPageCount, list.length)
 
       // update the list in redux
       const newList = [...list, ...result.data]
@@ -102,7 +97,7 @@ export default function Grades({ userData }: { userData: AccountTypes }) {
     setEditData(null)
   }
 
-  const handleEdit = (item: LiquidationTypes) => {
+  const handleEdit = (item: GradeTypes) => {
     setShowAddModal(true)
     setEditData(item)
   }
@@ -161,7 +156,7 @@ export default function Grades({ userData }: { userData: AccountTypes }) {
                 <thead className="app__thead">
                   <tr>
                     <th className="app__th pl-4"></th>
-                    <th className="app__th">School Semester/Year</th>
+                    <th className="app__th">Evaluation Period</th>
                     <th className="app__th">Attachment</th>
                   </tr>
                 </thead>
@@ -200,24 +195,12 @@ export default function Grades({ userData }: { userData: AccountTypes }) {
                                       <span>Edit</span>
                                     </div>
                                   </Menu.Item>
-                                  <Menu.Item>
-                                    <div
-                                      onClick={() => {
-                                        setSelectedId(item.id.toString())
-                                        setShowDeleteModal(true)
-                                      }}
-                                      className="app__dropdown_item"
-                                    >
-                                      <TrashIcon className="w-4 h-4" />
-                                      <span>Delete</span>
-                                    </div>
-                                  </Menu.Item>
                                 </div>
                               </Menu.Items>
                             </Transition>
                           </Menu>
                         </td>
-                        <td className="app__td">{item.description}</td>
+                        <td className="app__td">{item.period.description}</td>
                         <td className="app__td">
                           {item.file_path && (
                             <Link
@@ -246,19 +229,9 @@ export default function Grades({ userData }: { userData: AccountTypes }) {
 
             {/* Add/Edit Modal */}
             {showAddModal && (
-              <AddGradeModal hideModal={() => setShowAddModal(false)} />
-            )}
-
-            {/* Confirm Delete Modal */}
-            {showDeleteModal && (
-              <DeleteModal
-                table="sws_grades"
-                selectedId={selectedId}
-                showingCount={showingCount}
-                setShowingCount={setShowingCount}
-                resultsCount={resultsCount}
-                setResultsCount={setResultsCount}
-                hideModal={() => setShowDeleteModal(false)}
+              <AddGradeModal
+                editData={editData}
+                hideModal={() => setShowAddModal(false)}
               />
             )}
           </div>

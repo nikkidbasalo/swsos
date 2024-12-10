@@ -27,6 +27,7 @@ import Link from 'next/link'
 import React, { Fragment, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
+import axios from 'axios'
 import Filters from './Filters'
 
 const Page: React.FC = () => {
@@ -37,8 +38,8 @@ const Page: React.FC = () => {
   const [showDisapproveModal, setShowDisapproveModal] = useState(false)
   const [showApproveModal, setShowApproveModal] = useState(false)
 
+  const [refresh, setRefresh] = useState(false)
   const [selectedItem, setSelectedItem] = useState<ApplicationTypes>()
-  const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [filterKeyword, setFilterKeyword] = useState<string>('')
   const [filterStatus, setFilterStatus] = useState<string>('')
   const [list, setList] = useState<ApplicationTypes[]>([])
@@ -131,26 +132,22 @@ const Page: React.FC = () => {
   const handleAddGrantee = async () => {
     if (!selectedItem) return
 
-    const newData = {
-      program_id: selectedItem.program_id,
-      lastname: selectedItem.lastname,
-      firstname: selectedItem.firstname,
-      middlename: selectedItem.middlename,
-      gender: selectedItem.gender,
-      birthday: selectedItem.birthday || null
-    }
-
     try {
-      const { error } = await supabase.from('sws_grantees').insert(newData)
+      const { error } = await addAccount(selectedItem)
 
       if (error) {
-        throw new Error(error.message)
+        setToast('error', `Failed to add account: ${error}`)
+        return
       }
 
-      await supabase
+      const { error: error2 } = await supabase
         .from('sws_applications')
         .update({ status: 'Approved' })
         .eq('id', selectedItem.id)
+
+      if (error2) {
+        throw new Error(error2.message)
+      }
 
       const items = [...globallist]
       const updatedData = {
@@ -162,6 +159,8 @@ const Page: React.FC = () => {
       dispatch(updateList(items))
 
       setToast('success', 'Successfully approved.')
+
+      setRefresh(!refresh)
     } catch (e) {
       console.error(e)
     } finally {
@@ -203,9 +202,52 @@ const Page: React.FC = () => {
     }
   }
 
+  const addAccount = async (
+    formdata: ApplicationTypes
+  ): Promise<{ error?: string }> => {
+    const tempPassword = Math.floor(Math.random() * 8999) + 1000
+
+    const newData = {
+      program_id: formdata.program_id,
+      lastname: formdata.lastname,
+      firstname: formdata.firstname,
+      middlename: formdata.middlename,
+      email: formdata.email.toLowerCase(),
+      gender: formdata.gender,
+      birthday: formdata.birthday || null,
+      type: 'Scholar',
+      temp_password: tempPassword.toString()
+    }
+
+    try {
+      // Sign up the user on the server side
+      const response = await axios.post('/api/signup', { item: newData })
+
+      if (response.data.error_message) {
+        return { error: response.data.error_message } // Return error from API
+      }
+
+      const { error: dbError } = await supabase
+        .from('sws_users')
+        .insert({ ...newData, id: response.data.insert_id })
+
+      if (dbError) {
+        return { error: dbError.message } // Return database error
+      }
+
+      setToast('success', 'Successfully saved.')
+      return {} // Return success
+    } catch (e) {
+      console.error(e)
+      setToast('error', 'Something went wrong, please reload the page.')
+      return { error: 'Unexpected error occurred.' } // Return unexpected error
+    }
+  }
+
   // Update list whenever list in redux updates
   useEffect(() => {
     setList(globallist)
+    console.log('redux updated')
   }, [globallist])
 
   // Featch data
@@ -213,7 +255,7 @@ const Page: React.FC = () => {
     setList([])
     void fetchData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [perPageCount, filterKeyword, filterStatus])
+  }, [perPageCount, refresh, filterKeyword, filterStatus])
 
   const isDataEmpty = !Array.isArray(list) || list.length < 1 || !list
 
@@ -334,7 +376,19 @@ const Page: React.FC = () => {
                           {item.email} | {item.gender} | {item.civil_status}
                         </div>
                       </td>
-                      <td className="app__td">{item.status}</td>
+                      <td className="app__td">
+                        {item.status === 'Approved' && (
+                          <span className="app__status_green">Approved</span>
+                        )}
+                        {item.status === 'Pending Approval' && (
+                          <span className="app__status_orange">
+                            Pending Approval
+                          </span>
+                        )}
+                        {item.status === 'Disapproved' && (
+                          <span className="app__status_red">Disapproved</span>
+                        )}
+                      </td>
                       <td className="app__td">{item.program?.name}</td>
                       <td className="app__td">
                         <div>Contact #: {item.contact_number}</div>
@@ -366,7 +420,7 @@ const Page: React.FC = () => {
             <ShowMore handleShowMore={handleShowMore} />
           )}
 
-          {/* Delete Modal */}
+          {/* Approve Modal */}
           {showApproveModal && (
             <ConfirmModal
               header="Confirm Approve"
@@ -376,7 +430,7 @@ const Page: React.FC = () => {
               onCancel={() => setShowApproveModal(false)}
             />
           )}
-          {/* Confirm Approve Modal */}
+          {/* Confirm Disapprove Modal */}
           {showDisapproveModal && (
             <ConfirmModal
               header="Confirm Disapprove"

@@ -14,7 +14,9 @@ export async function fetchPrograms(
   try {
     let query = supabase.from('sws_programs').select('*', { count: 'exact' })
 
-    query = query.eq('type', type)
+    if (type !== '') {
+      query = query.eq('type', type)
+    }
 
     // Per Page from context
     const from = rangeFrom
@@ -38,9 +40,16 @@ export async function fetchPrograms(
   }
 }
 
-export async function fetchGrades(perPageCount: number, rangeFrom: number) {
+export async function fetchGrades(
+  userId: string,
+  perPageCount: number,
+  rangeFrom: number
+) {
   try {
-    let query = supabase.from('sws_grades').select('*', { count: 'exact' })
+    let query = supabase
+      .from('sws_grades')
+      .select('*,period:evaluation_period_id(*)', { count: 'exact' })
+      .eq('user_id', userId)
 
     // Per Page from context
     const from = rangeFrom
@@ -94,6 +103,34 @@ export async function fetchLiquidations(
   }
 }
 
+export async function fetchPeriods(perPageCount: number, rangeFrom: number) {
+  try {
+    let query = supabase
+      .from('sws_evaluation_periods')
+      .select('*', { count: 'exact' })
+
+    // Per Page from context
+    const from = rangeFrom
+    const to = from + (perPageCount - 1)
+
+    // Per Page from context
+    query = query.range(from, to)
+
+    // Order By
+    query = query.order('id', { ascending: false })
+
+    const { data, error, count } = await query
+
+    if (error) {
+      throw new Error(error.message)
+    }
+    return { data, count }
+  } catch (error) {
+    console.error('fetch periods error', error)
+    return { data: [], count: 0 }
+  }
+}
+
 export async function fetchApplications(
   filters: {
     filterKeyword?: string
@@ -142,16 +179,44 @@ export async function fetchApplications(
 }
 
 export async function fetchGrantees(
+  filters: {
+    filterProgram?: string
+    filterKeyword?: string
+    filterStatus?: string
+  },
   ref: string,
   perPageCount: number,
   rangeFrom: number
 ) {
   try {
     let query = supabase
-      .from('sws_grantees')
+      .from('sws_users')
       .select('*, program:program_id(*)', { count: 'exact' })
+      .not('program_id', 'is', null)
 
-    query = query.eq('program_id', ref)
+    if (ref !== '') {
+      query = query.eq('program_id', ref)
+    }
+
+    // filter name
+    if (filters.filterKeyword && filters.filterKeyword !== '') {
+      // Search match
+      query = query.or(
+        `firstname.ilike.%${filters.filterKeyword}%,middlename.ilike.%${filters.filterKeyword}%,lastname.ilike.%${filters.filterKeyword}%`
+      )
+    }
+
+    // filter status
+    if (filters.filterStatus && filters.filterStatus !== '') {
+      query = query.eq('status', filters.filterStatus)
+    } else {
+      query = query.eq('status', 'Active')
+    }
+
+    // filter program
+    if (filters.filterProgram && filters.filterProgram !== '') {
+      query = query.eq('program_id', filters.filterProgram)
+    }
 
     // Per Page from context
     const from = rangeFrom

@@ -33,6 +33,8 @@ const AddEditModal = ({ hideModal, editData }: ModalProps) => {
     register,
     formState: { errors },
     reset,
+    setError,
+    clearErrors,
     handleSubmit
   } = useForm<AccountTypes>({
     mode: 'onSubmit'
@@ -40,6 +42,9 @@ const AddEditModal = ({ hideModal, editData }: ModalProps) => {
 
   const onSubmit = async (formdata: AccountTypes) => {
     if (saving) return
+
+    const emailCheck = void handleCheckEmail(formdata.email)
+    if (!emailCheck) return
 
     setSaving(true)
 
@@ -155,6 +160,27 @@ const AddEditModal = ({ hideModal, editData }: ModalProps) => {
     }
   }
 
+  const handleCheckEmail = async (email: string) => {
+    // Prepopulate Tin No
+    const { data } = await supabase
+      .from('sws_users')
+      .select()
+      .eq('email', email)
+      .limit(1)
+      .maybeSingle()
+
+    if (data) {
+      setError('email', {
+        type: 'manual',
+        message: 'This email already exist'
+      })
+      return false
+    } else {
+      clearErrors('email')
+      return true
+    }
+  }
+
   // manually set the defaultValues of use-form-hook whenever the component receives new props.
   useEffect(() => {
     reset({
@@ -213,10 +239,15 @@ const AddEditModal = ({ hideModal, editData }: ModalProps) => {
                       <div className="app__label_standard">Middlename</div>
                       <div>
                         <input
-                          {...register('middlename')}
+                          {...register('middlename', { required: true })}
                           type="text"
                           className="app__input_standard"
                         />
+                        {errors.middlename && (
+                          <div className="app__error_message">
+                            Middle Name is required
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -225,10 +256,15 @@ const AddEditModal = ({ hideModal, editData }: ModalProps) => {
                       <div className="app__label_standard">Lastname</div>
                       <div>
                         <input
-                          {...register('lastname')}
+                          {...register('lastname', { required: true })}
                           type="text"
                           className="app__input_standard"
                         />
+                        {errors.lastname && (
+                          <div className="app__error_message">
+                            Last Name is required
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -239,13 +275,15 @@ const AddEditModal = ({ hideModal, editData }: ModalProps) => {
                           <div className="app__label_standard">Email</div>
                           <div>
                             <input
-                              {...register('email', { required: true })}
+                              {...register('email', {
+                                required: 'Email is required'
+                              })}
                               type="email"
                               className="app__select_standard"
                             />
                             {errors.email && (
                               <div className="app__error_message">
-                                Email is required
+                                {errors.email.message}
                               </div>
                             )}
                           </div>

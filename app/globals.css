@@ -276,7 +276,7 @@ body {
   @apply w-48 text-gray-500 focus:ring-0 focus:outline-none text-xs py-1 text-left inline-flex items-center dark:bg-gray-300;
 }
 .app__filter_select {
-  @apply outline-none text-xs py-1;
+  @apply outline-none text-xs py-1 text-gray-600;
 }
 .app__norecordsfound {
   @apply text-sm p-4 text-gray-700;
@@ -334,4 +334,16 @@ body {
 }
 .app__status_container_blue {
   @apply font-medium text-blue-600 border px-1 py-px border-blue-400 bg-blue-100;
+}
+.app__status_green {
+  @apply font-medium text-green-700 bg-green-100 border border-green-500 py-px px-1 text-xs;
+}
+.app__status_orange {
+  @apply font-medium text-orange-700 bg-orange-100 border border-orange-500 py-px px-1 text-xs;
+}
+.app__status_gray {
+  @apply font-medium text-gray-600 bg-gray-100 border border-gray-300 py-px px-1 text-xs;
+}
+.app__status_red {
+  @apply font-medium text-red-700 bg-red-100 border border-red-500 py-px px-1 text-xs;
 }

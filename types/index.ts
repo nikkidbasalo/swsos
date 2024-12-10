@@ -75,6 +75,22 @@ export interface LiquidationTypes {
   file_path: string
   confirmed: string
 }
+export interface GradeTypes {
+  id: string
+  grade_id: string
+  period_id: string
+  period: EvaluationPeriodTypes
+  file_path: string
+  remarks: string
+  status: string
+  lowest_grade: string
+  confirmed: string
+}
+export interface EvaluationPeriodTypes {
+  id: string
+  description: string
+  confirmed: string
+}
 
 export interface AnnouncementTypes {
   id: string
@@ -93,6 +109,7 @@ export interface GranteeTypes {
   control_number: string
   employee_number: string
   function: string
+  email: string
   lastname: string
   firstname: string
   middlename: string
@@ -102,6 +119,8 @@ export interface GranteeTypes {
   degree_program: string
   year_level_status: string
   remarks: string
+  added_to_system: string
+  status: string
 }
 
 export interface excludedItemsTypes {
@@ -118,6 +137,7 @@ export interface AccountTypes {
   department: string
   avatar_url: string
   email: string
+  type: string
   org_id: string
   created_by: string
   temp_password: string

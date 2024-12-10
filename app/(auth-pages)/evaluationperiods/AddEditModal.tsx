@@ -6,17 +6,16 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 // Types
-import type { LiquidationTypes } from '@/types'
+import type { EvaluationPeriodTypes } from '@/types'
 
 // Redux imports
 import { updateList } from '@/GlobalRedux/Features/listSlice'
 import { updateResultCounter } from '@/GlobalRedux/Features/resultsCounterSlice'
-import { PaperClipIcon } from '@heroicons/react/20/solid'
 import { useDispatch, useSelector } from 'react-redux'
 
 interface ModalProps {
   hideModal: () => void
-  editData: LiquidationTypes | null
+  editData: EvaluationPeriodTypes | null
 }
 
 const AddEditModal = ({ hideModal, editData }: ModalProps) => {
@@ -29,24 +28,16 @@ const AddEditModal = ({ hideModal, editData }: ModalProps) => {
   const resultsCounter = useSelector((state: any) => state.results.value)
   const dispatch = useDispatch()
 
-  const [file, setFile] = useState<File | null>(null)
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0] || null
-    setFile(selectedFile)
-  }
-
   const {
     register,
     formState: { errors },
     reset,
-    setError,
     handleSubmit
-  } = useForm<LiquidationTypes>({
+  } = useForm<EvaluationPeriodTypes>({
     mode: 'onSubmit'
   })
 
-  const onSubmit = async (formdata: LiquidationTypes) => {
+  const onSubmit = async (formdata: EvaluationPeriodTypes) => {
     if (saving) return
 
     setSaving(true)
@@ -58,36 +49,21 @@ const AddEditModal = ({ hideModal, editData }: ModalProps) => {
     }
   }
 
-  const handleCreate = async (formdata: LiquidationTypes) => {
+  const handleCreate = async (formdata: EvaluationPeriodTypes) => {
     try {
-      let filePath: string | null = null
-
-      // Upload file if it exists
-      if (file) {
-        const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, '_')
-        const fileName = `${Date.now()}_${sanitizedFileName}`
-        const { data: fileData, error: fileError } = await supabase.storage
-          .from('sws_public') // Replace with your storage bucket name
-          .upload(`liquidations/${fileName}`, file)
-
-        if (fileError) throw new Error(fileError.message)
-        filePath = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/sws_public/${fileData.path}` // Get the path of the uploaded file
-      }
-
       const newData = {
-        description: formdata.description,
-        file_path: filePath
+        description: formdata.description
       }
 
       const { data, error } = await supabase
-        .from('sws_liquidations')
+        .from('sws_evaluation_periods')
         .insert(newData)
         .select()
 
       if (error) {
         void logError(
-          'Create Liquidations',
-          'sws_liquidations',
+          'Create sws_evaluation_periods',
+          'sws_evaluation_periods',
           JSON.stringify(newData),
           error.message
         )
@@ -127,38 +103,23 @@ const AddEditModal = ({ hideModal, editData }: ModalProps) => {
     }
   }
 
-  const handleUpdate = async (formdata: LiquidationTypes) => {
+  const handleUpdate = async (formdata: EvaluationPeriodTypes) => {
     if (!editData) return
 
     try {
-      let filePath: string | null = null
-
-      // Upload file if it exists
-      if (file) {
-        const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, '_')
-        const fileName = `${Date.now()}_${sanitizedFileName}`
-        const { data: fileData, error: fileError } = await supabase.storage
-          .from('sws_public') // Replace with your storage bucket name
-          .upload(`liquidations/${fileName}`, file)
-
-        if (fileError) throw new Error(fileError.message)
-        filePath = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/sws_public/${fileData.path}` // Get the path of the uploaded file
-      }
-
       const newData = {
-        description: formdata.description,
-        file_path: filePath
+        description: formdata.description
       }
 
       const { error } = await supabase
-        .from('sws_liquidations')
+        .from('sws_evaluation_periods')
         .update(newData)
         .eq('id', editData.id)
 
       if (error) {
         void logError(
-          'Update Liquidations',
-          'sws_liquidations',
+          'Update sws_evaluation_periods',
+          'sws_evaluation_periods',
           JSON.stringify(newData),
           error.message
         )
@@ -206,7 +167,9 @@ const AddEditModal = ({ hideModal, editData }: ModalProps) => {
         <div className="app__modal_wrapper2">
           <div className="app__modal_wrapper3">
             <div className="app__modal_header">
-              <h5 className="app__modal_header_text">Liquidations Details</h5>
+              <h5 className="app__modal_header_text">
+                Evaluation Period Details
+              </h5>
               <CustomButton
                 containerStyles="app__btn_gray"
                 title="Close"
@@ -229,39 +192,6 @@ const AddEditModal = ({ hideModal, editData }: ModalProps) => {
                         Description is required
                       </div>
                     )}
-                  </div>
-                </div>
-              </div>
-              <div className="app__form_field_container">
-                <div className="w-full">
-                  <div className="mt-2 flex flex-col space-y-2 items-start">
-                    {/* File Input Wrapper */}
-                    <div className="relative">
-                      <input
-                        type="file"
-                        accept=".pdf, .doc, .docx, .xls, .xlsx, .png, .jpg, .jpeg, .gif"
-                        onChange={handleFileChange}
-                        className="hidden" // Hides the default file input
-                        id="fileUpload"
-                      />
-
-                      {/* Custom Button for File Input */}
-                      <label
-                        htmlFor="fileUpload"
-                        className="cursor-pointer flex items-start space-x-2"
-                      >
-                        <span className="text-sm text-gray-600">
-                          Attachment
-                        </span>
-                        <PaperClipIcon className="w-4 h-4" />
-                      </label>
-
-                      {file && (
-                        <span className="mt-1 text-xs text-gray-600 dark:text-gray-400">
-                          Selected: {file.name}
-                        </span>
-                      )}
-                    </div>
                   </div>
                 </div>
               </div>

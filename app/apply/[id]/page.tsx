@@ -1,5 +1,5 @@
 'use client'
-import { TopBarDark } from '@/components'
+import { TopBarDark } from '@/components/index'
 import { useSupabase } from '@/context/SupabaseProvider'
 import { ApplicationTypes } from '@/types'
 import { generateRandomAlphaNumber } from '@/utils/text-helper'
@@ -29,6 +29,8 @@ export default function Page({ params }: { params: { id: string } }) {
   const {
     register,
     formState: { errors },
+    setError,
+    clearErrors,
     handleSubmit
   } = useForm<ApplicationTypes>({
     mode: 'onSubmit'
@@ -36,6 +38,9 @@ export default function Page({ params }: { params: { id: string } }) {
 
   const onSubmit = async (formdata: ApplicationTypes) => {
     if (saving) return
+
+    const emailCheck = await handleCheckEmail(formdata.email)
+    if (!emailCheck) return
     setSaving(true)
 
     void handleCreate(formdata)
@@ -117,6 +122,27 @@ export default function Page({ params }: { params: { id: string } }) {
       console.error(e)
     } finally {
       setSaving(false)
+    }
+  }
+
+  const handleCheckEmail = async (email: string) => {
+    // Prepopulate Tin No
+    const { data } = await supabase
+      .from('sws_users')
+      .select()
+      .eq('email', email)
+      .limit(1)
+      .maybeSingle()
+
+    if (data) {
+      setError('email', {
+        type: 'manual',
+        message: 'This email already exist'
+      })
+      return false
+    } else {
+      clearErrors('email')
+      return true
     }
   }
 
@@ -315,12 +341,15 @@ export default function Page({ params }: { params: { id: string } }) {
                               className="font-bold border border-black p-1"
                             >
                               <input
-                                {...register('email', { required: true })}
-                                className="app__input_standard"
+                                {...register('email', {
+                                  required: 'Email is required'
+                                })}
+                                type="email"
+                                className="app__select_standard"
                               />
                               {errors.email && (
                                 <div className="app__error_message">
-                                  Email is required
+                                  {errors.email.message}
                                 </div>
                               )}
                             </td>
@@ -713,8 +742,12 @@ export default function Page({ params }: { params: { id: string } }) {
                   </div>
                 </div>
                 <div className="">
-                  <button type="submit" className="app__btn_green_sm">
-                    Submit
+                  <button
+                    type="submit"
+                    disabled={saving}
+                    className="app__btn_green_sm"
+                  >
+                    {saving ? 'Verifying Data..' : 'Submit'}
                   </button>
                 </div>
               </div>

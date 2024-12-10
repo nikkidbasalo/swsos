@@ -47,7 +47,7 @@ const MainMenu = () => {
                 </div>
               </div>
             </Link>
-            <Link href="/modules">
+            <Link href="/evaluation">
               <div className="app__menu_item">
                 <div className="pt-1">
                   <ListBulletIcon className="w-8 h-8" />

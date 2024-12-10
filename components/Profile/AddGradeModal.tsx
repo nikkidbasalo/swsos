@@ -1,12 +1,12 @@
-import { CustomButton } from '@/components'
+import { CustomButton } from '@/components/index'
 import { useFilter } from '@/context/FilterContext'
 import { useSupabase } from '@/context/SupabaseProvider'
-import { logError } from '@/utils/fetchApi'
-import { useState } from 'react'
+import { fetchPeriods, logError } from '@/utils/fetchApi'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 // Types
-import type { LiquidationTypes } from '@/types'
+import type { EvaluationPeriodTypes, GradeTypes } from '@/types'
 
 // Redux imports
 import { updateList } from '@/GlobalRedux/Features/listSlice'
@@ -16,12 +16,15 @@ import { useDispatch, useSelector } from 'react-redux'
 
 interface ModalProps {
   hideModal: () => void
+  editData: GradeTypes | null
 }
 
-const AddGradeModal = ({ hideModal }: ModalProps) => {
+const AddGradeModal = ({ hideModal, editData }: ModalProps) => {
   const { setToast } = useFilter()
-  const { supabase } = useSupabase()
+  const { supabase, session } = useSupabase()
   const [saving, setSaving] = useState(false)
+
+  const [periods, setPeriods] = useState<EvaluationPeriodTypes[]>([])
 
   // Redux staff
   const globallist = useSelector((state: any) => state.list.value)
@@ -41,19 +44,23 @@ const AddGradeModal = ({ hideModal }: ModalProps) => {
     reset,
     setError,
     handleSubmit
-  } = useForm<LiquidationTypes>({
+  } = useForm<GradeTypes>({
     mode: 'onSubmit'
   })
 
-  const onSubmit = async (formdata: LiquidationTypes) => {
+  const onSubmit = async (formdata: GradeTypes) => {
     if (saving) return
 
     setSaving(true)
 
-    void handleCreate(formdata)
+    if (editData) {
+      void handleUpdate(formdata)
+    } else {
+      void handleCreate(formdata)
+    }
   }
 
-  const handleCreate = async (formdata: LiquidationTypes) => {
+  const handleCreate = async (formdata: GradeTypes) => {
     try {
       let filePath: string | null = null
 
@@ -70,7 +77,8 @@ const AddGradeModal = ({ hideModal }: ModalProps) => {
       }
 
       const newData = {
-        description: formdata.description,
+        user_id: session.user.id,
+        evaluation_period_id: formdata.period_id,
         file_path: filePath
       }
 
@@ -95,6 +103,9 @@ const AddGradeModal = ({ hideModal }: ModalProps) => {
 
       const updatedData = {
         ...newData,
+        period: periods.find(
+          (p) => p.id.toString() === formdata.period_id.toString()
+        ),
         id: data[0].id
       }
       dispatch(updateList([updatedData, ...globallist]))
@@ -122,6 +133,88 @@ const AddGradeModal = ({ hideModal }: ModalProps) => {
     }
   }
 
+  const handleUpdate = async (formdata: GradeTypes) => {
+    if (!editData) return
+
+    try {
+      let filePath: string | null = null
+
+      // Upload file if it exists
+      if (file) {
+        const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, '_')
+        const fileName = `${Date.now()}_${sanitizedFileName}`
+        const { data: fileData, error: fileError } = await supabase.storage
+          .from('sws_public') // Replace with your storage bucket name
+          .upload(`grades/${fileName}`, file)
+
+        if (fileError) throw new Error(fileError.message)
+        filePath = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/sws_public/${fileData.path}` // Get the path of the uploaded file
+      }
+
+      const newData = {
+        file_path: filePath
+      }
+
+      const { data, error } = await supabase
+        .from('sws_grades')
+        .update(newData)
+        .eq('id', editData.id)
+
+      if (error) {
+        void logError(
+          'Create grades',
+          'sws_grades',
+          JSON.stringify(newData),
+          error.message
+        )
+        setToast(
+          'error',
+          'Saving failed, please reload the page and try again.'
+        )
+        throw new Error(error.message)
+      }
+
+      const items = [...globallist]
+      const updatedData = {
+        ...newData,
+        id: editData.id
+      }
+      const foundIndex = items.findIndex((x) => x.id === updatedData.id)
+      items[foundIndex] = { ...items[foundIndex], ...updatedData }
+      dispatch(updateList(items))
+
+      // pop up the success message
+      setToast('success', 'Successfully saved.')
+
+      // Updating showing text in redux
+      dispatch(
+        updateResultCounter({
+          showing: Number(resultsCounter.showing) + 1,
+          results: Number(resultsCounter.results) + 1
+        })
+      )
+
+      setSaving(false)
+
+      // hide the modal
+      hideModal()
+
+      // reset all form fields
+      reset()
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  // Featch data
+  useEffect(() => {
+    ;(async () => {
+      const result = await fetchPeriods(999, 0)
+      setPeriods(result.data)
+    })()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   return (
     <>
       <div className="app__modal_wrapper">
@@ -140,18 +233,28 @@ const AddGradeModal = ({ hideModal }: ModalProps) => {
             <form onSubmit={handleSubmit(onSubmit)} className="app__modal_body">
               <div className="app__form_field_container">
                 <div className="w-full">
-                  <div className="app__label_standard">
-                    School Semester/Year
-                  </div>
+                  <div className="app__label_standard">Evaluation Period</div>
                   <div>
-                    <input
-                      {...register('description', { required: true })}
-                      className="app__input_standard"
-                    />
-                    {errors.description && (
-                      <div className="app__error_message">
-                        Description is required
-                      </div>
+                    {editData && <span>{editData.period.description}</span>}
+                    {!editData && (
+                      <>
+                        <select
+                          {...register('period_id', { required: true })}
+                          className="app__input_standard"
+                        >
+                          <option value="">Choose Evaluation Period</option>
+                          {periods?.map((p, i) => (
+                            <option key={i} value={p.id}>
+                              {p.description}
+                            </option>
+                          ))}
+                        </select>
+                        {errors.period_id && (
+                          <div className="app__error_message">
+                            Period is required
+                          </div>
+                        )}
+                      </>
                     )}
                   </div>
                 </div>

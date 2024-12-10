@@ -1,5 +1,6 @@
 'use client'
 import {
+  ConfirmModal,
   CustomButton,
   PerPage,
   ProgramsSideBar,
@@ -15,33 +16,42 @@ import { useFilter } from '@/context/FilterContext'
 import { useSupabase } from '@/context/SupabaseProvider'
 import { updateList } from '@/GlobalRedux/Features/listSlice'
 import { updateResultCounter } from '@/GlobalRedux/Features/resultsCounterSlice'
-import { GranteeTypes, ProgramTypes } from '@/types'
-import { fetchGrantees, fetchPrograms } from '@/utils/fetchApi'
+import { GranteeTypes } from '@/types'
+import { fetchGrantees } from '@/utils/fetchApi'
 import { Menu, Transition } from '@headlessui/react'
 import {
   ArrowLeftIcon,
+  CheckIcon,
   ChevronDownIcon,
-  PencilSquareIcon
+  PencilSquareIcon,
+  TrashIcon
 } from '@heroicons/react/20/solid'
 import Link from 'next/link'
 import { notFound, useSearchParams } from 'next/navigation'
 import React, { Fragment, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import AddEditModal from './AddEditModal'
+import Filters from './Filters'
 
 const Page: React.FC = () => {
-  const { hasAccess } = useFilter()
-  const { session } = useSupabase()
+  const { hasAccess, setToast } = useFilter()
+  const { session, supabase } = useSupabase()
 
   const searchParams = useSearchParams()
   const type = searchParams.get('type') // Get the "type" query parameter
+  const program = searchParams.get('program') // Get the "type" query parameter
   const ref = searchParams.get('ref') // Get the "ref" query parameter
 
   const [loading, setLoading] = useState(false)
   const [showAddModal, setShowAddModal] = useState(false)
 
+  const [showArchiveModal, setShowArchiveModal] = useState(false)
+  const [showActiveModal, setShowActiveModal] = useState(false)
+
+  const [filterKeyword, setFilterKeyword] = useState<string>('')
+  const [filterStatus, setFilterStatus] = useState<string>('')
+
   const [list, setList] = useState<GranteeTypes[]>([])
-  const [programs, setPrograms] = useState<ProgramTypes[]>([])
 
   const [perPageCount, setPerPageCount] = useState<number>(10)
   const [editData, setEditData] = useState<GranteeTypes | null>(null)
@@ -61,7 +71,12 @@ const Page: React.FC = () => {
     setLoading(true)
 
     try {
-      const result = await fetchGrantees(ref, perPageCount, 0)
+      const result = await fetchGrantees(
+        { filterStatus, filterKeyword },
+        ref,
+        perPageCount,
+        0
+      )
       // update the list in redux
       dispatch(updateList(result.data))
 
@@ -84,7 +99,12 @@ const Page: React.FC = () => {
     setLoading(true)
 
     try {
-      const result = await fetchGrantees(ref, perPageCount, list.length)
+      const result = await fetchGrantees(
+        { filterStatus, filterKeyword },
+        ref,
+        perPageCount,
+        list.length
+      )
 
       // update the list in redux
       const newList = [...list, ...result.data]
@@ -114,6 +134,92 @@ const Page: React.FC = () => {
     setEditData(item)
   }
 
+  const handleActivate = (item: GranteeTypes) => {
+    setShowActiveModal(true)
+    setEditData(item)
+  }
+
+  const handleArchived = (item: GranteeTypes) => {
+    setShowArchiveModal(true)
+    setEditData(item)
+  }
+
+  const activate = async () => {
+    if (!editData) return
+    try {
+      const newData = {
+        status: 'Active'
+      }
+
+      const { error } = await supabase
+        .from('sws_users')
+        .update(newData)
+        .eq('id', editData.id)
+
+      if (error) {
+        setToast(
+          'error',
+          'Saving failed, please reload the page and try again.'
+        )
+        throw new Error(error.message)
+      }
+
+      const items = [...globallist]
+      const updatedData = {
+        ...newData,
+        id: editData.id
+      }
+      const foundIndex = items.findIndex((x) => x.id === updatedData.id)
+      items[foundIndex] = { ...items[foundIndex], ...updatedData }
+      dispatch(updateList(items))
+
+      // pop up the success message
+      setToast('success', 'Successfully added.')
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setShowActiveModal(false)
+    }
+  }
+
+  const archived = async () => {
+    if (!editData) return
+    try {
+      const newData = {
+        status: 'Archived'
+      }
+
+      const { error } = await supabase
+        .from('sws_users')
+        .update(newData)
+        .eq('id', editData.id)
+
+      if (error) {
+        setToast(
+          'error',
+          'Saving failed, please reload the page and try again.'
+        )
+        throw new Error(error.message)
+      }
+
+      const items = [...globallist]
+      const updatedData = {
+        ...newData,
+        id: editData.id
+      }
+      const foundIndex = items.findIndex((x) => x.id === updatedData.id)
+      items[foundIndex] = { ...items[foundIndex], ...updatedData }
+      dispatch(updateList(items))
+
+      // pop up the success message
+      setToast('success', 'Successfully added.')
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setShowArchiveModal(false)
+    }
+  }
+
   // Update list whenever list in redux updates
   useEffect(() => {
     setList(globallist)
@@ -121,14 +227,10 @@ const Page: React.FC = () => {
 
   // Featch data
   useEffect(() => {
-    ;(async () => {
-      const result = await fetchPrograms(type, perPageCount, 0)
-      setPrograms(result.data)
-    })()
     setList([])
     void fetchData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [perPageCount, type])
+  }, [perPageCount, type, filterStatus, filterKeyword])
 
   const isDataEmpty = !Array.isArray(list) || list.length < 1 || !list
 
@@ -156,12 +258,20 @@ const Page: React.FC = () => {
               <ArrowLeftIcon className="w-4 h-4" />
               <span>Back</span>
             </Link>
-            <Title title="Grantees" />
+            <Title title={`${program} Grantees`} />
             <CustomButton
               containerStyles="app__btn_green"
               title="Add Grantee"
               btnType="button"
               handleClick={handleAdd}
+            />
+          </div>
+
+          {/* Filters */}
+          <div className="app__filters">
+            <Filters
+              setFilterKeyword={setFilterKeyword}
+              setFilterStatus={setFilterStatus}
             />
           </div>
 
@@ -220,14 +330,51 @@ const Page: React.FC = () => {
                                     <span>Edit</span>
                                   </div>
                                 </Menu.Item>
+                                {item.status === 'Archived' && (
+                                  <Menu.Item>
+                                    <div
+                                      onClick={() => handleActivate(item)}
+                                      className="app__dropdown_item"
+                                    >
+                                      <CheckIcon className="w-4 h-4" />
+                                      <span>Change to Active</span>
+                                    </div>
+                                  </Menu.Item>
+                                )}
+                                {item.status === 'Active' && (
+                                  <Menu.Item>
+                                    <div
+                                      onClick={() => handleArchived(item)}
+                                      className="app__dropdown_item"
+                                    >
+                                      <TrashIcon className="w-4 h-4" />
+                                      <span>Move to Archived</span>
+                                    </div>
+                                  </Menu.Item>
+                                )}
                               </div>
                             </Menu.Items>
                           </Transition>
                         </Menu>
                       </td>
                       <th className="app__th_firstcol">
-                        <div>
-                          {item.firstname} {item.middlename} {item.lastname}
+                        <div className="space-y-1">
+                          <div className="font-bold">
+                            {item.lastname}, {item.firstname} {item.middlename}
+                          </div>
+                          <div>
+                            {item.email} | {item.gender}
+                          </div>
+                          <div>
+                            {item.status === 'Active' && (
+                              <span className="app__status_green">Active</span>
+                            )}
+                            {item.status === 'Archived' && (
+                              <span className="app__status_orange">
+                                Archived
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </th>
                       <td className="app__td">
@@ -256,8 +403,29 @@ const Page: React.FC = () => {
             <AddEditModal
               type={type}
               editData={editData}
-              programs={programs}
+              programId={ref}
               hideModal={() => setShowAddModal(false)}
+            />
+          )}
+          {/* Active Modal */}
+          {showActiveModal && (
+            <ConfirmModal
+              header="Confirm Active"
+              btnText="Confirm"
+              message="Please confirm this action."
+              onConfirm={activate}
+              onCancel={() => setShowActiveModal(false)}
+            />
+          )}
+
+          {/* Archive Modal */}
+          {showArchiveModal && (
+            <ConfirmModal
+              header="Confirm Archive"
+              btnText="Confirm"
+              message="Please confirm this action."
+              onConfirm={archived}
+              onCancel={() => setShowArchiveModal(false)}
             />
           )}
         </div>
