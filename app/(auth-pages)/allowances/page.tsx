@@ -1,5 +1,6 @@
 'use client'
 import {
+  ConfirmModal,
   CustomButton,
   PerPage,
   ShowMore,
@@ -16,7 +17,7 @@ import { useSupabase } from '@/context/SupabaseProvider'
 import { updateList } from '@/GlobalRedux/Features/listSlice'
 import { updateResultCounter } from '@/GlobalRedux/Features/resultsCounterSlice'
 import { AllowancesTypes } from '@/types'
-import { fetchAllowances } from '@/utils/fetchApi'
+import { fetchAllowances, logError } from '@/utils/fetchApi'
 import Excel from 'exceljs'
 import { saveAs } from 'file-saver'
 import React, { useEffect, useState } from 'react'
@@ -25,12 +26,19 @@ import BulkAddModal from './BulkAddModal'
 import Filters from './Filters'
 
 const Page: React.FC = () => {
-  const { hasAccess } = useFilter()
-  const { session } = useSupabase()
+  const { hasAccess, setToast } = useFilter()
+  const { session, supabase } = useSupabase()
+
+  const [selectedItems, setSelectedItems] = useState<AllowancesTypes[]>([])
+  const [checkAll, setCheckAll] = useState(false)
+  const [selectedIds, setSelectedIds] = useState<string[]>([])
+
+  const [refresh, setRefresh] = useState(false)
 
   const [loading, setLoading] = useState(false)
   const [downloading, setDownloading] = useState(false)
   const [showBulkAddModal, setShowBulkAddModal] = useState(false)
+  const [showConfirmDeleteModal, setShowConfirmDeleteModal] = useState(false)
 
   const [filterPeriod, setFilterPeriod] = useState<string>('')
   const [filterProgram, setFilterProgram] = useState<string>('')
@@ -170,6 +178,71 @@ const Page: React.FC = () => {
     setDownloading(false)
   }
 
+  const handleDeleteSelected = () => {
+    setShowConfirmDeleteModal(true)
+  }
+  const handleDeleteConfirmed = async () => {
+    try {
+      const ids = selectedItems.map((obj) => obj.id)
+
+      const { error } = await supabase
+        .from('sws_allowances')
+        .delete()
+        .in('id', ids)
+
+      if (error) {
+        void logError(
+          'Bulk delete Allowance',
+          'sws_allowances',
+          '',
+          error.message
+        )
+        setToast(
+          'error',
+          'Saving failed, please reload the page and try again.'
+        )
+        throw new Error(error.message)
+      }
+
+      setToast('success', 'Successfully deleted')
+      setRefresh(!refresh)
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setShowConfirmDeleteModal(false)
+    }
+  }
+
+  // Function to handle checkbox change event
+  const handleCheckboxChange = (id: string) => {
+    if (selectedIds.length > 0 && selectedIds.includes(id)) {
+      // If item is already selected, remove it
+      const ids = selectedIds.filter((selectedId) => selectedId !== id)
+      setSelectedIds(ids)
+      const items = list.filter((item) => ids.includes(item.id.toString()))
+      setSelectedItems(items)
+    } else {
+      // If item is not selected, add it
+      const ids = [...selectedIds, id]
+      setSelectedIds(ids)
+      const items = list.filter((item) => ids.includes(item.id.toString()))
+      setSelectedItems(items)
+    }
+  }
+
+  const handleCheckAllChange = () => {
+    setCheckAll(!checkAll)
+    if (!checkAll) {
+      const ids = list.map((obj) => obj.id.toString())
+      setSelectedIds([...ids])
+      const items = list.filter((item) => ids.includes(item.id.toString()))
+      setSelectedItems(items)
+    } else {
+      setSelectedIds([])
+      setSelectedItems([])
+    }
+  }
+
   // Update list whenever list in redux updates
   useEffect(() => {
     setList(globallist)
@@ -180,7 +253,7 @@ const Page: React.FC = () => {
     setList([])
     void fetchData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [perPageCount, filterProgram, filterPeriod])
+  }, [perPageCount, filterProgram, filterPeriod, refresh])
 
   const isDataEmpty = !Array.isArray(list) || list.length < 1 || !list
 
@@ -220,23 +293,31 @@ const Page: React.FC = () => {
 
           {/* Export Button */}
           <div className="mx-4 mb-4 flex justify-start items-end space-x-2">
-            <div className="flex-1 flex justify-center space-x-2">
-              <div className="border bg-gray-200 py-px px-2 rounded-lg">
-                <div className="text-xs font-medium">Total Scholars</div>
-                <div className="text-sm font-bold text-center">
-                  {totalScholars}
-                </div>
-              </div>
-              <div className="border bg-gray-200 py-px px-2 rounded-lg">
-                <div className="text-xs font-medium">Total Allowances</div>
-                <div className="text-sm font-bold text-center">
-                  {totalAllowances.toLocaleString('en-US', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                  })}
-                </div>
-              </div>
+            <div className="text-xs font-medium">
+              Total Scholars:{' '}
+              <span className="text-xl font-bold">{totalScholars}</span>
             </div>
+            <div className="text-xs font-medium">
+              Total Allowances:{' '}
+              <span className="text-xl font-bold">
+                {totalAllowances.toLocaleString('en-US', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2
+                })}
+              </span>
+            </div>
+            <div className="flex-1"></div>
+            {selectedItems.length > 0 && (
+              <div>
+                <CustomButton
+                  containerStyles="app__btn_red"
+                  isDisabled={downloading}
+                  title={`Delete Selected (${selectedItems.length})`}
+                  btnType="button"
+                  handleClick={handleDeleteSelected}
+                />
+              </div>
+            )}
             <div>
               <CustomButton
                 containerStyles="app__btn_blue"
@@ -261,8 +342,14 @@ const Page: React.FC = () => {
             <table className="app__table">
               <thead className="app__thead">
                 <tr>
-                  <th className="app__th pl-4"></th>
-                  <th className="app__th pl-4">Scholar</th>
+                  <th className="app__th pl-4">
+                    <input
+                      type="checkbox"
+                      checked={checkAll}
+                      onChange={handleCheckAllChange}
+                    />
+                  </th>
+                  <th className="app__th">Scholar</th>
                   <th className="app__th">Program</th>
                   <th className="app__th">Allowance</th>
                 </tr>
@@ -270,8 +357,19 @@ const Page: React.FC = () => {
               <tbody>
                 {!isDataEmpty &&
                   list.map((item, index) => (
-                    <tr key={index} className="app__tr">
-                      <th className="app__tdapp__th_firstcol"></th>
+                    <tr
+                      key={index}
+                      onClick={() => handleCheckboxChange(item.id.toString())}
+                      className="app__tr cursor-pointer"
+                    >
+                      <td className="app__td">
+                        <input
+                          type="checkbox"
+                          value={item.id.toString()}
+                          checked={selectedIds.includes(item.id.toString())}
+                          readOnly
+                        />
+                      </td>
                       <td className="app__td">
                         <div className="space-y-1">
                           <div className="font-bold">
@@ -304,7 +402,21 @@ const Page: React.FC = () => {
 
           {/* Add/Edit Modal */}
           {showBulkAddModal && (
-            <BulkAddModal hideModal={() => setShowBulkAddModal(false)} />
+            <BulkAddModal
+              hideModal={() => setShowBulkAddModal(false)}
+              refresh={() => setRefresh(!refresh)}
+            />
+          )}
+
+          {/* Confirm (Active) Modal */}
+          {showConfirmDeleteModal && (
+            <ConfirmModal
+              header="Confirmation"
+              btnText="Confirm"
+              message="Please confirm this action"
+              onConfirm={handleDeleteConfirmed}
+              onCancel={() => setShowConfirmDeleteModal(false)}
+            />
           )}
         </div>
       </div>

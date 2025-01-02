@@ -196,6 +196,7 @@ export async function fetchGrantees(
       .from('sws_users')
       .select('*, program:program_id(*)', { count: 'exact' })
       .not('program_id', 'is', null)
+      .eq('type', 'Scholar')
 
     if (ref !== '') {
       query = query.eq('program_id', ref)

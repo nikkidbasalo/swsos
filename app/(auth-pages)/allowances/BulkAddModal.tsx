@@ -1,25 +1,27 @@
 import { CustomButton } from '@/components/index'
 import { useFilter } from '@/context/FilterContext'
 import { useSupabase } from '@/context/SupabaseProvider'
-import { fetchPrograms } from '@/utils/fetchApi'
+import { fetchPrograms, logError } from '@/utils/fetchApi'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 // Types
-import type { ProgramTypes } from '@/types'
+import type { AccountTypes, ProgramTypes } from '@/types'
 
 // Redux imports
 
 interface ModalProps {
   hideModal: () => void
+  refresh: () => void
 }
 
 interface FormTypes {
   confirmed: string
   program_id: string
   period: string
+  amount: string
 }
-const BulkAddModal = ({ hideModal }: ModalProps) => {
+const BulkAddModal = ({ hideModal, refresh }: ModalProps) => {
   const { setToast } = useFilter()
   const { supabase } = useSupabase()
   const [saving, setSaving] = useState(false)
@@ -42,7 +44,75 @@ const BulkAddModal = ({ hideModal }: ModalProps) => {
   }
 
   const handleCreate = async (formdata: FormTypes) => {
-    //
+    try {
+      const { data, error } = await supabase
+        .from('sws_users')
+        .select()
+        .eq('program_id', formdata.program_id)
+
+      if (error) {
+        void logError(
+          'Bulk Create Allowance',
+          'sws_allowances',
+          ')',
+          error.message
+        )
+        setToast(
+          'error',
+          'Saving failed, please reload the page and try again.'
+        )
+        throw new Error(error.message)
+      }
+
+      const insertArray: Array<{
+        user_id: string | number
+        program_id: string | number
+        period: string | number
+        amount: string
+      }> = []
+
+      data.forEach((item: AccountTypes) => {
+        insertArray.push({
+          user_id: item.id,
+          program_id: formdata.program_id,
+          period: formdata.period,
+          amount: formdata.amount
+        })
+      })
+
+      if (insertArray.length === 0) {
+        setToast('error', 'No grantees found on the selected program')
+        throw new Error('No grantees found on the selected program')
+      }
+
+      const { error: error2 } = await supabase
+        .from('sws_allowances')
+        .insert(insertArray)
+
+      if (error2) {
+        void logError(
+          'Bulk Create Allowance',
+          'sws_allowances',
+          ')',
+          error2.message
+        )
+        setToast(
+          'error',
+          'Saving failed, please reload the page and try again.'
+        )
+        throw new Error(error2.message)
+      }
+
+      setToast('success', 'Successfully added')
+
+      // hide the modal
+      hideModal()
+      refresh()
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setSaving(false)
+    }
   }
 
   // Featch data
@@ -105,6 +175,23 @@ const BulkAddModal = ({ hideModal }: ModalProps) => {
                     {errors.period && (
                       <div className="app__error_message">
                         Period is required
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div className="app__form_field_container">
+                <div className="w-full">
+                  <div className="app__label_standard">Amount</div>
+                  <div>
+                    <input
+                      type="number"
+                      {...register('amount', { required: true })}
+                      className="app__input_standard"
+                    />
+                    {errors.amount && (
+                      <div className="app__error_message">
+                        Amount is required
                       </div>
                     )}
                   </div>

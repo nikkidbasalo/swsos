@@ -223,26 +223,24 @@ const Page: React.FC = () => {
 
           {/* Export Button */}
           <div className="mx-4 mb-4 flex justify-start items-end space-x-2">
-            <div className="flex-1 flex justify-center space-x-2">
-              <div className="border bg-gray-200 py-px px-2 rounded-lg">
-                <div className="text-xs font-medium">Total Passed</div>
-                <div className="text-sm font-bold text-center">
-                  {totalPassed}
-                </div>
-              </div>
-              <div className="border bg-gray-200 py-px px-2 rounded-lg">
-                <div className="text-xs font-medium">Total Failed</div>
-                <div className="text-sm font-bold text-center">
-                  {totalFailed}
-                </div>
-              </div>
-              <div className="border bg-gray-200 pxy-1 px-2 rounded-lg">
-                <div className="text-xs font-medium">Total For Evaluation</div>
-                <div className="text-sm font-bold text-center">
-                  {totalForEvaluation}
-                </div>
-              </div>
+            <div className="text-xs font-medium">
+              Total Passed:{' '}
+              <span className="text-xl font-bold">{totalPassed}</span>
             </div>
+            <div className="text-xs font-medium">
+              Total Failed:{' '}
+              <span className="text-xl font-bold">{totalFailed}</span>
+            </div>
+            <div className="text-xs font-medium">
+              Total For Evaluation:{' '}
+              <span className="text-xl font-bold">
+                {totalForEvaluation.toLocaleString('en-US', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2
+                })}
+              </span>
+            </div>
+            <div className="flex-1"></div>
             <div>
               <CustomButton
                 containerStyles="app__btn_blue"

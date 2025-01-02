@@ -116,7 +116,12 @@ const Page: React.FC = () => {
       { header: '#', key: 'no', width: 20 },
       { header: 'Lastname', key: 'lastname', width: 20 },
       { header: 'Firstname', key: 'firstname', width: 20 },
-      { header: 'Middlename', key: 'middlename', width: 20 }
+      { header: 'Middlename', key: 'middlename', width: 20 },
+      { header: 'Gender', key: 'gender', width: 20 },
+      { header: 'Year Level', key: 'year', width: 20 },
+      { header: 'Program', key: 'program', width: 20 },
+      { header: 'Birthday', key: 'birthday', width: 20 },
+      { header: 'Year Granted', key: 'yeargranted', width: 20 }
       // Add more columns based on your data structure
     ]
 
@@ -136,7 +141,12 @@ const Page: React.FC = () => {
         no: index + 1,
         lastname: `${item.lastname}`,
         firstname: `${item.firstname}`,
-        middlename: `${item.middlename}`
+        middlename: `${item.middlename}`,
+        gender: `${item.gender}`,
+        year: `${item.year_level_status}`,
+        program: `${item.program?.name}`,
+        birthday: `${item.birthday}`,
+        yeargranted: `${item.year_granted}`
       })
     })
 
@@ -241,8 +251,8 @@ const Page: React.FC = () => {
                   <th className="app__th pl-4"></th>
                   <th className="app__th pl-4">Scholar</th>
                   <th className="app__th">Program</th>
-                  <th className="app__th">Year Level</th>
                   <th className="app__th">Gender</th>
+                  <th className="app__th">Year Level</th>
                 </tr>
               </thead>
               <tbody>
