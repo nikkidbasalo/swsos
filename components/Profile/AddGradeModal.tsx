@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 // Types
-import type { EvaluationPeriodTypes, GradeTypes } from '@/types'
+import type { AccountTypes, EvaluationPeriodTypes, GradeTypes } from '@/types'
 
 // Redux imports
 import { updateList } from '@/GlobalRedux/Features/listSlice'
@@ -17,9 +17,10 @@ import { useDispatch, useSelector } from 'react-redux'
 interface ModalProps {
   hideModal: () => void
   editData: GradeTypes | null
+  userData: AccountTypes
 }
 
-const AddGradeModal = ({ hideModal, editData }: ModalProps) => {
+const AddGradeModal = ({ hideModal, editData, userData }: ModalProps) => {
   const { setToast } = useFilter()
   const { supabase, session } = useSupabase()
   const [saving, setSaving] = useState(false)
@@ -79,7 +80,8 @@ const AddGradeModal = ({ hideModal, editData }: ModalProps) => {
       const newData = {
         user_id: session.user.id,
         evaluation_period_id: formdata.period_id,
-        file_path: filePath
+        file_path: filePath,
+        program_id: userData.program_id
       }
 
       const { data, error } = await supabase

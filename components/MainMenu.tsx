@@ -4,11 +4,13 @@ import { useFilter } from '@/context/FilterContext'
 import { useSupabase } from '@/context/SupabaseProvider'
 import {
   AcademicCapIcon,
+  ChartBarIcon,
   Cog6ToothIcon,
   ListBulletIcon,
   TableCellsIcon,
   UserIcon
 } from '@heroicons/react/20/solid'
+import { CurrencyDollarIcon } from '@heroicons/react/24/solid'
 import Link from 'next/link'
 
 const MainMenu = () => {
@@ -21,60 +23,98 @@ const MainMenu = () => {
       <div className="px-4 py-2 overflow-y-auto h-[calc(100vh-170px)]">
         <div className="lg:flex lg:space-x-2 lg:space-y-0 space-y-2 justify-center lg:flex-row-reverse">
           <div className="px-2 py-4 lg:w-96 border text-gray-600 rounded-lg bg-white shadow-md flex flex-col space-y-2">
-            <Link href="/modules">
+            <Link href="/">
               <div className="app__menu_item">
                 <div className="pt-1">
-                  <AcademicCapIcon className="w-8 h-8" />
+                  <ChartBarIcon className="w-8 h-8" />
                 </div>
                 <div>
-                  <div className="app__menu_item_label">Modules</div>
+                  <div className="app__menu_item_label">Dashboard</div>
                   <div className="app__menu_item_label_description">
-                    Scholarship Programs
+                    Dashboard
                   </div>
                 </div>
               </div>
             </Link>
-            <Link href="/applications">
-              <div className="app__menu_item">
-                <div className="pt-1">
-                  <TableCellsIcon className="w-8 h-8" />
-                </div>
-                <div>
-                  <div className="app__menu_item_label">Applications</div>
-                  <div className="app__menu_item_label_description">
-                    Scholarship Applications
+            {(hasAccess('settings') || hasAccess('staff')) && (
+              <Link href="/modules">
+                <div className="app__menu_item">
+                  <div className="pt-1">
+                    <AcademicCapIcon className="w-8 h-8" />
+                  </div>
+                  <div>
+                    <div className="app__menu_item_label">Modules</div>
+                    <div className="app__menu_item_label_description">
+                      Scholarship Programs
+                    </div>
                   </div>
                 </div>
-              </div>
-            </Link>
-            <Link href="/evaluation">
-              <div className="app__menu_item">
-                <div className="pt-1">
-                  <ListBulletIcon className="w-8 h-8" />
-                </div>
-                <div>
-                  <div className="app__menu_item_label">
-                    Evaluation & Monitoring
+              </Link>
+            )}
+            {(hasAccess('settings') || hasAccess('staff')) && (
+              <Link href="/applications">
+                <div className="app__menu_item">
+                  <div className="pt-1">
+                    <TableCellsIcon className="w-8 h-8" />
                   </div>
-                  <div className="app__menu_item_label_description">
-                    Evaluation & Monitoring
-                  </div>
-                </div>
-              </div>
-            </Link>
-            <Link href="/liquidations">
-              <div className="app__menu_item">
-                <div className="pt-1">
-                  <TableCellsIcon className="w-8 h-8" />
-                </div>
-                <div>
-                  <div className="app__menu_item_label">Liquidations</div>
-                  <div className="app__menu_item_label_description">
-                    Liquidations
+                  <div>
+                    <div className="app__menu_item_label">Applications</div>
+                    <div className="app__menu_item_label_description">
+                      Scholarship Applications
+                    </div>
                   </div>
                 </div>
-              </div>
-            </Link>
+              </Link>
+            )}
+            {(hasAccess('settings') || hasAccess('staff')) && (
+              <Link href="/allowances">
+                <div className="app__menu_item">
+                  <div className="pt-1">
+                    <CurrencyDollarIcon className="w-8 h-8" />
+                  </div>
+                  <div>
+                    <div className="app__menu_item_label">Allowances</div>
+                    <div className="app__menu_item_label_description">
+                      Allowances
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            )}
+            {(hasAccess('settings') ||
+              hasAccess('staff') ||
+              hasAccess('evaluator')) && (
+              <Link href="/evaluation">
+                <div className="app__menu_item">
+                  <div className="pt-1">
+                    <ListBulletIcon className="w-8 h-8" />
+                  </div>
+                  <div>
+                    <div className="app__menu_item_label">
+                      Evaluation & Monitoring
+                    </div>
+                    <div className="app__menu_item_label_description">
+                      Evaluation & Monitoring
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            )}
+            {(hasAccess('settings') || hasAccess('staff')) && (
+              <Link href="/liquidations">
+                <div className="app__menu_item">
+                  <div className="pt-1">
+                    <TableCellsIcon className="w-8 h-8" />
+                  </div>
+                  <div>
+                    <div className="app__menu_item_label">Liquidations</div>
+                    <div className="app__menu_item_label_description">
+                      Liquidations
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            )}
             <div className="pt-4">
               <hr />
             </div>

@@ -72,6 +72,7 @@ export async function fetchGrades(
     return { data: [], count: 0 }
   }
 }
+
 export async function fetchLiquidations(
   perPageCount: number,
   rangeFrom: number
@@ -183,6 +184,8 @@ export async function fetchGrantees(
     filterProgram?: string
     filterKeyword?: string
     filterStatus?: string
+    filterYear?: string
+    filterGender?: string
   },
   ref: string,
   perPageCount: number,
@@ -218,6 +221,16 @@ export async function fetchGrantees(
       query = query.eq('program_id', filters.filterProgram)
     }
 
+    // filter gender
+    if (filters.filterGender && filters.filterGender !== '') {
+      query = query.eq('gender', filters.filterGender)
+    }
+
+    // filter year
+    if (filters.filterYear && filters.filterYear !== '') {
+      query = query.eq('year_level_status', filters.filterYear)
+    }
+
     // Per Page from context
     const from = rangeFrom
     const to = from + (perPageCount - 1)
@@ -236,6 +249,104 @@ export async function fetchGrantees(
     return { data, count }
   } catch (error) {
     console.error('fetch grantees error', error)
+    return { data: [], count: 0 }
+  }
+}
+
+export async function fetchAllowances(
+  filters: {
+    filterProgram?: string
+    filterPeriod?: string
+  },
+  perPageCount: number,
+  rangeFrom: number
+) {
+  try {
+    let query = supabase
+      .from('sws_allowances')
+      .select('*, user:user_id(*),program:program_id(*)', { count: 'exact' })
+
+    // filter program
+    if (filters.filterProgram && filters.filterProgram !== '') {
+      query = query.eq('program_id', filters.filterProgram)
+    }
+
+    // filter period
+    if (filters.filterPeriod && filters.filterPeriod !== '') {
+      query = query.eq('period', filters.filterPeriod)
+    }
+
+    // Per Page from context
+    const from = rangeFrom
+    const to = from + (perPageCount - 1)
+
+    // Per Page from context
+    query = query.range(from, to)
+
+    // Order By
+    query = query.order('id', { ascending: false })
+
+    const { data, error, count } = await query
+
+    if (error) {
+      throw new Error(error.message)
+    }
+    return { data, count }
+  } catch (error) {
+    console.error('fetch allowances error', error)
+    return { data: [], count: 0 }
+  }
+}
+
+export async function fetchEvaluations(
+  filters: {
+    filterProgram?: string
+    filterPeriod?: string
+    filterStatus?: string
+  },
+  perPageCount: number,
+  rangeFrom: number
+) {
+  try {
+    let query = supabase
+      .from('sws_grades')
+      .select(
+        '*, user:user_id(*),program:program_id(*),period:evaluation_period_id(*)',
+        { count: 'exact' }
+      )
+
+    // filter program
+    if (filters.filterProgram && filters.filterProgram !== '') {
+      query = query.eq('program_id', filters.filterProgram)
+    }
+
+    // filter period
+    if (filters.filterPeriod && filters.filterPeriod !== '') {
+      query = query.eq('evaluation_period_id', filters.filterPeriod)
+    }
+    // filter status
+    if (filters.filterStatus && filters.filterStatus !== '') {
+      query = query.eq('status', filters.filterStatus)
+    }
+
+    // Per Page from context
+    const from = rangeFrom
+    const to = from + (perPageCount - 1)
+
+    // Per Page from context
+    query = query.range(from, to)
+
+    // Order By
+    query = query.order('id', { ascending: false })
+
+    const { data, error, count } = await query
+
+    if (error) {
+      throw new Error(error.message)
+    }
+    return { data, count }
+  } catch (error) {
+    console.error('fetch allowances error', error)
     return { data: [], count: 0 }
   }
 }

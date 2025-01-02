@@ -1,27 +1,27 @@
 'use client'
-import { ChartYearLevel } from '@/components/ChartYearLevel'
 import {
   CustomButton,
   PerPage,
-  ProgramsSideBar,
   ShowMore,
   Sidebar,
   TableRowLoading,
   Title,
   Unauthorized
 } from '@/components/index'
+import AllowancesSidebar from '@/components/Sidebars/AllowancesSidebar'
 import TopBar from '@/components/TopBar'
 import { superAdmins } from '@/constants'
 import { useFilter } from '@/context/FilterContext'
 import { useSupabase } from '@/context/SupabaseProvider'
 import { updateList } from '@/GlobalRedux/Features/listSlice'
 import { updateResultCounter } from '@/GlobalRedux/Features/resultsCounterSlice'
-import { GranteeTypes, ProgramTypes } from '@/types'
-import { fetchGrantees, fetchPrograms } from '@/utils/fetchApi'
+import { AllowancesTypes } from '@/types'
+import { fetchAllowances } from '@/utils/fetchApi'
 import Excel from 'exceljs'
 import { saveAs } from 'file-saver'
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import BulkAddModal from './BulkAddModal'
 import Filters from './Filters'
 
 const Page: React.FC = () => {
@@ -30,17 +30,16 @@ const Page: React.FC = () => {
 
   const [loading, setLoading] = useState(false)
   const [downloading, setDownloading] = useState(false)
+  const [showBulkAddModal, setShowBulkAddModal] = useState(false)
 
-  const [programs, setPrograms] = useState<ProgramTypes[]>([])
-
-  const [filterKeyword, setFilterKeyword] = useState<string>('')
+  const [filterPeriod, setFilterPeriod] = useState<string>('')
   const [filterProgram, setFilterProgram] = useState<string>('')
-  const [filterYear, setFilterYear] = useState<string>('')
-  const [filterGender, setFilterGender] = useState<string>('')
 
-  const [list, setList] = useState<GranteeTypes[]>([])
+  const [list, setList] = useState<AllowancesTypes[]>([])
 
   const [perPageCount, setPerPageCount] = useState<number>(10)
+  const [totalScholars, setTotalScholars] = useState(0)
+  const [totalAllowances, setTotalAllowances] = useState(0)
 
   // Redux staff
   const globallist = useSelector((state: any) => state.list.value)
@@ -51,9 +50,8 @@ const Page: React.FC = () => {
     setLoading(true)
 
     try {
-      const result = await fetchGrantees(
-        { filterProgram, filterKeyword, filterGender, filterYear },
-        '',
+      const result = await fetchAllowances(
+        { filterProgram, filterPeriod },
         perPageCount,
         0
       )
@@ -72,6 +70,16 @@ const Page: React.FC = () => {
     } finally {
       setLoading(false)
     }
+
+    //All
+    const all = await fetchAllowances({ filterProgram, filterPeriod }, 99999, 0)
+    const totalAmount = all.data.reduce(
+      (sum, item: AllowancesTypes) => sum + Number(item.amount),
+      0
+    )
+
+    setTotalScholars(all.data.length)
+    setTotalAllowances(totalAmount)
   }
 
   // Append data to existing list whenever 'show more' button is clicked
@@ -79,9 +87,8 @@ const Page: React.FC = () => {
     setLoading(true)
 
     try {
-      const result = await fetchGrantees(
-        { filterProgram, filterKeyword, filterGender, filterYear },
-        '',
+      const result = await fetchAllowances(
+        { filterProgram, filterPeriod },
         perPageCount,
         list.length
       )
@@ -104,6 +111,10 @@ const Page: React.FC = () => {
     }
   }
 
+  const handleAdd = () => {
+    setShowBulkAddModal(true)
+  }
+
   const handleDownloadExcel = async () => {
     setDownloading(true)
 
@@ -116,27 +127,32 @@ const Page: React.FC = () => {
       { header: '#', key: 'no', width: 20 },
       { header: 'Lastname', key: 'lastname', width: 20 },
       { header: 'Firstname', key: 'firstname', width: 20 },
-      { header: 'Middlename', key: 'middlename', width: 20 }
+      { header: 'Middlename', key: 'middlename', width: 20 },
+      { header: 'Program', key: 'program', width: 20 },
+      { header: 'Period', key: 'period', width: 20 },
+      { header: 'Amount', key: 'amount', width: 20 }
       // Add more columns based on your data structure
     ]
 
-    const result = await fetchGrantees(
-      { filterProgram, filterKeyword, filterGender, filterYear },
-      '',
+    const result = await fetchAllowances(
+      { filterProgram, filterPeriod },
       99999,
       0
     )
 
-    const results: GranteeTypes[] = result.data
+    const results: AllowancesTypes[] = result.data
 
     // Data for the Excel file
     const data: any[] = []
     results.forEach((item, index) => {
       data.push({
         no: index + 1,
-        lastname: `${item.lastname}`,
-        firstname: `${item.firstname}`,
-        middlename: `${item.middlename}`
+        lastname: `${item.user?.lastname}`,
+        firstname: `${item.user?.firstname}`,
+        middlename: `${item.user?.middlename}`,
+        program: `${item.program?.name}`,
+        period: `${item.period}`,
+        amount: `${item.amount}`
       })
     })
 
@@ -161,19 +177,10 @@ const Page: React.FC = () => {
 
   // Featch data
   useEffect(() => {
-    ;(async () => {
-      const result = await fetchPrograms('', 999, 0)
-      setPrograms(result.data)
-    })()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  // Featch data
-  useEffect(() => {
     setList([])
     void fetchData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [perPageCount, filterProgram, filterKeyword, filterYear, filterGender])
+  }, [perPageCount, filterProgram, filterPeriod])
 
   const isDataEmpty = !Array.isArray(list) || list.length < 1 || !list
 
@@ -188,41 +195,57 @@ const Page: React.FC = () => {
   return (
     <>
       <Sidebar>
-        <ProgramsSideBar />
+        <AllowancesSidebar />
       </Sidebar>
       <TopBar />
       <div className="app__main">
         <div>
           <div className="app__title">
-            <Title title="Grantees Reports" />
+            <Title title="Allowances" />
+            <CustomButton
+              containerStyles="app__btn_green"
+              title="Bulk Add Allowances"
+              btnType="button"
+              handleClick={handleAdd}
+            />
           </div>
 
           {/* Filters */}
           <div className="app__filters">
             <Filters
-              setFilterKeyword={setFilterKeyword}
+              setFilterPeriod={setFilterPeriod}
               setFilterProgram={setFilterProgram}
-              setFilterGender={setFilterGender}
-              setFilterYear={setFilterYear}
-              programs={programs}
             />
-          </div>
-
-          <div>
-            <div className="mx-4 my-4 grid md:grid-cols-2 gap-2">
-              <ChartYearLevel />
-            </div>
           </div>
 
           {/* Export Button */}
-          <div className="mx-4 mb-4 flex justify-end space-x-2">
-            <CustomButton
-              containerStyles="app__btn_blue"
-              isDisabled={downloading}
-              title={downloading ? 'Downloading...' : 'Export To Excel'}
-              btnType="button"
-              handleClick={handleDownloadExcel}
-            />
+          <div className="mx-4 mb-4 flex justify-start items-end space-x-2">
+            <div className="flex-1 flex justify-center space-x-2">
+              <div className="border bg-gray-200 py-px px-2 rounded-lg">
+                <div className="text-xs font-medium">Total Scholars</div>
+                <div className="text-sm font-bold text-center">
+                  {totalScholars}
+                </div>
+              </div>
+              <div className="border bg-gray-200 py-px px-2 rounded-lg">
+                <div className="text-xs font-medium">Total Allowances</div>
+                <div className="text-sm font-bold text-center">
+                  {totalAllowances.toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                  })}
+                </div>
+              </div>
+            </div>
+            <div>
+              <CustomButton
+                containerStyles="app__btn_blue"
+                isDisabled={downloading}
+                title={downloading ? 'Downloading...' : 'Export To Excel'}
+                btnType="button"
+                handleClick={handleDownloadExcel}
+              />
+            </div>
           </div>
 
           {/* Per Page */}
@@ -241,8 +264,7 @@ const Page: React.FC = () => {
                   <th className="app__th pl-4"></th>
                   <th className="app__th pl-4">Scholar</th>
                   <th className="app__th">Program</th>
-                  <th className="app__th">Year Level</th>
-                  <th className="app__th">Gender</th>
+                  <th className="app__th">Allowance</th>
                 </tr>
               </thead>
               <tbody>
@@ -253,17 +275,21 @@ const Page: React.FC = () => {
                       <td className="app__td">
                         <div className="space-y-1">
                           <div className="font-bold">
-                            {item.lastname}, {item.firstname} {item.middlename}
+                            {item.user?.lastname}, {item.user?.firstname}{' '}
+                            {item.user?.middlename}
                           </div>
-                          <div>{item.email}</div>
                         </div>
                       </td>
-                      <td className="app__td">{item.program?.name}</td>
-                      <td className="app__td">{item.gender}</td>
-                      <td className="app__td">{item.year_level_status}</td>
+                      <td className="app__td">{item.program.name}</td>
+                      <td className="app__td">
+                        {Number(item.amount).toLocaleString('en-US', {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2
+                        })}
+                      </td>
                     </tr>
                   ))}
-                {loading && <TableRowLoading cols={5} rows={2} />}
+                {loading && <TableRowLoading cols={4} rows={2} />}
               </tbody>
             </table>
             {!loading && isDataEmpty && (
@@ -274,6 +300,11 @@ const Page: React.FC = () => {
           {/* Show More */}
           {resultsCounter.results > resultsCounter.showing && !loading && (
             <ShowMore handleShowMore={handleShowMore} />
+          )}
+
+          {/* Add/Edit Modal */}
+          {showBulkAddModal && (
+            <BulkAddModal hideModal={() => setShowBulkAddModal(false)} />
           )}
         </div>
       </div>

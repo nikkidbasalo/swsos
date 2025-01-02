@@ -237,6 +237,7 @@ const Page: React.FC = () => {
   // Check access from permission settings or Super Admins
   if (
     !hasAccess('evaluators') &&
+    !hasAccess('staff') &&
     !hasAccess('settings') &&
     !superAdmins.includes(session.user.email)
   )
@@ -289,8 +290,7 @@ const Page: React.FC = () => {
               <thead className="app__thead">
                 <tr>
                   <th className="app__th pl-4"></th>
-                  <th className="app__th">Fullname</th>
-                  <th className="app__th">ID Number</th>
+                  <th className="app__th">Scholar</th>
                   <th className="app__th">Program</th>
                   <th className="app__th">Year Granted</th>
                 </tr>
@@ -377,15 +377,11 @@ const Page: React.FC = () => {
                           </div>
                         </div>
                       </th>
-                      <td className="app__td">
-                        ID: {item.id_number}{' '}
-                        {item.control_number && `/ ${item.control_number}`}
-                      </td>
                       <td className="app__td">{item.program.name}</td>
                       <td className="app__td">{item.year_granted}</td>
                     </tr>
                   ))}
-                {loading && <TableRowLoading cols={5} rows={2} />}
+                {loading && <TableRowLoading cols={4} rows={2} />}
               </tbody>
             </table>
             {!loading && isDataEmpty && (

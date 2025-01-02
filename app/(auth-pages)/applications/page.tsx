@@ -205,8 +205,6 @@ const Page: React.FC = () => {
   const addAccount = async (
     formdata: ApplicationTypes
   ): Promise<{ error?: string }> => {
-    const tempPassword = Math.floor(Math.random() * 8999) + 1000
-
     const newData = {
       program_id: formdata.program_id,
       lastname: formdata.lastname,
@@ -216,7 +214,7 @@ const Page: React.FC = () => {
       gender: formdata.gender,
       birthday: formdata.birthday || null,
       type: 'Scholar',
-      temp_password: tempPassword.toString()
+      temp_password: selectedItem?.temporary_password
     }
 
     try {
@@ -261,7 +259,7 @@ const Page: React.FC = () => {
 
   // Check access from permission settings or Super Admins
   if (
-    !hasAccess('evaluators') &&
+    !hasAccess('staff') &&
     !hasAccess('settings') &&
     !superAdmins.includes(session.user.email)
   )

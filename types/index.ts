@@ -80,6 +80,10 @@ export interface GradeTypes {
   grade_id: string
   period_id: string
   period: EvaluationPeriodTypes
+  user_id: string
+  user: AccountTypes
+  program_id: string
+  program: ProgramTypes
   file_path: string
   remarks: string
   status: string
@@ -137,7 +141,9 @@ export interface AccountTypes {
   department: string
   avatar_url: string
   email: string
+  gender: string
   type: string
+  program_id: string
   org_id: string
   created_by: string
   temp_password: string
@@ -187,4 +193,14 @@ export interface ApplicationTypes {
   email: string
   temporary_password: string
   confirm: string
+}
+
+export interface AllowancesTypes {
+  id: string
+  user_id: string
+  user: AccountTypes
+  program_id: string
+  program: ProgramTypes
+  period: string
+  amount: string
 }

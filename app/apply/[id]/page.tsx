@@ -50,6 +50,8 @@ export default function Page({ params }: { params: { id: string } }) {
     const randomCode = generateRandomAlphaNumber(5)
     setRefCode(randomCode)
 
+    const tempPassword = Math.floor(Math.random() * 8999) + 1000
+
     try {
       let filePath: string | null = null
 
@@ -103,7 +105,8 @@ export default function Page({ params }: { params: { id: string } }) {
         reference_contact_1: formdata.reference_contact_1,
         reference_contact_2: formdata.reference_contact_2,
         reference_contact_3: formdata.reference_contact_3,
-        file_path: filePath
+        file_path: filePath,
+        temporary_password: tempPassword
       }
 
       const { data, error } = await supabase
@@ -115,6 +118,10 @@ export default function Page({ params }: { params: { id: string } }) {
         throw new Error(error.message)
       }
 
+      void handleNotify(
+        `${formdata.firstname} ${formdata.middlename} ${formdata.lastname}`
+      )
+
       setSubmitted(true)
 
       setSaving(false)
@@ -122,6 +129,51 @@ export default function Page({ params }: { params: { id: string } }) {
       console.error(e)
     } finally {
       setSaving(false)
+    }
+  }
+
+  const handleNotify = async (fullname: string) => {
+    //
+    try {
+      const userIds: string[] = []
+
+      // Approvers
+      const { data, error } = await supabase
+        .from('sws_system_access')
+        .select('user_id')
+        .in('type', ['settings', 'staff'])
+
+      if (error) {
+        throw new Error(error.message)
+      }
+
+      data.forEach((item: any) => {
+        userIds.push(item.user_id)
+      })
+
+      const notificationData: any[] = []
+
+      userIds.forEach((userId) => {
+        notificationData.push({
+          message: `${fullname} has recently applied for scholarship. Kindly review his/her applicantion.`,
+          url: '/applications',
+          type: 'New Scholarship Application',
+          user_id: userId
+        })
+      })
+
+      if (notificationData.length > 0) {
+        // insert to notifications
+        const { error: error3 } = await supabase
+          .from('sws_notifications')
+          .insert(notificationData)
+
+        if (error3) {
+          throw new Error(error3.message)
+        }
+      }
+    } catch (e) {
+      console.error(e)
     }
   }
 

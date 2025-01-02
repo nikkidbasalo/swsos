@@ -3,10 +3,8 @@ import {
   CustomButton,
   PerPage,
   ShowMore,
-  TableRowLoading,
-  Unauthorized
+  TableRowLoading
 } from '@/components/index'
-import { superAdmins } from '@/constants'
 import { useFilter } from '@/context/FilterContext'
 import { useSupabase } from '@/context/SupabaseProvider'
 import { updateList } from '@/GlobalRedux/Features/listSlice'
@@ -116,14 +114,6 @@ export default function Grades({ userData }: { userData: AccountTypes }) {
 
   const isDataEmpty = !Array.isArray(list) || list.length < 1 || !list
 
-  // Check access from permission settings or Super Admins
-  if (
-    !hasAccess('evaluators') &&
-    !hasAccess('settings') &&
-    !superAdmins.includes(session.user.email)
-  )
-    return <Unauthorized />
-
   return (
     <>
       <div>
@@ -228,9 +218,10 @@ export default function Grades({ userData }: { userData: AccountTypes }) {
             )}
 
             {/* Add/Edit Modal */}
-            {showAddModal && (
+            {showAddModal && userData && (
               <AddGradeModal
                 editData={editData}
+                userData={userData}
                 hideModal={() => setShowAddModal(false)}
               />
             )}

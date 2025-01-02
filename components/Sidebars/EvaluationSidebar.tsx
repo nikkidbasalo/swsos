@@ -29,6 +29,18 @@ const EvaluationSidebar = () => {
             <span className="flex-1 ml-3 whitespace-nowrap">Evaluations</span>
           </Link>
         </li>
+        <li>
+          <Link
+            href="/evaluationreports"
+            className={`app__menu_link ${
+              currentRoute === '/evaluationreports'
+                ? 'app_menu_link_active'
+                : ''
+            }`}
+          >
+            <span className="flex-1 ml-3 whitespace-nowrap">Reports</span>
+          </Link>
+        </li>
         <li className="pt-5">
           <div className="flex items-center text-gray-500 items-centers space-x-1 px-2">
             <Cog6ToothIcon className="w-4 h-4" />

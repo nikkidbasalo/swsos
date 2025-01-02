@@ -1,23 +1,22 @@
 'use client'
-import { ChartYearLevel } from '@/components/ChartYearLevel'
 import {
   CustomButton,
   PerPage,
-  ProgramsSideBar,
   ShowMore,
   Sidebar,
   TableRowLoading,
   Title,
   Unauthorized
 } from '@/components/index'
+import EvaluationSidebar from '@/components/Sidebars/EvaluationSidebar'
 import TopBar from '@/components/TopBar'
 import { superAdmins } from '@/constants'
 import { useFilter } from '@/context/FilterContext'
 import { useSupabase } from '@/context/SupabaseProvider'
 import { updateList } from '@/GlobalRedux/Features/listSlice'
 import { updateResultCounter } from '@/GlobalRedux/Features/resultsCounterSlice'
-import { GranteeTypes, ProgramTypes } from '@/types'
-import { fetchGrantees, fetchPrograms } from '@/utils/fetchApi'
+import { GradeTypes } from '@/types'
+import { fetchEvaluations } from '@/utils/fetchApi'
 import Excel from 'exceljs'
 import { saveAs } from 'file-saver'
 import React, { useEffect, useState } from 'react'
@@ -31,16 +30,16 @@ const Page: React.FC = () => {
   const [loading, setLoading] = useState(false)
   const [downloading, setDownloading] = useState(false)
 
-  const [programs, setPrograms] = useState<ProgramTypes[]>([])
-
-  const [filterKeyword, setFilterKeyword] = useState<string>('')
+  const [filterStatus, setFilterStatus] = useState<string>('')
+  const [filterPeriod, setFilterPeriod] = useState<string>('')
   const [filterProgram, setFilterProgram] = useState<string>('')
-  const [filterYear, setFilterYear] = useState<string>('')
-  const [filterGender, setFilterGender] = useState<string>('')
 
-  const [list, setList] = useState<GranteeTypes[]>([])
+  const [list, setList] = useState<GradeTypes[]>([])
 
   const [perPageCount, setPerPageCount] = useState<number>(10)
+  const [totalPassed, setTotalPassed] = useState(0)
+  const [totalFailed, setTotalFailed] = useState(0)
+  const [totalForEvaluation, setTotalForEvaluation] = useState(0)
 
   // Redux staff
   const globallist = useSelector((state: any) => state.list.value)
@@ -51,9 +50,8 @@ const Page: React.FC = () => {
     setLoading(true)
 
     try {
-      const result = await fetchGrantees(
-        { filterProgram, filterKeyword, filterGender, filterYear },
-        '',
+      const result = await fetchEvaluations(
+        { filterProgram, filterPeriod, filterStatus },
         perPageCount,
         0
       )
@@ -72,6 +70,25 @@ const Page: React.FC = () => {
     } finally {
       setLoading(false)
     }
+
+    //All
+    const all = await fetchEvaluations(
+      { filterProgram, filterPeriod },
+      99999,
+      0
+    )
+    const passed = all.data.filter(
+      (item: GradeTypes) => item.status === 'Passed'
+    ).length
+    const failed = all.data.filter(
+      (item: GradeTypes) => item.status === 'Failed'
+    ).length
+    const forEval = all.data.filter(
+      (item: GradeTypes) => item.status === 'For Evaluation'
+    ).length
+    setTotalPassed(passed)
+    setTotalFailed(failed)
+    setTotalForEvaluation(forEval)
   }
 
   // Append data to existing list whenever 'show more' button is clicked
@@ -79,9 +96,8 @@ const Page: React.FC = () => {
     setLoading(true)
 
     try {
-      const result = await fetchGrantees(
-        { filterProgram, filterKeyword, filterGender, filterYear },
-        '',
+      const result = await fetchEvaluations(
+        { filterProgram, filterPeriod, filterStatus },
         perPageCount,
         list.length
       )
@@ -116,27 +132,34 @@ const Page: React.FC = () => {
       { header: '#', key: 'no', width: 20 },
       { header: 'Lastname', key: 'lastname', width: 20 },
       { header: 'Firstname', key: 'firstname', width: 20 },
-      { header: 'Middlename', key: 'middlename', width: 20 }
+      { header: 'Middlename', key: 'middlename', width: 20 },
+      { header: 'Program', key: 'program', width: 20 },
+      { header: 'Evaluation Period', key: 'period', width: 20 },
+      { header: 'Remarks', key: 'remarks', width: 20 },
+      { header: 'Status', key: 'status', width: 20 }
       // Add more columns based on your data structure
     ]
 
-    const result = await fetchGrantees(
-      { filterProgram, filterKeyword, filterGender, filterYear },
-      '',
+    const result = await fetchEvaluations(
+      { filterProgram, filterPeriod, filterStatus },
       99999,
       0
     )
 
-    const results: GranteeTypes[] = result.data
+    const results: GradeTypes[] = result.data
 
     // Data for the Excel file
     const data: any[] = []
     results.forEach((item, index) => {
       data.push({
         no: index + 1,
-        lastname: `${item.lastname}`,
-        firstname: `${item.firstname}`,
-        middlename: `${item.middlename}`
+        lastname: `${item.user?.lastname}`,
+        firstname: `${item.user?.firstname}`,
+        middlename: `${item.user?.middlename}`,
+        program: `${item.program?.name}`,
+        period: `${item.period?.description}`,
+        remarks: `${item.remarks}`,
+        status: `${item.status}`
       })
     })
 
@@ -161,24 +184,16 @@ const Page: React.FC = () => {
 
   // Featch data
   useEffect(() => {
-    ;(async () => {
-      const result = await fetchPrograms('', 999, 0)
-      setPrograms(result.data)
-    })()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  // Featch data
-  useEffect(() => {
     setList([])
     void fetchData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [perPageCount, filterProgram, filterKeyword, filterYear, filterGender])
+  }, [perPageCount, filterProgram, filterPeriod, filterStatus])
 
   const isDataEmpty = !Array.isArray(list) || list.length < 1 || !list
 
   // Check access from permission settings or Super Admins
   if (
+    !hasAccess('evaluators') &&
     !hasAccess('staff') &&
     !hasAccess('settings') &&
     !superAdmins.includes(session.user.email)
@@ -188,41 +203,55 @@ const Page: React.FC = () => {
   return (
     <>
       <Sidebar>
-        <ProgramsSideBar />
+        <EvaluationSidebar />
       </Sidebar>
       <TopBar />
       <div className="app__main">
         <div>
           <div className="app__title">
-            <Title title="Grantees Reports" />
+            <Title title="Evaluation Reports" />
           </div>
 
           {/* Filters */}
           <div className="app__filters">
             <Filters
-              setFilterKeyword={setFilterKeyword}
+              setFilterPeriod={setFilterPeriod}
               setFilterProgram={setFilterProgram}
-              setFilterGender={setFilterGender}
-              setFilterYear={setFilterYear}
-              programs={programs}
+              setFilterStatus={setFilterStatus}
             />
-          </div>
-
-          <div>
-            <div className="mx-4 my-4 grid md:grid-cols-2 gap-2">
-              <ChartYearLevel />
-            </div>
           </div>
 
           {/* Export Button */}
-          <div className="mx-4 mb-4 flex justify-end space-x-2">
-            <CustomButton
-              containerStyles="app__btn_blue"
-              isDisabled={downloading}
-              title={downloading ? 'Downloading...' : 'Export To Excel'}
-              btnType="button"
-              handleClick={handleDownloadExcel}
-            />
+          <div className="mx-4 mb-4 flex justify-start items-end space-x-2">
+            <div className="flex-1 flex justify-center space-x-2">
+              <div className="border bg-gray-200 py-px px-2 rounded-lg">
+                <div className="text-xs font-medium">Total Passed</div>
+                <div className="text-sm font-bold text-center">
+                  {totalPassed}
+                </div>
+              </div>
+              <div className="border bg-gray-200 py-px px-2 rounded-lg">
+                <div className="text-xs font-medium">Total Failed</div>
+                <div className="text-sm font-bold text-center">
+                  {totalFailed}
+                </div>
+              </div>
+              <div className="border bg-gray-200 pxy-1 px-2 rounded-lg">
+                <div className="text-xs font-medium">Total For Evaluation</div>
+                <div className="text-sm font-bold text-center">
+                  {totalForEvaluation}
+                </div>
+              </div>
+            </div>
+            <div>
+              <CustomButton
+                containerStyles="app__btn_blue"
+                isDisabled={downloading}
+                title={downloading ? 'Downloading...' : 'Export To Excel'}
+                btnType="button"
+                handleClick={handleDownloadExcel}
+              />
+            </div>
           </div>
 
           {/* Per Page */}
@@ -239,10 +268,11 @@ const Page: React.FC = () => {
               <thead className="app__thead">
                 <tr>
                   <th className="app__th pl-4"></th>
-                  <th className="app__th pl-4">Scholar</th>
+                  <th className="app__th">Scholar</th>
                   <th className="app__th">Program</th>
-                  <th className="app__th">Year Level</th>
-                  <th className="app__th">Gender</th>
+                  <th className="app__th">Evaluation Period</th>
+                  <th className="app__th">Remarks</th>
+                  <th className="app__th">Status</th>
                 </tr>
               </thead>
               <tbody>
@@ -253,17 +283,34 @@ const Page: React.FC = () => {
                       <td className="app__td">
                         <div className="space-y-1">
                           <div className="font-bold">
-                            {item.lastname}, {item.firstname} {item.middlename}
+                            {item.user?.lastname}, {item.user?.firstname}{' '}
+                            {item.user?.middlename}
                           </div>
-                          <div>{item.email}</div>
+                          <div>
+                            {item.user?.email} | {item.user?.gender}
+                          </div>
                         </div>
                       </td>
+
                       <td className="app__td">{item.program?.name}</td>
-                      <td className="app__td">{item.gender}</td>
-                      <td className="app__td">{item.year_level_status}</td>
+                      <td className="app__td">{item.period?.description}</td>
+                      <td className="app__td">{item.remarks}</td>
+                      <td className="app__td">
+                        {item.status === 'Passed' && (
+                          <span className="app__status_green">Passed</span>
+                        )}
+                        {item.status === 'For Evaluation' && (
+                          <span className="app__status_orange">
+                            For&nbsp;Evaluation
+                          </span>
+                        )}
+                        {item.status === 'Failed' && (
+                          <span className="app__status_red">Failed</span>
+                        )}
+                      </td>
                     </tr>
                   ))}
-                {loading && <TableRowLoading cols={5} rows={2} />}
+                {loading && <TableRowLoading cols={6} rows={2} />}
               </tbody>
             </table>
             {!loading && isDataEmpty && (
