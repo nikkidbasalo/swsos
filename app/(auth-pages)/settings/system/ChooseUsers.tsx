@@ -201,7 +201,7 @@ export default function ChooseUsers({
           <div className="relative">
             <input
               type="text"
-              placeholder="Search User"
+              placeholder="Type user Name"
               value={searchManager}
               onChange={async (e) => await handleSearchUser(e)}
               className="app__input_noborder"

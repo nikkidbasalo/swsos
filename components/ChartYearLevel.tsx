@@ -26,6 +26,8 @@ export function ChartYearLevel() {
 
     const result = await fetchGrantees({}, '', 99999, 0)
 
+    console.log('result', result.data)
+
     const results: GranteeTypes[] = result.data
 
     const firstYearData: any = { month: '1st Year' }
