@@ -43,8 +43,21 @@ const AddEditModal = ({ hideModal, editData }: ModalProps) => {
   const onSubmit = async (formdata: AccountTypes) => {
     if (saving) return
 
-    const emailCheck = void handleCheckEmail(formdata.email)
-    if (!emailCheck) return
+    const { data: checkUser } = await supabase
+      .from('sws_users')
+      .select()
+      .eq('email', formdata.email)
+      .limit(1)
+      .maybeSingle()
+
+    if (checkUser) {
+      setError('email', {
+        type: 'manual',
+        message: 'This email already exist'
+      })
+    } else {
+      clearErrors('email')
+    }
 
     setSaving(true)
 
@@ -157,27 +170,6 @@ const AddEditModal = ({ hideModal, editData }: ModalProps) => {
       reset()
     } catch (e) {
       console.error(e)
-    }
-  }
-
-  const handleCheckEmail = async (email: string) => {
-    // Prepopulate Tin No
-    const { data } = await supabase
-      .from('sws_users')
-      .select()
-      .eq('email', email)
-      .limit(1)
-      .maybeSingle()
-
-    if (data) {
-      setError('email', {
-        type: 'manual',
-        message: 'This email already exist'
-      })
-      return false
-    } else {
-      clearErrors('email')
-      return true
     }
   }
 
