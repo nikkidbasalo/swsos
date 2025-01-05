@@ -347,3 +347,6 @@ body {
 .app__status_red {
   @apply font-medium text-red-700 bg-red-100 border border-red-500 py-px px-1 text-xs;
 }
+.app__requirements_ul {
+  @apply list-disc;
+}

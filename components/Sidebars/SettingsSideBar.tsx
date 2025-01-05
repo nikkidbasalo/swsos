@@ -33,7 +33,7 @@ const SettingsSideBar = () => {
         <li className="pt-5">
           <div className="flex items-center text-gray-500 items-centers space-x-1 px-2">
             <Cog6ToothIcon className="w-4 h-4" />
-            <span>Settins</span>
+            <span>Settings</span>
           </div>
         </li>
         <li>

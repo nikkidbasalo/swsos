@@ -155,7 +155,7 @@ export default function Page({ params }: { params: { id: string } }) {
 
       userIds.forEach((userId) => {
         notificationData.push({
-          message: `${fullname} has recently applied for scholarship. Kindly review his/her applicantion.`,
+          message: `${fullname} has recently applied for scholarship. Kindly review his/her application.`,
           url: '/applications',
           type: 'New Scholarship Application',
           user_id: userId
@@ -331,14 +331,9 @@ export default function Page({ params }: { params: { id: string } }) {
                             </td>
                             <td className="font-bold border border-black p-1">
                               <input
-                                {...register('middlename', { required: true })}
+                                {...register('middlename')}
                                 className="app__input_standard"
                               />
-                              {errors.middlename && (
-                                <div className="app__error_message">
-                                  Middlename is required
-                                </div>
-                              )}
                             </td>
                             <td className="font-bold border border-black bg-green-200 p-1">
                               GENDER
@@ -428,9 +423,16 @@ export default function Page({ params }: { params: { id: string } }) {
                             </td>
                             <td className="font-bold border border-black p-1">
                               <input
-                                {...register('contact_number')}
+                                {...register('contact_number', {
+                                  required: true
+                                })}
                                 className="app__input_standard"
                               />
+                              {errors.contact_number && (
+                                <div className="app__error_message">
+                                  Contact No is required
+                                </div>
+                              )}
                             </td>
                           </tr>
                           <tr>
@@ -439,9 +441,16 @@ export default function Page({ params }: { params: { id: string } }) {
                             </td>
                             <td className="font-bold border border-black p-1">
                               <input
-                                {...register('present_address')}
+                                {...register('present_address', {
+                                  required: true
+                                })}
                                 className="app__input_standard"
                               />
+                              {errors.present_address && (
+                                <div className="app__error_message">
+                                  Address is required
+                                </div>
+                              )}
                             </td>
                           </tr>
                           <tr>
@@ -450,9 +459,16 @@ export default function Page({ params }: { params: { id: string } }) {
                             </td>
                             <td className="font-bold border border-black p-1">
                               <input
-                                {...register('permanent_address')}
+                                {...register('permanent_address', {
+                                  required: true
+                                })}
                                 className="app__input_standard"
                               />
+                              {errors.permanent_address && (
+                                <div className="app__error_message">
+                                  Address is required
+                                </div>
+                              )}
                             </td>
                           </tr>
                         </tbody>
@@ -477,18 +493,30 @@ export default function Page({ params }: { params: { id: string } }) {
                             </td>
                             <td className="font-bold border border-black p-1">
                               <input
-                                {...register('father')}
+                                {...register('father', { required: true })}
                                 className="app__input_standard"
                               />
+                              {errors.father && (
+                                <div className="app__error_message">
+                                  This is required
+                                </div>
+                              )}
                             </td>
                             <td className="font-bold border border-black bg-green-200 p-1">
                               OCCUPATION
                             </td>
                             <td className="font-bold border border-black p-1">
                               <input
-                                {...register('father_occupation')}
+                                {...register('father_occupation', {
+                                  required: true
+                                })}
                                 className="app__input_standard"
                               />
+                              {errors.father_occupation && (
+                                <div className="app__error_message">
+                                  This is required
+                                </div>
+                              )}
                             </td>
                           </tr>
                           <tr>
@@ -497,18 +525,30 @@ export default function Page({ params }: { params: { id: string } }) {
                             </td>
                             <td className="font-bold border border-black p-1">
                               <input
-                                {...register('mother')}
+                                {...register('mother', { required: true })}
                                 className="app__input_standard"
                               />
+                              {errors.mother && (
+                                <div className="app__error_message">
+                                  This is required
+                                </div>
+                              )}
                             </td>
                             <td className="font-bold border border-black bg-green-200 p-1">
                               OCCUPATION
                             </td>
                             <td className="font-bold border border-black p-1">
                               <input
-                                {...register('mother_occupation')}
+                                {...register('mother_occupation', {
+                                  required: true
+                                })}
                                 className="app__input_standard"
                               />
+                              {errors.mother_occupation && (
+                                <div className="app__error_message">
+                                  This is required
+                                </div>
+                              )}
                             </td>
                           </tr>
                           <tr>
@@ -517,18 +557,30 @@ export default function Page({ params }: { params: { id: string } }) {
                             </td>
                             <td className="font-bold border border-black p-1">
                               <input
-                                {...register('guardian')}
+                                {...register('guardian', { required: true })}
                                 className="app__input_standard"
                               />
+                              {errors.guardian && (
+                                <div className="app__error_message">
+                                  This is required
+                                </div>
+                              )}
                             </td>
                             <td className="font-bold border border-black bg-green-200 p-1">
                               OCCUPATION
                             </td>
                             <td className="font-bold border border-black p-1">
                               <input
-                                {...register('guardian_occupation')}
+                                {...register('guardian_occupation', {
+                                  required: true
+                                })}
                                 className="app__input_standard"
                               />
+                              {errors.guardian_occupation && (
+                                <div className="app__error_message">
+                                  This is required
+                                </div>
+                              )}
                             </td>
                           </tr>
                           <tr>
@@ -540,9 +592,16 @@ export default function Page({ params }: { params: { id: string } }) {
                               className="font-bold border border-black p-1"
                             >
                               <input
-                                {...register('parent_address')}
+                                {...register('parent_address', {
+                                  required: true
+                                })}
                                 className="app__input_standard"
                               />
+                              {errors.parent_address && (
+                                <div className="app__error_message">
+                                  This is required
+                                </div>
+                              )}
                             </td>
                           </tr>
                         </tbody>
@@ -572,18 +631,30 @@ export default function Page({ params }: { params: { id: string } }) {
                             </td>
                             <td className="font-bold border border-black p-1">
                               <input
-                                {...register('shs')}
+                                {...register('shs', { required: true })}
                                 className="app__input_standard"
                               />
+                              {errors.shs && (
+                                <div className="app__error_message">
+                                  This is required
+                                </div>
+                              )}
                             </td>
                             <td className="font-bold border border-black bg-green-200 p-1">
                               PRINCIPAL
                             </td>
                             <td className="font-bold border border-black p-1">
                               <input
-                                {...register('shs_principal')}
+                                {...register('shs_principal', {
+                                  required: true
+                                })}
                                 className="app__input_standard"
                               />
+                              {errors.shs_principal && (
+                                <div className="app__error_message">
+                                  This is required
+                                </div>
+                              )}
                             </td>
                           </tr>
                           <tr>
@@ -592,18 +663,30 @@ export default function Page({ params }: { params: { id: string } }) {
                             </td>
                             <td className="font-bold border border-black p-1">
                               <input
-                                {...register('shs_address')}
+                                {...register('shs_address', { required: true })}
                                 className="app__input_standard"
                               />
+                              {errors.shs_address && (
+                                <div className="app__error_message">
+                                  This is required
+                                </div>
+                              )}
                             </td>
                             <td className="font-bold border border-black bg-green-200 p-1">
                               YEAR GRADUATED
                             </td>
                             <td className="font-bold border border-black p-1">
                               <input
-                                {...register('shs_year_graduated')}
+                                {...register('shs_year_graduated', {
+                                  required: true
+                                })}
                                 className="app__input_standard"
                               />
+                              {errors.shs_year_graduated && (
+                                <div className="app__error_message">
+                                  This is required
+                                </div>
+                              )}
                             </td>
                           </tr>
                           <tr>
@@ -612,21 +695,33 @@ export default function Page({ params }: { params: { id: string } }) {
                             </td>
                             <td className="font-bold border border-black p-1">
                               <select
-                                {...register('shs_school_type')}
+                                {...register('shs_school_type', {
+                                  required: true
+                                })}
                                 className="app__select_standard"
                               >
                                 <option value="Public">Public</option>
                                 <option value="Private">Private</option>
                               </select>
+                              {errors.shs_school_type && (
+                                <div className="app__error_message">
+                                  This is required
+                                </div>
+                              )}
                             </td>
                             <td className="font-bold border border-black bg-green-200 p-1">
                               HONORS RECEIVED
                             </td>
                             <td className="font-bold border border-black p-1">
                               <input
-                                {...register('shs_honor')}
+                                {...register('shs_honor', { required: true })}
                                 className="app__input_standard"
                               />
+                              {errors.shs_honor && (
+                                <div className="app__error_message">
+                                  This is required
+                                </div>
+                              )}
                             </td>
                           </tr>
                         </tbody>
@@ -651,9 +746,16 @@ export default function Page({ params }: { params: { id: string } }) {
                             </td>
                             <td className="font-bold border border-black p-1">
                               <input
-                                {...register('reference_name_1')}
+                                {...register('reference_name_1', {
+                                  required: true
+                                })}
                                 className="app__input_standard"
                               />
+                              {errors.reference_name_1 && (
+                                <div className="app__error_message">
+                                  This is required
+                                </div>
+                              )}
                             </td>
                             <td className="font-bold border border-black bg-green-200 p-1">
                               NAME
@@ -680,9 +782,16 @@ export default function Page({ params }: { params: { id: string } }) {
                             </td>
                             <td className="font-bold border border-black p-1">
                               <input
-                                {...register('reference_address_1')}
+                                {...register('reference_address_1', {
+                                  required: true
+                                })}
                                 className="app__input_standard"
                               />
+                              {errors.reference_address_1 && (
+                                <div className="app__error_message">
+                                  This is required
+                                </div>
+                              )}
                             </td>
                             <td className="font-bold border border-black bg-green-200 p-1">
                               ADDRESS
@@ -709,9 +818,16 @@ export default function Page({ params }: { params: { id: string } }) {
                             </td>
                             <td className="font-bold border border-black p-1">
                               <input
-                                {...register('reference_contact_1')}
+                                {...register('reference_contact_1', {
+                                  required: true
+                                })}
                                 className="app__input_standard"
                               />
+                              {errors.reference_contact_1 && (
+                                <div className="app__error_message">
+                                  This is required
+                                </div>
+                              )}
                             </td>
                             <td className="font-bold border border-black bg-green-200 p-1">
                               CONTACT #
@@ -740,6 +856,102 @@ export default function Page({ params }: { params: { id: string } }) {
               </table>
               <div className="mx-4 mb-8">
                 <div className="app__form_field_container">
+                  <div>
+                    <div className="mt-4 font-bold">
+                      ACADEMIC SCHOLARSHIP REQUIREMENTS
+                    </div>
+                    <div className="ml-6">
+                      <div className="text-gray-700 italic">
+                        For Valedictorian:
+                      </div>
+                      <div className="text-xs text-gray-700 ml-6">
+                        <ul className="app__requirements_ul">
+                          <li>
+                            Accomplished Academic Scholarship Application Form
+                          </li>
+                          <li>
+                            Certificate as Class Valedictorian duly signed by
+                            the School Principal
+                          </li>
+                          <li>
+                            Certificate of General Weighted Average duly signed
+                            by the School Registrar
+                          </li>
+                          <li>
+                            Certificate of Good Moral Character from where the
+                            applicant graduated
+                          </li>
+                          <li>
+                            Certificate of Residency with Recommendation duly
+                            signed by the Brgy. Captain where the applicant
+                            permanently resides.
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                    <div className="ml-6">
+                      <div className="text-gray-700 italic">
+                        For Salutatorian:
+                      </div>
+                      <div className="text-xs text-gray-700 ml-6">
+                        <ul className="app__requirements_ul">
+                          <li>
+                            Accomplished Academic Scholarship Application Form
+                          </li>
+                          <li>
+                            {' '}
+                            Certificate as Class Valedictorian duly signed by
+                            the School Principal
+                          </li>
+                          <li>
+                            {' '}
+                            Certificate of General Weighted Average duly signed
+                            by the School Registrar
+                          </li>
+                          <li>
+                            {' '}
+                            Certificate of Good Moral Character from where the
+                            applicant graduated
+                          </li>
+                          <li>
+                            {' '}
+                            Certificate of Residency with Recommendation duly
+                            signed by the Brgy. Captain where the applicant
+                            permanently resides.
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                    <div className="mt-4 font-bold">
+                      PRESIDENTIAL SCHOLARSHIP REQUIREMENTS
+                    </div>
+                    <div className="text-gray-700 italic text-xs">
+                      (must have at least 1 year in the college but not more
+                      than the number of years required in the program enrolled)
+                    </div>
+                    <div className="text-xs text-gray-700 mt-4 ml-6">
+                      <ul className="app__requirements_ul">
+                        <li>
+                          Accomplished Academic Scholarship Application Form
+                        </li>
+                        <li>
+                          Grade Slip(s) for two (2) consecutive semesters of the
+                          preceding Academic Year with no grade below 87
+                        </li>
+                        <li>
+                          Certificate of General Weighted Average for two (2)
+                          consecutive semesters of the preceding Academic Year
+                          with at least 91%{' '}
+                        </li>
+                        <li>and above duly signed by the College Registrar</li>
+                        <li>
+                          Certificate of Good Moral Character duly signed by the
+                          Prefect of Discipline and Formation/College Guidance
+                          Counselor
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
                   <div className="w-full">
                     <div className="mt-2 flex flex-col space-y-2 items-start">
                       {/* File Input Wrapper */}
@@ -758,7 +970,7 @@ export default function Page({ params }: { params: { id: string } }) {
                           className="cursor-pointer flex items-start space-x-2"
                         >
                           <span className="text-sm text-gray-700 font-bold">
-                            Attachment
+                            Click here to attachment requirements
                           </span>
                           <PaperClipIcon className="w-4 h-4" />
                         </label>
