@@ -292,7 +292,7 @@ const Page: React.FC = () => {
                   <th className="app__th pl-4"></th>
                   <th className="app__th">Scholar</th>
                   <th className="app__th">Program</th>
-                  <th className="app__th">Year Granted</th>
+                  <th className="app__th">Institute</th>
                 </tr>
               </thead>
               <tbody>
@@ -378,7 +378,7 @@ const Page: React.FC = () => {
                         </div>
                       </th>
                       <td className="app__td">{item.program.name}</td>
-                      <td className="app__td">{item.year_granted}</td>
+                      <td className="app__td">{item.institute?.name}</td>
                     </tr>
                   ))}
                 {loading && <TableRowLoading cols={4} rows={2} />}

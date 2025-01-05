@@ -58,7 +58,6 @@ const Notifications = ({ darkMode }: propTypes) => {
 
     // return if no more notifications to load
     if (list.length === total) {
-      console.log(list.length, total)
       return
     }
 

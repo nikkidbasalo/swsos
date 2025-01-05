@@ -116,7 +116,8 @@ export default function ChooseUsers({
         const newData = {
           sws_user: item,
           user_id: item.id,
-          type
+          type,
+          program_ids: []
         }
 
         if (multiple) {
@@ -132,7 +133,7 @@ export default function ChooseUsers({
         router.refresh()
       }
     } catch (err) {
-      console.log(err)
+      console.error(err)
     }
 
     // Resets

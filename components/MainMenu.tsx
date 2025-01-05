@@ -10,7 +10,6 @@ import {
   TableCellsIcon,
   UserIcon
 } from '@heroicons/react/20/solid'
-import { CurrencyDollarIcon } from '@heroicons/react/24/solid'
 import Link from 'next/link'
 
 const MainMenu = () => {
@@ -61,21 +60,6 @@ const MainMenu = () => {
                     <div className="app__menu_item_label">Applications</div>
                     <div className="app__menu_item_label_description">
                       Scholarship Applications
-                    </div>
-                  </div>
-                </div>
-              </Link>
-            )}
-            {(hasAccess('settings') || hasAccess('staff')) && (
-              <Link href="/allowances">
-                <div className="app__menu_item">
-                  <div className="pt-1">
-                    <CurrencyDollarIcon className="w-8 h-8" />
-                  </div>
-                  <div>
-                    <div className="app__menu_item_label">Allowances</div>
-                    <div className="app__menu_item_label_description">
-                      Allowances
                     </div>
                   </div>
                 </div>

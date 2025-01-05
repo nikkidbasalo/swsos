@@ -48,7 +48,9 @@ export async function fetchGrades(
   try {
     let query = supabase
       .from('sws_grades')
-      .select('*,period:evaluation_period_id(*)', { count: 'exact' })
+      .select('*,period:evaluation_period_id(*)', {
+        count: 'exact'
+      })
       .eq('user_id', userId)
 
     // Per Page from context
@@ -181,7 +183,9 @@ export async function fetchApplications(
 
 export async function fetchGrantees(
   filters: {
+    filterProgramIds?: string[]
     filterProgram?: string
+    filterInstitute?: string
     filterKeyword?: string
     filterStatus?: string
     filterYear?: string
@@ -194,7 +198,9 @@ export async function fetchGrantees(
   try {
     let query = supabase
       .from('sws_users')
-      .select('*, program:program_id(*)', { count: 'exact' })
+      .select('*, institute:institute_id(*),program:program_id(*)', {
+        count: 'exact'
+      })
       .not('program_id', 'is', null)
       .eq('type', 'Scholar')
 
@@ -220,6 +226,15 @@ export async function fetchGrantees(
     // filter program
     if (filters.filterProgram && filters.filterProgram !== '') {
       query = query.eq('program_id', filters.filterProgram)
+    }
+    // filter institute
+    if (filters.filterInstitute && filters.filterInstitute !== '') {
+      query = query.eq('institute_id', filters.filterInstitute)
+    }
+
+    // filter program ids
+    if (filters.filterProgramIds) {
+      query = query.in('program_id', filters.filterProgramIds)
     }
 
     // filter gender
@@ -379,6 +394,32 @@ export async function fetchAnnoucements(
     return { data, count }
   } catch (error) {
     console.error('fetch announcements error', error)
+    return { data: [], count: 0 }
+  }
+}
+
+export async function fetchInstitutes(perPageCount: number, rangeFrom: number) {
+  try {
+    let query = supabase.from('sws_institutes').select('*', { count: 'exact' })
+
+    // Per Page from context
+    const from = rangeFrom
+    const to = from + (perPageCount - 1)
+
+    // Per Page from context
+    query = query.range(from, to)
+
+    // Order By
+    query = query.order('id', { ascending: false })
+
+    const { data, error, count } = await query
+
+    if (error) {
+      throw new Error(error.message)
+    }
+    return { data, count }
+  } catch (error) {
+    console.error('fetch institutes error', error)
     return { data: [], count: 0 }
   }
 }

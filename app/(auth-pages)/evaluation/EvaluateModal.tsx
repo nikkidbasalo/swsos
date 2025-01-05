@@ -46,7 +46,8 @@ export default function EvaluateModal({ hideModal, grantee }: ModalProps) {
     const newData = {
       remarks: formdata.remarks,
       status: formdata.status,
-      lowest_grade: formdata.lowest_grade
+      allowance: formdata.allowance,
+      allowance_type: formdata.allowance_type
     }
 
     try {
@@ -93,7 +94,7 @@ export default function EvaluateModal({ hideModal, grantee }: ModalProps) {
   // Update data whenever list in redux updates
   useEffect(() => {
     ;(async () => {
-      const result = await fetchGrades(session.user.id, 999, 0)
+      const result = await fetchGrades(grantee.id, 999, 0)
       setGrades(result.data)
     })()
   }, [refresh])
@@ -255,7 +256,7 @@ export default function EvaluateModal({ hideModal, grantee }: ModalProps) {
                         <tr>
                           <th className="app__th">Period</th>
                           <th className="app__th">Grades</th>
-                          <th className="app__th">Lowest&nbsp;Grade</th>
+                          <th className="app__th">Allowance</th>
                           <th className="app__th">Remarks</th>
                           <th className="app__th">Status</th>
                         </tr>
@@ -277,7 +278,13 @@ export default function EvaluateModal({ hideModal, grantee }: ModalProps) {
                                 </Link>
                               )}
                             </td>
-                            <td className="app__td">{item.lowest_grade}</td>
+                            <td className="app__td">
+                              {Number(item.allowance).toLocaleString('en-US', {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                              })}{' '}
+                              {item.allowance_type}
+                            </td>
                             <td className="app__td">{item.remarks}</td>
                             <td className="app__td">
                               {item.status === 'Passed' && (
@@ -296,6 +303,13 @@ export default function EvaluateModal({ hideModal, grantee }: ModalProps) {
                             </td>
                           </tr>
                         ))}
+                        {grades.length === 0 && (
+                          <tr className="app__tr">
+                            <td className="app__td" colSpan={5}>
+                              No Grades Uploaded Yet
+                            </td>
+                          </tr>
+                        )}
                       </tbody>
                     </table>
                   </div>
@@ -345,20 +359,46 @@ export default function EvaluateModal({ hideModal, grantee }: ModalProps) {
                             <div className="app__form_field_container">
                               <div className="w-full">
                                 <div className="app__label_standard">
-                                  Lowest Grade
+                                  Allowance
                                 </div>
                                 <div>
                                   <input
-                                    {...register('lowest_grade', {
+                                    {...register('allowance', {
                                       required: true
                                     })}
                                     type="number"
                                     step="any"
                                     className="app__input_standard"
                                   />
-                                  {errors.lowest_grade && (
+                                  {errors.allowance && (
                                     <div className="app__error_message">
-                                      Lowest Grade is required
+                                      Allowance required
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                            <div className="app__form_field_container">
+                              <div className="w-full">
+                                <div className="app__label_standard">
+                                  Allowance Type
+                                </div>
+                                <div>
+                                  <select
+                                    {...register('allowance_type', {
+                                      required: true
+                                    })}
+                                    className="app__select_standard"
+                                  >
+                                    <option value="">Choose Type</option>
+                                    <option value="Per Month">Per Month</option>
+                                    <option value="Per Semester">
+                                      Per Semester
+                                    </option>
+                                  </select>
+                                  {errors.allowance_type && (
+                                    <div className="app__error_message">
+                                      Allowance Type required
                                     </div>
                                   )}
                                 </div>
@@ -371,16 +411,9 @@ export default function EvaluateModal({ hideModal, grantee }: ModalProps) {
                                 </div>
                                 <div>
                                   <textarea
-                                    {...register('remarks', {
-                                      required: true
-                                    })}
+                                    {...register('remarks')}
                                     className="app__input_standard"
                                   />
-                                  {errors.remarks && (
-                                    <div className="app__error_message">
-                                      Remarks is required
-                                    </div>
-                                  )}
                                 </div>
                               </div>
                             </div>

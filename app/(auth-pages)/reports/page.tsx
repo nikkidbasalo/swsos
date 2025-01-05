@@ -16,12 +16,13 @@ import { useFilter } from '@/context/FilterContext'
 import { useSupabase } from '@/context/SupabaseProvider'
 import { updateList } from '@/GlobalRedux/Features/listSlice'
 import { updateResultCounter } from '@/GlobalRedux/Features/resultsCounterSlice'
-import { GranteeTypes, ProgramTypes } from '@/types'
-import { fetchGrantees, fetchPrograms } from '@/utils/fetchApi'
+import { GranteeTypes, InstituteTypes, ProgramTypes } from '@/types'
+import { fetchGrantees, fetchInstitutes, fetchPrograms } from '@/utils/fetchApi'
 import Excel from 'exceljs'
 import { saveAs } from 'file-saver'
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import EvaluationModal from './EvaluationModal'
 import Filters from './Filters'
 
 const Page: React.FC = () => {
@@ -30,15 +31,19 @@ const Page: React.FC = () => {
 
   const [loading, setLoading] = useState(false)
   const [downloading, setDownloading] = useState(false)
+  const [showEvaluationModal, setShowEvaluationModal] = useState(false)
 
   const [programs, setPrograms] = useState<ProgramTypes[]>([])
+  const [institutes, setInstitutes] = useState<InstituteTypes[]>([])
 
   const [filterKeyword, setFilterKeyword] = useState<string>('')
   const [filterProgram, setFilterProgram] = useState<string>('')
+  const [filterInstitute, setFilterInstitute] = useState<string>('')
   const [filterYear, setFilterYear] = useState<string>('')
   const [filterGender, setFilterGender] = useState<string>('')
 
   const [list, setList] = useState<GranteeTypes[]>([])
+  const [editData, setEditData] = useState<GranteeTypes | null>(null)
 
   const [perPageCount, setPerPageCount] = useState<number>(10)
 
@@ -52,7 +57,13 @@ const Page: React.FC = () => {
 
     try {
       const result = await fetchGrantees(
-        { filterProgram, filterKeyword, filterGender, filterYear },
+        {
+          filterProgram,
+          filterKeyword,
+          filterGender,
+          filterYear,
+          filterInstitute
+        },
         '',
         perPageCount,
         0
@@ -80,7 +91,13 @@ const Page: React.FC = () => {
 
     try {
       const result = await fetchGrantees(
-        { filterProgram, filterKeyword, filterGender, filterYear },
+        {
+          filterProgram,
+          filterKeyword,
+          filterGender,
+          filterYear,
+          filterInstitute
+        },
         '',
         perPageCount,
         list.length
@@ -120,13 +137,20 @@ const Page: React.FC = () => {
       { header: 'Gender', key: 'gender', width: 20 },
       { header: 'Year Level', key: 'year', width: 20 },
       { header: 'Program', key: 'program', width: 20 },
+      { header: 'Institute', key: 'institute', width: 20 },
       { header: 'Birthday', key: 'birthday', width: 20 },
       { header: 'Year Granted', key: 'yeargranted', width: 20 }
       // Add more columns based on your data structure
     ]
 
     const result = await fetchGrantees(
-      { filterProgram, filterKeyword, filterGender, filterYear },
+      {
+        filterProgram,
+        filterKeyword,
+        filterGender,
+        filterYear,
+        filterInstitute
+      },
       '',
       99999,
       0
@@ -145,8 +169,9 @@ const Page: React.FC = () => {
         gender: `${item.gender}`,
         year: `${item.year_level_status}`,
         program: `${item.program?.name}`,
+        institute: `${item.institute?.name}`,
         birthday: `${item.birthday}`,
-        yeargranted: `${item.year_granted}`
+        yeargranted: `${item.year_granted ?? ''}`
       })
     })
 
@@ -164,6 +189,11 @@ const Page: React.FC = () => {
     setDownloading(false)
   }
 
+  const handleViewDetails = (item: GranteeTypes) => {
+    setShowEvaluationModal(true)
+    setEditData(item)
+  }
+
   // Update list whenever list in redux updates
   useEffect(() => {
     setList(globallist)
@@ -174,6 +204,8 @@ const Page: React.FC = () => {
     ;(async () => {
       const result = await fetchPrograms('', 999, 0)
       setPrograms(result.data)
+      const institutesData = await fetchInstitutes(999, 0)
+      setInstitutes(institutesData.data)
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -183,7 +215,14 @@ const Page: React.FC = () => {
     setList([])
     void fetchData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [perPageCount, filterProgram, filterKeyword, filterYear, filterGender])
+  }, [
+    perPageCount,
+    filterProgram,
+    filterInstitute,
+    filterKeyword,
+    filterYear,
+    filterGender
+  ])
 
   const isDataEmpty = !Array.isArray(list) || list.length < 1 || !list
 
@@ -214,7 +253,9 @@ const Page: React.FC = () => {
               setFilterProgram={setFilterProgram}
               setFilterGender={setFilterGender}
               setFilterYear={setFilterYear}
+              setFilterInstitute={setFilterInstitute}
               programs={programs}
+              institutes={institutes}
             />
           </div>
 
@@ -251,6 +292,7 @@ const Page: React.FC = () => {
                   <th className="app__th pl-4"></th>
                   <th className="app__th pl-4">Scholar</th>
                   <th className="app__th">Program</th>
+                  <th className="app__th">Institute</th>
                   <th className="app__th">Gender</th>
                   <th className="app__th">Year Level</th>
                 </tr>
@@ -266,14 +308,23 @@ const Page: React.FC = () => {
                             {item.lastname}, {item.firstname} {item.middlename}
                           </div>
                           <div>{item.email}</div>
+                          <div>
+                            <CustomButton
+                              containerStyles="app__btn_green"
+                              title="View Evaluation Results"
+                              btnType="button"
+                              handleClick={() => handleViewDetails(item)}
+                            />
+                          </div>
                         </div>
                       </td>
                       <td className="app__td">{item.program?.name}</td>
+                      <td className="app__td">{item.institute?.name}</td>
                       <td className="app__td">{item.gender}</td>
                       <td className="app__td">{item.year_level_status}</td>
                     </tr>
                   ))}
-                {loading && <TableRowLoading cols={5} rows={2} />}
+                {loading && <TableRowLoading cols={6} rows={2} />}
               </tbody>
             </table>
             {!loading && isDataEmpty && (
@@ -284,6 +335,14 @@ const Page: React.FC = () => {
           {/* Show More */}
           {resultsCounter.results > resultsCounter.showing && !loading && (
             <ShowMore handleShowMore={handleShowMore} />
+          )}
+
+          {/* Tracker Modal */}
+          {showEvaluationModal && editData && (
+            <EvaluationModal
+              grantee={editData}
+              hideModal={() => setShowEvaluationModal(false)}
+            />
           )}
         </div>
       </div>

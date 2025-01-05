@@ -12,6 +12,7 @@ export interface UserAccessTypes {
   user_id: string
   type: string
   sws_user: AccountTypes
+  program_ids: string[]
 }
 
 export interface searchUser {
@@ -88,6 +89,8 @@ export interface GradeTypes {
   remarks: string
   status: string
   lowest_grade: string
+  allowance: string
+  allowance_type: string
   confirmed: string
 }
 export interface EvaluationPeriodTypes {
@@ -109,6 +112,8 @@ export interface GranteeTypes {
   program_id: string
   year_granted: string
   program: ProgramTypes
+  institute_id: string
+  institute: InstituteTypes
   confirmed: string
   control_number: string
   employee_number: string
@@ -148,6 +153,11 @@ export interface AccountTypes {
   created_by: string
   temp_password: string
   confirmed: string
+}
+
+export interface InstituteTypes {
+  id: string
+  name: string
 }
 
 export interface ApplicationTypes {

@@ -26,8 +26,6 @@ export function ChartYearLevel() {
 
     const result = await fetchGrantees({}, '', 99999, 0)
 
-    console.log('result', result.data)
-
     const results: GranteeTypes[] = result.data
 
     const firstYearData: any = { month: '1st Year' }
@@ -86,8 +84,6 @@ export function ChartYearLevel() {
     ]
 
     const chartConfig = chartConfigData satisfies ChartConfig
-
-    console.log('xx', chartData, chartConfig)
 
     setDataSets(chartData)
     setLabels(chartConfig)

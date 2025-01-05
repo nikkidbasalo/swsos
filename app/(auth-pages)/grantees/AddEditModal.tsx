@@ -1,12 +1,12 @@
 import { CustomButton } from '@/components/index'
 import { useFilter } from '@/context/FilterContext'
 import { useSupabase } from '@/context/SupabaseProvider'
-import { fetchPrograms, logError } from '@/utils/fetchApi'
+import { fetchInstitutes, fetchPrograms, logError } from '@/utils/fetchApi'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 // Types
-import type { GranteeTypes, ProgramTypes } from '@/types'
+import type { GranteeTypes, InstituteTypes, ProgramTypes } from '@/types'
 
 // Redux imports
 import { updateList } from '@/GlobalRedux/Features/listSlice'
@@ -26,6 +26,7 @@ const AddEditModal = ({ hideModal, editData, programId, type }: ModalProps) => {
   const [saving, setSaving] = useState(false)
 
   const [programs, setPrograms] = useState<ProgramTypes[]>([])
+  const [institutes, setInstitutes] = useState<InstituteTypes[]>([])
 
   // Redux staff
   const globallist = useSelector((state: any) => state.list.value)
@@ -78,6 +79,7 @@ const AddEditModal = ({ hideModal, editData, programId, type }: ModalProps) => {
       birthday: formdata.birthday || null,
       degree_program: formdata.degree_program,
       year_level_status: formdata.year_level_status,
+      institute_id: formdata.institute_id,
       remarks: formdata.remarks,
       type: 'Scholar',
       temp_password: tempPassword.toString()
@@ -102,7 +104,10 @@ const AddEditModal = ({ hideModal, editData, programId, type }: ModalProps) => {
               program: programs.find(
                 (p) => p.id.toString() === programId.toString()
               ),
-              id: response.data.insert_id
+              id: response.data.insert_id,
+              institute: institutes.find(
+                (p) => p.id.toString() === formdata.institute_id
+              )
             }
             dispatch(updateList([updatedData, ...globallist]))
 
@@ -150,6 +155,7 @@ const AddEditModal = ({ hideModal, editData, programId, type }: ModalProps) => {
       birthday: formdata.birthday || null,
       degree_program: formdata.degree_program,
       year_level_status: formdata.year_level_status,
+      institute_id: formdata.institute_id,
       remarks: formdata.remarks
     }
 
@@ -176,7 +182,10 @@ const AddEditModal = ({ hideModal, editData, programId, type }: ModalProps) => {
       const items = [...globallist]
       const updatedData = {
         ...newData,
-        id: editData.id
+        id: editData.id,
+        institute: institutes.find(
+          (p) => p.id.toString() === formdata.institute_id
+        )
       }
       const foundIndex = items.findIndex((x) => x.id === updatedData.id)
       items[foundIndex] = { ...items[foundIndex], ...updatedData }
@@ -223,7 +232,11 @@ const AddEditModal = ({ hideModal, editData, programId, type }: ModalProps) => {
     ;(async () => {
       const result = await fetchPrograms(type, 999, 0)
       setPrograms(result.data)
+
+      const institutesData = await fetchInstitutes(999, 0)
+      setInstitutes(institutesData.data)
     })()
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -244,9 +257,10 @@ const AddEditModal = ({ hideModal, editData, programId, type }: ModalProps) => {
       birthday: editData ? editData.birthday : '',
       degree_program: editData ? editData.degree_program : '',
       year_level_status: editData ? editData.year_level_status : '',
+      institute_id: editData ? editData.institute_id : '',
       remarks: editData ? editData.remarks : ''
     })
-  }, [editData, reset])
+  }, [editData, institutes, reset])
 
   return (
     <>
@@ -375,7 +389,7 @@ const AddEditModal = ({ hideModal, editData, programId, type }: ModalProps) => {
                       {...register('year_level_status', { required: true })}
                       className="app__select_standard"
                     >
-                      <option value="">Select Gender</option>
+                      <option value="">Select Year Level</option>
                       <option value="1st Year">1st Year</option>
                       <option value="2nd Year">2nd Year</option>
                       <option value="3rd Year">3rd Year</option>
@@ -384,6 +398,29 @@ const AddEditModal = ({ hideModal, editData, programId, type }: ModalProps) => {
                     {errors.year_level_status && (
                       <div className="app__error_message">
                         Year Level / Status is required
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div className="app__form_field_container">
+                <div className="w-full">
+                  <div className="app__label_standard">Institute</div>
+                  <div>
+                    <select
+                      {...register('institute_id', { required: true })}
+                      className="app__select_standard"
+                    >
+                      <option value="">Select Institute</option>
+                      {institutes?.map((institute) => (
+                        <option key={institute.id} value={institute.id}>
+                          {institute.name}
+                        </option>
+                      ))}
+                    </select>
+                    {errors.institute_id && (
+                      <div className="app__error_message">
+                        Institute is required
                       </div>
                     )}
                   </div>

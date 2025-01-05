@@ -63,7 +63,9 @@ export default function Page({ params }: { params: { id: string } }) {
           .from('sws_public') // Replace with your storage bucket name
           .upload(`applications/${fileName}`, file)
 
-        if (fileError) throw new Error(fileError.message)
+        if (fileError) {
+          throw new Error(fileError.message)
+        }
         filePath = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/sws_public/${fileData.path}` // Get the path of the uploaded file
       }
 

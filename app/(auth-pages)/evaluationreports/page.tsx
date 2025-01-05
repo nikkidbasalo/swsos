@@ -269,6 +269,7 @@ const Page: React.FC = () => {
                   <th className="app__th">Scholar</th>
                   <th className="app__th">Program</th>
                   <th className="app__th">Evaluation Period</th>
+                  <th className="app__th">Allowance</th>
                   <th className="app__th">Remarks</th>
                   <th className="app__th">Status</th>
                 </tr>
@@ -292,6 +293,13 @@ const Page: React.FC = () => {
 
                       <td className="app__td">{item.program?.name}</td>
                       <td className="app__td">{item.period?.description}</td>
+                      <td className="app__td">
+                        {Number(item.allowance).toLocaleString('en-US', {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2
+                        })}{' '}
+                        {item.allowance_type}
+                      </td>
                       <td className="app__td">{item.remarks}</td>
                       <td className="app__td">
                         {item.status === 'Passed' && (

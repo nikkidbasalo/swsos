@@ -1,5 +1,6 @@
 import { CustomButton } from '@/components/index'
-import { ProgramTypes } from '@/types'
+import { useSupabase } from '@/context/SupabaseProvider'
+import { ProgramTypes, UserAccessTypes } from '@/types'
 import { fetchPrograms } from '@/utils/fetchApi'
 import { MagnifyingGlassIcon, TagIcon } from '@heroicons/react/20/solid'
 import React, { useEffect, useState } from 'react'
@@ -17,6 +18,11 @@ const Filters = ({
   const [selectedProgram, setSelectedProgram] = useState<string>('')
 
   const [programs, setPrograms] = useState<ProgramTypes[]>([])
+
+  const { session, systemAccess } = useSupabase()
+  const userAccess: UserAccessTypes | undefined = systemAccess.find(
+    (user: UserAccessTypes) => user.user_id === session.user.id
+  )
 
   const handleApply = () => {
     if (keyword.trim() === '' && selectedProgram.trim() === '') return
@@ -46,7 +52,13 @@ const Filters = ({
   useEffect(() => {
     ;(async () => {
       const result = await fetchPrograms('', 999, 0)
-      setPrograms(result.data)
+
+      if (userAccess && userAccess.program_ids) {
+        const filterResult = result.data.filter((program: ProgramTypes) =>
+          (userAccess.program_ids || []).includes(program.id)
+        )
+        setPrograms(filterResult)
+      }
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])

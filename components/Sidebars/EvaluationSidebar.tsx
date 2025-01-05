@@ -61,6 +61,16 @@ const EvaluationSidebar = () => {
             </span>
           </Link>
         </li>
+        <li>
+          <Link
+            href="/evaluators"
+            className={`app__menu_link ${
+              currentRoute === '/evaluators' ? 'app_menu_link_active' : ''
+            }`}
+          >
+            <span className="flex-1 ml-3 whitespace-nowrap">Evaluators</span>
+          </Link>
+        </li>
       </ul>
     </>
   )

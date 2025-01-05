@@ -1,5 +1,5 @@
 import { CustomButton } from '@/components/index'
-import { ProgramTypes } from '@/types'
+import { InstituteTypes, ProgramTypes } from '@/types'
 import { MagnifyingGlassIcon, TagIcon } from '@heroicons/react/20/solid'
 import React, { useState } from 'react'
 
@@ -8,7 +8,9 @@ interface FilterTypes {
   setFilterProgram: (status: string) => void
   setFilterGender: (gender: string) => void
   setFilterYear: (year: string) => void
+  setFilterInstitute: (year: string) => void
   programs: ProgramTypes[]
+  institutes: InstituteTypes[]
 }
 
 const Filters = ({
@@ -16,17 +18,21 @@ const Filters = ({
   setFilterProgram,
   setFilterGender,
   setFilterYear,
-  programs
+  setFilterInstitute,
+  programs,
+  institutes
 }: FilterTypes) => {
   const [keyword, setKeyword] = useState<string>('')
   const [gender, setGender] = useState<string>('')
   const [year, setYear] = useState<string>('')
   const [selectedProgram, setSelectedProgram] = useState<string>('')
+  const [selectedInstitute, setSelectedInstitute] = useState<string>('')
 
   const handleApply = () => {
     if (
       keyword.trim() === '' &&
       selectedProgram.trim() === '' &&
+      selectedInstitute.trim() === '' &&
       gender.trim() === '' &&
       year.trim() === ''
     )
@@ -34,6 +40,7 @@ const Filters = ({
 
     setFilterKeyword(keyword) // pass keyword to parent
     setFilterProgram(selectedProgram) // pass keyword to parent
+    setFilterInstitute(selectedInstitute) // pass keyword to parent
     setFilterGender(gender) // pass  to parent
     setFilterYear(year) // pass  to parent
   }
@@ -44,6 +51,7 @@ const Filters = ({
     if (
       keyword.trim() === '' &&
       selectedProgram.trim() === '' &&
+      selectedInstitute.trim() === '' &&
       gender.trim() === '' &&
       year.trim() === ''
     )
@@ -51,6 +59,7 @@ const Filters = ({
 
     setFilterKeyword(keyword) // pass keyword to parent
     setFilterProgram(selectedProgram) // pass keyword to parent
+    setFilterInstitute(selectedInstitute) // pass keyword to parent
     setFilterGender(gender) // pass  to parent
     setFilterYear(year) // pass  to parent
   }
@@ -61,6 +70,8 @@ const Filters = ({
     setKeyword('')
     setFilterProgram('')
     setSelectedProgram('')
+    setFilterInstitute('')
+    setSelectedInstitute('')
     setFilterYear('')
     setYear('')
     setFilterGender('')
@@ -89,6 +100,21 @@ const Filters = ({
             >
               <option value="">Choose Scholarship Program</option>
               {programs?.map((p, i) => (
+                <option key={i} value={p.id}>
+                  {p.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="app__filter_container">
+            <TagIcon className="w-4 h-4 mr-1 text-gray-500" />
+            <select
+              value={selectedInstitute}
+              onChange={(e) => setSelectedInstitute(e.target.value)}
+              className="app__filter_select"
+            >
+              <option value="">Choose Institute</option>
+              {institutes?.map((p, i) => (
                 <option key={i} value={p.id}>
                   {p.name}
                 </option>

@@ -15,7 +15,7 @@ import { useFilter } from '@/context/FilterContext'
 import { useSupabase } from '@/context/SupabaseProvider'
 import { updateList } from '@/GlobalRedux/Features/listSlice'
 import { updateResultCounter } from '@/GlobalRedux/Features/resultsCounterSlice'
-import { GranteeTypes } from '@/types'
+import { GranteeTypes, UserAccessTypes } from '@/types'
 import { fetchGrantees } from '@/utils/fetchApi'
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -24,7 +24,7 @@ import Filters from './Filters'
 
 const Page: React.FC = () => {
   const { hasAccess } = useFilter()
-  const { session } = useSupabase()
+  const { session, systemAccess } = useSupabase()
 
   const [loading, setLoading] = useState(false)
   const [showEvaluateModal, setShowEvaluateModal] = useState(false)
@@ -37,6 +37,10 @@ const Page: React.FC = () => {
   const [perPageCount, setPerPageCount] = useState<number>(10)
   const [editData, setEditData] = useState<GranteeTypes | null>(null)
 
+  const userAccess: UserAccessTypes | undefined = systemAccess.find(
+    (user: UserAccessTypes) => user.user_id === session.user.id
+  )
+
   // Redux staff
   const globallist = useSelector((state: any) => state.list.value)
   const resultsCounter = useSelector((state: any) => state.results.value)
@@ -47,7 +51,12 @@ const Page: React.FC = () => {
 
     try {
       const result = await fetchGrantees(
-        { filterProgram, filterKeyword },
+        {
+          filterProgram,
+          filterKeyword,
+          filterProgramIds:
+            userAccess && userAccess.program_ids ? userAccess.program_ids : []
+        },
         '',
         perPageCount,
         0
