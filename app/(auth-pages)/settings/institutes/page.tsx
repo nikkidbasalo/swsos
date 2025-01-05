@@ -20,7 +20,6 @@ import { InstituteTypes } from '@/types'
 import { fetchInstitutes } from '@/utils/fetchApi'
 import { Menu, Transition } from '@headlessui/react'
 import { ChevronDownIcon, PencilSquareIcon } from '@heroicons/react/20/solid'
-import { TrashIcon } from '@heroicons/react/24/solid'
 import React, { Fragment, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import AddEditModal from './AddEditModal'
@@ -197,7 +196,7 @@ const Page: React.FC = () => {
                                     <span>Edit</span>
                                   </div>
                                 </Menu.Item>
-                                <Menu.Item>
+                                {/* <Menu.Item>
                                   <div
                                     onClick={() => handleDelete(item.id)}
                                     className="app__dropdown_item"
@@ -205,7 +204,7 @@ const Page: React.FC = () => {
                                     <TrashIcon className="w-4 h-4" />
                                     <span>Delete</span>
                                   </div>
-                                </Menu.Item>
+                                </Menu.Item> */}
                               </div>
                             </Menu.Items>
                           </Transition>

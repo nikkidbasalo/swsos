@@ -82,9 +82,11 @@ export interface GradeTypes {
   period_id: string
   period: EvaluationPeriodTypes
   user_id: string
-  user: AccountTypes
+  user: GranteeTypes
   program_id: string
   program: ProgramTypes
+  institute_id: string
+  institute: InstituteTypes
   file_path: string
   remarks: string
   status: string

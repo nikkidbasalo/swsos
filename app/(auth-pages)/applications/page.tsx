@@ -245,7 +245,6 @@ const Page: React.FC = () => {
   // Update list whenever list in redux updates
   useEffect(() => {
     setList(globallist)
-    console.log('redux updated')
   }, [globallist])
 
   // Featch data

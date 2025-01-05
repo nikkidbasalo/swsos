@@ -84,7 +84,6 @@ const AccountDetails = ({ hideModal, shouldUpdateRedux, id }: ModalProps) => {
 
       // Update data in redux
       if (shouldUpdateRedux) {
-        console.log('redux updated')
         const items = [...globallist]
         const updatedData = {
           ...newData,

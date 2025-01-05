@@ -33,6 +33,7 @@ const Page: React.FC = () => {
   const [filterStatus, setFilterStatus] = useState<string>('')
   const [filterPeriod, setFilterPeriod] = useState<string>('')
   const [filterProgram, setFilterProgram] = useState<string>('')
+  const [filterInstitute, setFilterInstitute] = useState<string>('')
 
   const [list, setList] = useState<GradeTypes[]>([])
 
@@ -51,7 +52,7 @@ const Page: React.FC = () => {
 
     try {
       const result = await fetchEvaluations(
-        { filterProgram, filterPeriod, filterStatus },
+        { filterProgram, filterPeriod, filterStatus, filterInstitute },
         perPageCount,
         0
       )
@@ -73,7 +74,7 @@ const Page: React.FC = () => {
 
     //All
     const all = await fetchEvaluations(
-      { filterProgram, filterPeriod },
+      { filterProgram, filterPeriod, filterStatus, filterInstitute },
       99999,
       0
     )
@@ -97,7 +98,7 @@ const Page: React.FC = () => {
 
     try {
       const result = await fetchEvaluations(
-        { filterProgram, filterPeriod, filterStatus },
+        { filterProgram, filterPeriod, filterStatus, filterInstitute },
         perPageCount,
         list.length
       )
@@ -134,14 +135,17 @@ const Page: React.FC = () => {
       { header: 'Firstname', key: 'firstname', width: 20 },
       { header: 'Middlename', key: 'middlename', width: 20 },
       { header: 'Program', key: 'program', width: 20 },
+      { header: 'Institute', key: 'institute', width: 20 },
       { header: 'Evaluation Period', key: 'period', width: 20 },
+      { header: 'Allowance', key: 'allowance', width: 20 },
+      { header: 'Allowance Type', key: 'allowance_type', width: 20 },
       { header: 'Remarks', key: 'remarks', width: 20 },
       { header: 'Status', key: 'status', width: 20 }
       // Add more columns based on your data structure
     ]
 
     const result = await fetchEvaluations(
-      { filterProgram, filterPeriod, filterStatus },
+      { filterProgram, filterPeriod, filterStatus, filterInstitute },
       99999,
       0
     )
@@ -155,10 +159,13 @@ const Page: React.FC = () => {
         no: index + 1,
         lastname: `${item.user?.lastname}`,
         firstname: `${item.user?.firstname}`,
-        middlename: `${item.user?.middlename}`,
+        middlename: `${item.user?.middlename || ''}`,
         program: `${item.program?.name}`,
         period: `${item.period?.description}`,
-        remarks: `${item.remarks}`,
+        institute: `${item.user?.institute?.name || ''}`,
+        allowance: `${item.allowance ?? ''}`,
+        allowance_type: `${item.allowance_type ?? ''}`,
+        remarks: `${item.remarks ?? ''}`,
         status: `${item.status}`
       })
     })
@@ -187,7 +194,7 @@ const Page: React.FC = () => {
     setList([])
     void fetchData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [perPageCount, filterProgram, filterPeriod, filterStatus])
+  }, [perPageCount, filterProgram, filterInstitute, filterPeriod, filterStatus])
 
   const isDataEmpty = !Array.isArray(list) || list.length < 1 || !list
 
@@ -217,6 +224,7 @@ const Page: React.FC = () => {
             <Filters
               setFilterPeriod={setFilterPeriod}
               setFilterProgram={setFilterProgram}
+              setFilterInstitute={setFilterInstitute}
               setFilterStatus={setFilterStatus}
             />
           </div>
@@ -268,6 +276,7 @@ const Page: React.FC = () => {
                   <th className="app__th pl-4"></th>
                   <th className="app__th">Scholar</th>
                   <th className="app__th">Program</th>
+                  <th className="app__th">Institute</th>
                   <th className="app__th">Evaluation Period</th>
                   <th className="app__th">Allowance</th>
                   <th className="app__th">Remarks</th>
@@ -292,6 +301,7 @@ const Page: React.FC = () => {
                       </td>
 
                       <td className="app__td">{item.program?.name}</td>
+                      <td className="app__td">{item.user?.institute?.name}</td>
                       <td className="app__td">{item.period?.description}</td>
                       <td className="app__td">
                         {Number(item.allowance).toLocaleString('en-US', {
@@ -316,7 +326,7 @@ const Page: React.FC = () => {
                       </td>
                     </tr>
                   ))}
-                {loading && <TableRowLoading cols={6} rows={2} />}
+                {loading && <TableRowLoading cols={8} rows={2} />}
               </tbody>
             </table>
             {!loading && isDataEmpty && (

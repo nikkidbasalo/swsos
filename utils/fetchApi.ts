@@ -1,4 +1,4 @@
-import type { AccountTypes, excludedItemsTypes } from '@/types'
+import type { AccountTypes, excludedItemsTypes, GranteeTypes } from '@/types'
 import { createBrowserClient } from '@supabase/ssr'
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -317,6 +317,7 @@ export async function fetchAllowances(
 export async function fetchEvaluations(
   filters: {
     filterProgram?: string
+    filterInstitute?: string
     filterPeriod?: string
     filterStatus?: string
   },
@@ -324,10 +325,25 @@ export async function fetchEvaluations(
   rangeFrom: number
 ) {
   try {
+    // filter institute
+    const userIds: string[] = []
+    if (filters.filterInstitute && filters.filterInstitute !== '') {
+      const { data } = await supabase
+        .from('sws_users')
+        .select()
+        .eq('institute_id', filters.filterInstitute)
+
+      if (data) {
+        data.forEach((u: GranteeTypes) => {
+          userIds.push(u.id)
+        })
+      }
+    }
+
     let query = supabase
       .from('sws_grades')
       .select(
-        '*, user:user_id(*),program:program_id(*),period:evaluation_period_id(*)',
+        '*, user:user_id(*,institute:institute_id(*)),program:program_id(*),period:evaluation_period_id(*)',
         { count: 'exact' }
       )
 
@@ -343,6 +359,10 @@ export async function fetchEvaluations(
     // filter status
     if (filters.filterStatus && filters.filterStatus !== '') {
       query = query.eq('status', filters.filterStatus)
+    }
+
+    if (filters.filterInstitute && filters.filterInstitute !== '') {
+      query = query.in('user_id', userIds)
     }
 
     // Per Page from context

@@ -1,37 +1,43 @@
 import { CustomButton } from '@/components/index'
-import { EvaluationPeriodTypes, ProgramTypes } from '@/types'
-import { fetchPeriods, fetchPrograms } from '@/utils/fetchApi'
+import { EvaluationPeriodTypes, InstituteTypes, ProgramTypes } from '@/types'
+import { fetchInstitutes, fetchPeriods, fetchPrograms } from '@/utils/fetchApi'
 import { TagIcon } from '@heroicons/react/20/solid'
 import React, { useEffect, useState } from 'react'
 
 interface FilterTypes {
   setFilterPeriod: (period: string) => void
   setFilterProgram: (status: string) => void
+  setFilterInstitute: (year: string) => void
   setFilterStatus: (status: string) => void
 }
 
 const Filters = ({
   setFilterPeriod,
   setFilterProgram,
+  setFilterInstitute,
   setFilterStatus
 }: FilterTypes) => {
   const [period, setPeriod] = useState<string>('')
   const [selectedProgram, setSelectedProgram] = useState<string>('')
+  const [selectedInstitute, setSelectedInstitute] = useState<string>('')
   const [status, setStatus] = useState<string>('')
 
   const [programs, setPrograms] = useState<ProgramTypes[]>([])
   const [periods, setPeriods] = useState<EvaluationPeriodTypes[]>([])
+  const [institutes, setInstitutes] = useState<InstituteTypes[]>([])
 
   const handleApply = () => {
     if (
       period.trim() === '' &&
       status.trim() === '' &&
+      selectedInstitute.trim() === '' &&
       selectedProgram.trim() === ''
     )
       return
 
     setFilterPeriod(period) // pass to parent
     setFilterStatus(status) // pass to parent
+    setFilterInstitute(selectedInstitute) // pass keyword to parent
     setFilterProgram(selectedProgram) // pass keyword to parent
   }
 
@@ -41,11 +47,13 @@ const Filters = ({
     if (
       period.trim() === '' &&
       status.trim() === '' &&
+      selectedInstitute.trim() === '' &&
       selectedProgram.trim() === ''
     )
       return
     setFilterPeriod(period) // pass to parent
     setFilterStatus(status) // pass to parent
+    setFilterInstitute(selectedInstitute) // pass keyword to parent
     setFilterProgram(selectedProgram) // pass keyword to parent
   }
 
@@ -57,6 +65,8 @@ const Filters = ({
     setStatus('')
     setFilterProgram('')
     setSelectedProgram('')
+    setFilterInstitute('')
+    setSelectedInstitute('')
   }
 
   // Featch data
@@ -67,6 +77,9 @@ const Filters = ({
 
       const periods = await fetchPeriods(999, 0)
       setPeriods(periods.data)
+
+      const institutesData = await fetchInstitutes(999, 0)
+      setInstitutes(institutesData.data)
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -102,6 +115,21 @@ const Filters = ({
               {periods?.map((p, i) => (
                 <option key={i} value={p.id}>
                   {p.description}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="app__filter_container">
+            <TagIcon className="w-4 h-4 mr-1 text-gray-500" />
+            <select
+              value={selectedInstitute}
+              onChange={(e) => setSelectedInstitute(e.target.value)}
+              className="app__filter_select"
+            >
+              <option value="">Choose Institute</option>
+              {institutes?.map((p, i) => (
+                <option key={i} value={p.id}>
+                  {p.name}
                 </option>
               ))}
             </select>

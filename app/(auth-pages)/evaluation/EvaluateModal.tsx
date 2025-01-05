@@ -37,7 +37,6 @@ export default function EvaluateModal({ hideModal, grantee }: ModalProps) {
 
   const onSubmit = async (formdata: GradeTypes) => {
     if (saving) return
-    console.log(formdata)
     setSaving(true)
     void handleSubmitEvaluation(formdata)
   }
