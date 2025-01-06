@@ -1,7 +1,7 @@
 'use client'
-import { ChartYearLevel } from '@/components/ChartYearLevel'
 import ActiveScholars from '@/components/Dashboard/ActiveScholars'
 import AllowanceReleased from '@/components/Dashboard/AllowanceReleased'
+import { ChartYearLevel } from '@/components/Dashboard/ChartYearLevel'
 import { Announcements, Jobs, TopBarDark } from '@/components/index'
 import TrackerBox from '@/components/TrackerBox'
 import { useSupabase } from '@/context/SupabaseProvider'

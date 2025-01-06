@@ -1,13 +1,6 @@
 'use client'
-import {
-  CustomButton,
-  PerPage,
-  ShowMore,
-  Sidebar,
-  TableRowLoading,
-  Title,
-  Unauthorized
-} from '@/components/index'
+import { EvaluationChart } from '@/components/Dashboard/EvaluationChart'
+import { Sidebar, Title, Unauthorized } from '@/components/index'
 import EvaluationSidebar from '@/components/Sidebars/EvaluationSidebar'
 import TopBar from '@/components/TopBar'
 import { superAdmins } from '@/constants'
@@ -15,13 +8,12 @@ import { useFilter } from '@/context/FilterContext'
 import { useSupabase } from '@/context/SupabaseProvider'
 import { updateList } from '@/GlobalRedux/Features/listSlice'
 import { updateResultCounter } from '@/GlobalRedux/Features/resultsCounterSlice'
-import { GradeTypes, GranteeSummaryTypes } from '@/types'
+import { GradeTypes } from '@/types'
 import { fetchEvaluations } from '@/utils/fetchApi'
 import Excel from 'exceljs'
 import { saveAs } from 'file-saver'
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import Filters from './Filters'
 
 const Page: React.FC = () => {
   const { hasAccess, setToast } = useFilter()
@@ -184,58 +176,6 @@ const Page: React.FC = () => {
       const blob = new Blob([buffer], {
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
       })
-      saveAs(blob, `Grantees.xlsx`)
-    })
-    setDownloading(false)
-  }
-  const handleDownloadSummary = async () => {
-    setDownloading(true)
-
-    const { data: stats } = await supabase.rpc('get_program_statistics', {
-      p_evaluation_period_id: filterPeriod === '' ? 0 : filterPeriod
-    })
-
-    // Create a new workbook and add a worksheet
-    const workbook = new Excel.Workbook()
-    const worksheet = workbook.addWorksheet('Sheet 1')
-
-    // Add data to the worksheet
-    worksheet.columns = [
-      { header: '#', key: 'no', width: 20 },
-      { header: 'Program', key: 'program', width: 20 },
-      { header: 'Total Grantees', key: 'total_grantees', width: 20 },
-      { header: 'Total Allowance', key: 'total_allowance', width: 20 }
-      // Add more columns based on your data structure
-    ]
-
-    const result = await fetchEvaluations(
-      { filterProgram, filterPeriod, filterStatus, filterInstitute },
-      99999,
-      0
-    )
-
-    const results: GradeTypes[] = result.data
-
-    // Data for the Excel file
-    const data: any[] = []
-    stats.forEach((item: GranteeSummaryTypes, index: number) => {
-      data.push({
-        no: index + 1,
-        program: `${item.program_name}`,
-        total_grantees: `${item.total_users}`,
-        total_allowance: `${item.total_allowance}`
-      })
-    })
-
-    data.forEach((item) => {
-      worksheet.addRow(item)
-    })
-
-    // Generate the Excel file
-    await workbook.xlsx.writeBuffer().then((buffer) => {
-      const blob = new Blob([buffer], {
-        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-      })
       saveAs(blob, `Summary.xlsx`)
     })
     setDownloading(false)
@@ -371,178 +311,14 @@ const Page: React.FC = () => {
       <div className="app__main">
         <div>
           <div className="app__title">
-            <Title title="Evaluation Reports" />
+            <Title title="Evaluation Dashboard" />
           </div>
 
-          {/* Filters */}
-          <div className="app__filters">
-            <Filters
-              setFilterPeriod={setFilterPeriod}
-              setFilterProgram={setFilterProgram}
-              setFilterInstitute={setFilterInstitute}
-              setFilterStatus={setFilterStatus}
-            />
-          </div>
-
-          {/* Export Button */}
-          <div className="mx-4 mb-4 flex justify-start items-end space-x-2">
-            <div className="text-xs font-medium">
-              Passed: <span className="text-xl font-bold">{totalPassed}</span>
-            </div>
-            <div className="text-xs font-medium">
-              Failed: <span className="text-xl font-bold">{totalFailed}</span>
-            </div>
-            <div className="text-xs font-medium">
-              For Evaluation:{' '}
-              <span className="text-xl font-bold">{totalForEvaluation}</span>
-            </div>
-            <div className="flex-1"></div>
-            <div className="space-x-2">
-              {selectedItems.length > 0 && (
-                <>
-                  <CustomButton
-                    containerStyles="app__btn_orange"
-                    isDisabled={downloading}
-                    title={`Mark Unpaid (${selectedItems.length})`}
-                    btnType="button"
-                    handleClick={handleUnpaidSelected}
-                  />
-                  <CustomButton
-                    containerStyles="app__btn_green"
-                    isDisabled={downloading}
-                    title={`Mark Paid (${selectedItems.length})`}
-                    btnType="button"
-                    handleClick={handlePaidSelected}
-                  />
-                </>
-              )}
-              <CustomButton
-                containerStyles="app__btn_blue"
-                isDisabled={downloading}
-                title={downloading ? 'Downloading...' : 'Download Summary'}
-                btnType="button"
-                handleClick={handleDownloadSummary}
-              />
-              <CustomButton
-                containerStyles="app__btn_blue"
-                isDisabled={downloading}
-                title={downloading ? 'Downloading...' : 'Export Data To Excel'}
-                btnType="button"
-                handleClick={handleDownloadExcel}
-              />
-            </div>
-          </div>
-
-          {/* Per Page */}
-          <PerPage
-            showingCount={resultsCounter.showing}
-            resultsCount={resultsCounter.results}
-            perPageCount={perPageCount}
-            setPerPageCount={setPerPageCount}
-          />
-
-          {/* Main Content */}
           <div>
-            <table className="app__table">
-              <thead className="app__thead">
-                <tr>
-                  <th className="app__th pl-4">
-                    <input
-                      type="checkbox"
-                      checked={checkAll}
-                      onChange={handleCheckAllChange}
-                    />
-                  </th>
-                  <th className="app__th">Scholar</th>
-                  <th className="app__th">Program</th>
-                  <th className="app__th">Institute</th>
-                  <th className="app__th">Evaluation Period</th>
-                  <th className="app__th">Allowance</th>
-                  <th className="app__th">Remarks</th>
-                  <th className="app__th">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {!isDataEmpty &&
-                  list.map((item, index) => (
-                    <tr
-                      key={index}
-                      onClick={() => handleCheckboxChange(item.id.toString())}
-                      className="app__tr cursor-pointer"
-                    >
-                      <td className="hidden md:table-cell app__td">
-                        <input
-                          type="checkbox"
-                          value={item.id.toString()}
-                          checked={selectedIds.includes(item.id.toString())}
-                          readOnly
-                        />
-                      </td>
-                      <td className="app__td">
-                        <div className="space-y-1">
-                          <div className="font-bold">
-                            {item.user?.lastname}, {item.user?.firstname}{' '}
-                            {item.user?.middlename}
-                          </div>
-                          <div>
-                            {item.user?.email} | {item.user?.gender}
-                          </div>
-                        </div>
-                      </td>
-
-                      <td className="app__td">{item.program?.name}</td>
-                      <td className="app__td">{item.user?.institute?.name}</td>
-                      <td className="app__td">{item.period?.description}</td>
-                      <td className="app__td">
-                        <div>
-                          <span className="font-bold">
-                            {Number(item.allowance).toLocaleString('en-US', {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2
-                            })}{' '}
-                          </span>
-                          {item.allowance_type}
-                        </div>
-                        <div>
-                          {item.is_paid ? (
-                            <span className="text-green-500 font-bold">
-                              Passed
-                            </span>
-                          ) : (
-                            <span className="text-orange-500 font-bold">
-                              Unpaid
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="app__td">{item.remarks}</td>
-                      <td className="app__td">
-                        {item.status === 'Passed' && (
-                          <span className="app__status_green">Passed</span>
-                        )}
-                        {item.status === 'For Evaluation' && (
-                          <span className="app__status_orange">
-                            For&nbsp;Evaluation
-                          </span>
-                        )}
-                        {item.status === 'Failed' && (
-                          <span className="app__status_red">Failed</span>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                {loading && <TableRowLoading cols={8} rows={2} />}
-              </tbody>
-            </table>
-            {!loading && isDataEmpty && (
-              <div className="app__norecordsfound">No records found.</div>
-            )}
+            <div className="mx-4 my-4 grid md:grid-cols-2 gap-2">
+              <EvaluationChart periodId={0} />
+            </div>
           </div>
-
-          {/* Show More */}
-          {resultsCounter.results > resultsCounter.showing && !loading && (
-            <ShowMore handleShowMore={handleShowMore} />
-          )}
         </div>
       </div>
     </>

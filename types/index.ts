@@ -93,6 +93,7 @@ export interface GradeTypes {
   lowest_grade: string
   allowance: string
   allowance_type: string
+  is_paid: boolean
   confirmed: string
 }
 export interface EvaluationPeriodTypes {
@@ -215,4 +216,10 @@ export interface AllowancesTypes {
   program: ProgramTypes
   period: string
   amount: string
+}
+
+export interface GranteeSummaryTypes {
+  program_name: string
+  total_users: number
+  total_allowance: string
 }

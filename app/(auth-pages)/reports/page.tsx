@@ -1,5 +1,5 @@
 'use client'
-import { ChartYearLevel } from '@/components/ChartYearLevel'
+import { ChartYearLevel } from '@/components/Dashboard/ChartYearLevel'
 import {
   CustomButton,
   PerPage,

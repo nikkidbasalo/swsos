@@ -68,7 +68,7 @@ const MainMenu = () => {
             {(hasAccess('settings') ||
               hasAccess('staff') ||
               hasAccess('evaluator')) && (
-              <Link href="/evaluation">
+              <Link href="/evaluationdashboard">
                 <div className="app__menu_item">
                   <div className="pt-1">
                     <ListBulletIcon className="w-8 h-8" />

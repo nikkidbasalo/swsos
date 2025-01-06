@@ -21,6 +21,18 @@ const EvaluationSidebar = () => {
         </li>
         <li>
           <Link
+            href="/evaluationdashboard"
+            className={`app__menu_link ${
+              currentRoute === '/evaluationdashboard'
+                ? 'app_menu_link_active'
+                : ''
+            }`}
+          >
+            <span className="flex-1 ml-3 whitespace-nowrap">Dashboard</span>
+          </Link>
+        </li>
+        <li>
+          <Link
             href="/evaluation"
             className={`app__menu_link ${
               currentRoute === '/evaluation' ? 'app_menu_link_active' : ''
