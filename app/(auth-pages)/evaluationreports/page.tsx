@@ -292,7 +292,7 @@ const Page: React.FC = () => {
     try {
       const { error } = await supabase
         .from('sws_grades')
-        .update({ is_paid: true })
+        .update({ is_paid: false })
         .in('id', ids)
 
       if (error) throw new Error(error.message)

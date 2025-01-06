@@ -2,6 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useSupabase } from '@/context/SupabaseProvider'
+import { GranteeSummaryTypes } from '@/types'
 import { useEffect, useState } from 'react'
 
 export function EvaluationChart({ periodId }: { periodId: number }) {
@@ -33,14 +34,18 @@ export function EvaluationChart({ periodId }: { periodId: number }) {
               <th className="app__th">Program</th>
               <th className="app__th">Total Grantees</th>
               <th className="app__th">Total Allowance</th>
+              <th className="app__th">Paid</th>
+              <th className="app__th">Un-Paid</th>
             </tr>
           </thead>
           <tbody>
-            {stats?.map((item: any, index: any) => (
+            {stats?.map((item: GranteeSummaryTypes, index: any) => (
               <tr key={index} className="app__tr">
                 <td className="app__td">{item.program_name}</td>
                 <td className="app__td">{item.total_users}</td>
                 <td className="app__td">{item.total_allowance}</td>
+                <td className="app__td">{item.total_paid}</td>
+                <td className="app__td">{item.total_unpaid}</td>
               </tr>
             ))}
           </tbody>

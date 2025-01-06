@@ -222,4 +222,6 @@ export interface GranteeSummaryTypes {
   program_name: string
   total_users: number
   total_allowance: string
+  total_paid: string
+  total_unpaid: string
 }

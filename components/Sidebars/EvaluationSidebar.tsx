@@ -50,7 +50,9 @@ const EvaluationSidebar = () => {
                 : ''
             }`}
           >
-            <span className="flex-1 ml-3 whitespace-nowrap">Reports</span>
+            <span className="flex-1 ml-3 whitespace-nowrap">
+              Evaluation Reports
+            </span>
           </Link>
         </li>
         <li className="pt-5">
