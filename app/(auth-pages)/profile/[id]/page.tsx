@@ -112,7 +112,9 @@ export default function Page({ params }: { params: { id: string } }) {
       try {
         const { data, error } = await supabase
           .from('sws_users')
-          .select('*, institute:institute_id(*),program:program_id(*)')
+          .select(
+            '*, institute:institute_id(*),program:program_id(*),applicant:applicant_id(*)'
+          )
           .eq('id', userId)
           .limit(1)
           .maybeSingle()
@@ -217,18 +219,20 @@ export default function Page({ params }: { params: { id: string } }) {
                     </span>
                   </Link>
                 </li>
-                <li>
-                  <Link
-                    href={`/profile/${userId}?page=grades`}
-                    className={`app__profile_menu_link ${
-                      page === 'grades' ? 'bg-gray-700' : ''
-                    }`}
-                  >
-                    <span className="flex-1 ml-3 whitespace-nowrap">
-                      Scholar Evaluations
-                    </span>
-                  </Link>
-                </li>
+                {userId === session.user.id && (
+                  <li>
+                    <Link
+                      href={`/profile/${userId}?page=grades`}
+                      className={`app__profile_menu_link ${
+                        page === 'grades' ? 'bg-gray-700' : ''
+                      }`}
+                    >
+                      <span className="flex-1 ml-3 whitespace-nowrap">
+                        Scholar Evaluations
+                      </span>
+                    </Link>
+                  </li>
+                )}
                 {(hasAccess('settings') || userId === session.user.id) && (
                   <li>
                     <Link
@@ -266,16 +270,18 @@ export default function Page({ params }: { params: { id: string } }) {
                 </div>
               </>
             )}
-            {page && page === 'loginsettings' && userId === session.user.id && (
-              <>
-                <div className="app__title">
-                  <Title title="Update Password" />
-                </div>
-                <div className="mt-4 mx-2">
-                  <LoginSettings userId={userId} />
-                </div>
-              </>
-            )}
+            {page &&
+              page === 'loginsettings' &&
+              (hasAccess('settings') || userId === session.user.id) && (
+                <>
+                  <div className="app__title">
+                    <Title title="Update Password" />
+                  </div>
+                  <div className="mt-4 mx-2">
+                    <LoginSettings userId={userId} />
+                  </div>
+                </>
+              )}
           </div>
         )}
       </div>

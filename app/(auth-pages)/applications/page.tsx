@@ -225,9 +225,11 @@ const Page: React.FC = () => {
         return { error: response.data.error_message } // Return error from API
       }
 
-      const { error: dbError } = await supabase
-        .from('sws_users')
-        .insert({ ...newData, id: response.data.insert_id })
+      const { error: dbError } = await supabase.from('sws_users').insert({
+        ...newData,
+        applicant_id: Number(formdata.id),
+        id: response.data.insert_id
+      })
 
       if (dbError) {
         return { error: dbError.message } // Return database error
@@ -390,6 +392,30 @@ const Page: React.FC = () => {
                       <td className="app__td">
                         <div>Contact #: {item.contact_number}</div>
                         <div>Permanent Address: {item.permanent_address}</div>
+                        <div>
+                          Mother: {item.mother} | {item.mother_occupation}
+                        </div>
+                        <div>
+                          Father: {item.father} | {item.father_occupation}
+                        </div>
+                        <div>
+                          Guardian: {item.guardian} | {item.guardian_occupation}
+                        </div>
+                        <div>
+                          References 1: {item.reference_name_1} |{' '}
+                          {item.reference_address_1} |{' '}
+                          {item.reference_contact_1}
+                        </div>
+                        <div>
+                          References 2: {item.reference_name_2} |{' '}
+                          {item.reference_address_2} |{' '}
+                          {item.reference_contact_2}
+                        </div>
+                        <div>
+                          References 3: {item.reference_name_3} |{' '}
+                          {item.reference_address_3} |{' '}
+                          {item.reference_contact_3}
+                        </div>
                       </td>
                       <td className="app__td">
                         {item.file_path && (

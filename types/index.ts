@@ -143,8 +143,10 @@ export interface AccountTypes {
   id: string
   fullname: string
   id_number: string
-  program_id: string
   year_granted: string
+  applicant_id: string
+  applicant: ApplicationTypes
+  program_id: string
   program: ProgramTypes
   institute_id: string
   institute: InstituteTypes

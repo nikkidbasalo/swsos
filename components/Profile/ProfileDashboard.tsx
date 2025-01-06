@@ -1,7 +1,5 @@
 'use client'
 
-import { useFilter } from '@/context/FilterContext'
-import { useSupabase } from '@/context/SupabaseProvider'
 import { AccountTypes } from '@/types'
 import Title from '../Title'
 
@@ -10,9 +8,6 @@ export default function ProfileDashboard({
 }: {
   userData: AccountTypes
 }) {
-  const { supabase, session } = useSupabase()
-  const { setToast } = useFilter()
-
   return (
     <>
       <div>
@@ -47,6 +42,18 @@ export default function ProfileDashboard({
                     {userData.gender}
                   </div>
                 </div>
+                <div className="inline-flex flex-col text-center border-r px-2 space-y-2">
+                  <div className="text-xs text-gray-500">Birth Date</div>
+                  <div className="text-xs text-gray-700 font-bold">
+                    {userData.applicant?.birthday}
+                  </div>
+                </div>
+                <div className="inline-flex flex-col text-center border-r px-2 space-y-2">
+                  <div className="text-xs text-gray-500">Contact Number</div>
+                  <div className="text-xs text-gray-700 font-bold">
+                    {userData.applicant?.contact_number}
+                  </div>
+                </div>
               </div>
             </div>
             <div className="bg-white p-4 mb-4 rounded-md shadow-md text-gray-600">
@@ -70,6 +77,34 @@ export default function ProfileDashboard({
                   <div className="text-xs text-gray-500">Year Level</div>
                   <div className="text-xs text-gray-700 font-bold">
                     {userData.year_level_status}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="bg-white p-4 mb-4 rounded-md shadow-md text-gray-600">
+              <div className="text-sm font-semibold px-2 mb-2 text-gray-600">
+                Other Information
+              </div>
+              <div className="items-center">
+                <div className="inline-flex flex-col text-center border-r px-2 space-y-2">
+                  <div className="text-xs text-gray-500">Mother</div>
+                  <div className="text-xs text-gray-700 font-bold">
+                    {userData.applicant?.mother} |{' '}
+                    {userData.applicant?.mother_occupation}
+                  </div>
+                </div>
+                <div className="inline-flex flex-col text-center border-r px-2 space-y-2">
+                  <div className="text-xs text-gray-500">Father</div>
+                  <div className="text-xs text-gray-700 font-bold">
+                    {userData.applicant?.father} |{' '}
+                    {userData.applicant?.father_occupation}
+                  </div>
+                </div>
+                <div className="inline-flex flex-col text-center border-r px-2 space-y-2">
+                  <div className="text-xs text-gray-500">Guardian</div>
+                  <div className="text-xs text-gray-700 font-bold">
+                    {userData.applicant?.guardian} |{' '}
+                    {userData.applicant?.guardian_occupation}
                   </div>
                 </div>
               </div>
