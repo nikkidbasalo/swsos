@@ -506,7 +506,7 @@ const Page: React.FC = () => {
                         <div>
                           {item.is_paid ? (
                             <span className="text-green-500 font-bold">
-                              Passed
+                              Paid
                             </span>
                           ) : (
                             <span className="text-orange-500 font-bold">
