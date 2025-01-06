@@ -1,6 +1,6 @@
 'use client'
-import { AllowancesTypes } from '@/types'
-import { fetchAllowances } from '@/utils/fetchApi'
+import { GradeTypes } from '@/types'
+import { fetchEvaluations } from '@/utils/fetchApi'
 import { useEffect, useState } from 'react'
 
 export default function AllowanceReleased() {
@@ -9,11 +9,15 @@ export default function AllowanceReleased() {
   useEffect(() => {
     ;(async () => {
       //All
-      const all = await fetchAllowances({}, 99999, 0)
-      const totalAmount = all.data.reduce(
-        (sum, item: AllowancesTypes) => sum + Number(item.amount),
-        0
-      )
+      const all = await fetchEvaluations({}, 99999, 0)
+
+      const totalAmount = all.data.reduce((sum, item: GradeTypes) => {
+        if (item.is_paid) {
+          return sum + Number(item.allowance)
+        } else {
+          return sum
+        }
+      }, 0)
 
       setTotalAllowances(totalAmount)
     })()
