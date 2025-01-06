@@ -8,7 +8,10 @@ export default function ActiveScholars() {
   }: { systemUsers: AccountTypes[]; supabase: any } = useSupabase()
 
   const count = systemUsers.filter(
-    (user) => user.type === 'Scholar' && user.status === 'Active'
+    (user) =>
+      user.type === 'Scholar' &&
+      user.status === 'Active' &&
+      user.program_id !== null
   ).length
 
   return (
