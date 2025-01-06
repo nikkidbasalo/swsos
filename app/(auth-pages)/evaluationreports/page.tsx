@@ -204,7 +204,9 @@ const Page: React.FC = () => {
       { header: '#', key: 'no', width: 20 },
       { header: 'Program', key: 'program', width: 20 },
       { header: 'Total Grantees', key: 'total_grantees', width: 20 },
-      { header: 'Total Allowance', key: 'total_allowance', width: 20 }
+      { header: 'Total Allowance', key: 'total_allowance', width: 20 },
+      { header: 'Total Paid', key: 'total_paid', width: 20 },
+      { header: 'Total Unpaid', key: 'total_unpaid', width: 20 }
       // Add more columns based on your data structure
     ]
 
@@ -223,7 +225,9 @@ const Page: React.FC = () => {
         no: index + 1,
         program: `${item.program_name}`,
         total_grantees: `${item.total_users}`,
-        total_allowance: `${item.total_allowance}`
+        total_allowance: `${item.total_allowance}`,
+        total_paid: `${item.total_paid}`,
+        total_unpaid: `${item.total_unpaid}`
       })
     })
 
