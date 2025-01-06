@@ -112,7 +112,7 @@ export default function Page({ params }: { params: { id: string } }) {
       try {
         const { data, error } = await supabase
           .from('sws_users')
-          .select('*')
+          .select('*, institute:institute_id(*),program:program_id(*)')
           .eq('id', userId)
           .limit(1)
           .maybeSingle()

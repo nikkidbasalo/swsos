@@ -141,19 +141,33 @@ export interface excludedItemsTypes {
 
 export interface AccountTypes {
   id: string
+  fullname: string
+  id_number: string
+  program_id: string
+  year_granted: string
+  program: ProgramTypes
+  institute_id: string
+  institute: InstituteTypes
+  control_number: string
+  employee_number: string
+  function: string
+  email: string
+  lastname: string
   firstname: string
   middlename: string
-  lastname: string
-  status: string
+  tes_award_number: string
+  gender: string
+  birthday: string
+  degree_program: string
+  year_level_status: string
+  remarks: string
+  added_to_system: string
+  type: string
   password: string
   department: string
   avatar_url: string
-  email: string
-  gender: string
-  type: string
-  program_id: string
-  org_id: string
   created_by: string
+  status: string
   temp_password: string
   confirmed: string
 }
