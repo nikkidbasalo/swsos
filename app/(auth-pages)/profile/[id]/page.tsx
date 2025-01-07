@@ -221,7 +221,7 @@ export default function Page({ params }: { params: { id: string } }) {
                     </span>
                   </Link>
                 </li>
-                {userId === session.user.id && (
+                {userId === session.user.id && userData?.program_id && (
                   <li>
                     <Link
                       href={`/profile/${userId}?page=grades`}
