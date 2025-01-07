@@ -110,7 +110,7 @@ const Page: React.FC = () => {
               <thead className="app__thead">
                 <tr>
                   <th className="app__th pl-4"></th>
-                  <th className="app__th pl-4">Evalator</th>
+                  <th className="app__th pl-4">Evaluator</th>
                   <th className="app_th">Program</th>
                 </tr>
               </thead>
