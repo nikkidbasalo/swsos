@@ -5,4 +5,4 @@ export const programsTypes: { [key: string]: string } = {
   'external-grant': 'External Grant-in-Aid Program'
 }
 
-export const superAdmins = ['berlcamp@gmail.com']
+export const superAdmins = ['berlcamp1234@gmail.com']
