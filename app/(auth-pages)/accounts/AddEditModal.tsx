@@ -74,6 +74,7 @@ const AddEditModal = ({ hideModal, editData }: ModalProps) => {
         firstname: formdata.firstname,
         middlename: formdata.middlename,
         lastname: formdata.lastname,
+        type: 'Staff',
         status: 'Active',
         email: formdata.email,
         temp_password: tempPassword.toString()

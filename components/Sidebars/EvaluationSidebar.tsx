@@ -1,4 +1,5 @@
 'use client'
+import { useFilter } from '@/context/FilterContext'
 import { useSupabase } from '@/context/SupabaseProvider'
 import { AcademicCapIcon } from '@heroicons/react/20/solid'
 import { Cog6ToothIcon } from '@heroicons/react/24/solid'
@@ -9,6 +10,7 @@ const EvaluationSidebar = () => {
   const currentRoute = usePathname()
 
   const { session } = useSupabase()
+  const { hasAccess } = useFilter()
 
   return (
     <>
@@ -55,36 +57,42 @@ const EvaluationSidebar = () => {
             </span>
           </Link>
         </li>
-        <li className="pt-5">
-          <div className="flex items-center text-gray-500 items-centers space-x-1 px-2">
-            <Cog6ToothIcon className="w-4 h-4" />
-            <span>Settings</span>
-          </div>
-        </li>
-        <li>
-          <Link
-            href="/evaluationperiods"
-            className={`app__menu_link ${
-              currentRoute === '/evaluationperiods'
-                ? 'app_menu_link_active'
-                : ''
-            }`}
-          >
-            <span className="flex-1 ml-3 whitespace-nowrap">
-              Evaluation Periods
-            </span>
-          </Link>
-        </li>
-        <li>
-          <Link
-            href="/evaluators"
-            className={`app__menu_link ${
-              currentRoute === '/evaluators' ? 'app_menu_link_active' : ''
-            }`}
-          >
-            <span className="flex-1 ml-3 whitespace-nowrap">Evaluators</span>
-          </Link>
-        </li>
+        {(hasAccess('staff') || hasAccess('settings')) && (
+          <>
+            <li className="pt-5">
+              <div className="flex items-center text-gray-500 items-centers space-x-1 px-2">
+                <Cog6ToothIcon className="w-4 h-4" />
+                <span>Settings</span>
+              </div>
+            </li>
+            <li>
+              <Link
+                href="/evaluationperiods"
+                className={`app__menu_link ${
+                  currentRoute === '/evaluationperiods'
+                    ? 'app_menu_link_active'
+                    : ''
+                }`}
+              >
+                <span className="flex-1 ml-3 whitespace-nowrap">
+                  Evaluation Periods
+                </span>
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/evaluators"
+                className={`app__menu_link ${
+                  currentRoute === '/evaluators' ? 'app_menu_link_active' : ''
+                }`}
+              >
+                <span className="flex-1 ml-3 whitespace-nowrap">
+                  Evaluators
+                </span>
+              </Link>
+            </li>
+          </>
+        )}
       </ul>
     </>
   )

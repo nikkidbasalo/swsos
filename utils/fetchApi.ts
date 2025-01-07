@@ -567,7 +567,11 @@ export async function fetchErrorLogs(perPageCount: number, rangeFrom: number) {
 }
 
 export async function fetchAccounts(
-  filters: { filterStatus?: string },
+  filters: {
+    filterStatus?: string
+    filterType?: string
+    filterKeyword?: string
+  },
   perPageCount: number,
   rangeFrom: number
 ) {
@@ -578,6 +582,18 @@ export async function fetchAccounts(
     // filter status
     if (filters.filterStatus && filters.filterStatus !== '') {
       query = query.eq('status', filters.filterStatus)
+    }
+
+    if (filters.filterKeyword && filters.filterKeyword !== '') {
+      // Search match
+      query = query.or(
+        `firstname.ilike.%${filters.filterKeyword}%,middlename.ilike.%${filters.filterKeyword}%,lastname.ilike.%${filters.filterKeyword}%`
+      )
+    }
+
+    // filter type
+    if (filters.filterType && filters.filterType !== '') {
+      query = query.eq('type', filters.filterType)
     }
 
     // Per Page from context

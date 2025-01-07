@@ -46,6 +46,8 @@ const Page: React.FC = () => {
 
   // Filter
   const [filterStatus, setFilterStatus] = useState<string>('')
+  const [filterKeyword, setFilterKeyword] = useState<string>('')
+  const [filterType, setFilterType] = useState<string>('')
 
   const [perPageCount, setPerPageCount] = useState<number>(10)
 
@@ -61,7 +63,11 @@ const Page: React.FC = () => {
     setLoading(true)
 
     try {
-      const result = await fetchAccounts({ filterStatus }, perPageCount, 0)
+      const result = await fetchAccounts(
+        { filterStatus, filterType, filterKeyword },
+        perPageCount,
+        0
+      )
 
       // update the list in redux
       dispatch(updateList(result.data))
@@ -86,7 +92,7 @@ const Page: React.FC = () => {
 
     try {
       const result = await fetchAccounts(
-        { filterStatus },
+        { filterStatus, filterType, filterKeyword },
         perPageCount,
         list.length
       )
@@ -186,7 +192,7 @@ const Page: React.FC = () => {
     void fetchData()
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [perPageCount, filterStatus])
+  }, [perPageCount, filterStatus, filterType, filterKeyword])
 
   const isDataEmpty = !Array.isArray(list) || list.length < 1 || !list
 
@@ -213,7 +219,11 @@ const Page: React.FC = () => {
 
           {/* Filters */}
           <div className="app__filters">
-            <Filters setFilterStatus={setFilterStatus} />
+            <Filters
+              setFilterStatus={setFilterStatus}
+              setFilterKeyword={setFilterKeyword}
+              setFilterType={setFilterType}
+            />
           </div>
 
           {/* Per Page */}
