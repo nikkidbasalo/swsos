@@ -42,6 +42,7 @@ const Page: React.FC = () => {
   const [selectedItem, setSelectedItem] = useState<ApplicationTypes>()
   const [filterKeyword, setFilterKeyword] = useState<string>('')
   const [filterStatus, setFilterStatus] = useState<string>('')
+  const [filterProgram, setFilterProgram] = useState<string>('')
   const [list, setList] = useState<ApplicationTypes[]>([])
 
   const [perPageCount, setPerPageCount] = useState<number>(10)
@@ -59,7 +60,7 @@ const Page: React.FC = () => {
 
     try {
       const result = await fetchApplications(
-        { filterStatus, filterKeyword },
+        { filterStatus, filterKeyword, filterProgram },
         perPageCount,
         0
       )
@@ -89,7 +90,7 @@ const Page: React.FC = () => {
 
     try {
       const result = await fetchApplications(
-        { filterStatus, filterKeyword },
+        { filterStatus, filterKeyword, filterProgram },
         perPageCount,
         list.length
       )
@@ -281,7 +282,7 @@ const Page: React.FC = () => {
     setList([])
     void fetchData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [perPageCount, refresh, filterKeyword, filterStatus])
+  }, [perPageCount, refresh, filterKeyword, filterProgram, filterStatus])
 
   const isDataEmpty = !Array.isArray(list) || list.length < 1 || !list
 
@@ -316,6 +317,7 @@ const Page: React.FC = () => {
           <div className="app__filters">
             <Filters
               setFilterKeyword={setFilterKeyword}
+              setFilterProgram={setFilterProgram}
               setFilterStatus={setFilterStatus}
             />
           </div>

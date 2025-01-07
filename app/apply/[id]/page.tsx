@@ -664,30 +664,18 @@ export default function Page({ params }: { params: { id: string } }) {
                             </td>
                             <td className="font-bold border border-black p-1">
                               <input
-                                {...register('shs', { required: true })}
+                                {...register('shs')}
                                 className="app__input_standard"
                               />
-                              {errors.shs && (
-                                <div className="app__error_message">
-                                  This is required
-                                </div>
-                              )}
                             </td>
                             <td className="font-bold border border-black bg-green-200 p-1">
                               PRINCIPAL
                             </td>
                             <td className="font-bold border border-black p-1">
                               <input
-                                {...register('shs_principal', {
-                                  required: true
-                                })}
+                                {...register('shs_principal')}
                                 className="app__input_standard"
                               />
-                              {errors.shs_principal && (
-                                <div className="app__error_message">
-                                  This is required
-                                </div>
-                              )}
                             </td>
                           </tr>
                           <tr>
@@ -696,30 +684,18 @@ export default function Page({ params }: { params: { id: string } }) {
                             </td>
                             <td className="font-bold border border-black p-1">
                               <input
-                                {...register('shs_address', { required: true })}
+                                {...register('shs_address')}
                                 className="app__input_standard"
                               />
-                              {errors.shs_address && (
-                                <div className="app__error_message">
-                                  This is required
-                                </div>
-                              )}
                             </td>
                             <td className="font-bold border border-black bg-green-200 p-1">
                               YEAR GRADUATED
                             </td>
                             <td className="font-bold border border-black p-1">
                               <input
-                                {...register('shs_year_graduated', {
-                                  required: true
-                                })}
+                                {...register('shs_year_graduated')}
                                 className="app__input_standard"
                               />
-                              {errors.shs_year_graduated && (
-                                <div className="app__error_message">
-                                  This is required
-                                </div>
-                              )}
                             </td>
                           </tr>
                           <tr>
@@ -728,19 +704,12 @@ export default function Page({ params }: { params: { id: string } }) {
                             </td>
                             <td className="font-bold border border-black p-1">
                               <select
-                                {...register('shs_school_type', {
-                                  required: true
-                                })}
+                                {...register('shs_school_type')}
                                 className="app__select_standard"
                               >
                                 <option value="Public">Public</option>
                                 <option value="Private">Private</option>
                               </select>
-                              {errors.shs_school_type && (
-                                <div className="app__error_message">
-                                  This is required
-                                </div>
-                              )}
                             </td>
                             <td className="font-bold border border-black bg-green-200 p-1">
                               HONORS RECEIVED

@@ -362,14 +362,33 @@ export default function EvaluateModal({ hideModal, grantee }: ModalProps) {
                                   Allowance
                                 </div>
                                 <div>
-                                  <input
+                                  <select
                                     {...register('allowance', {
                                       required: true
                                     })}
-                                    type="number"
-                                    step="any"
-                                    className="app__input_standard"
-                                  />
+                                    className="app__select_standard"
+                                  >
+                                    <option value="">Select Allowance</option>
+                                    <option value="1000">1000</option>
+                                    <option value="1500">1500</option>
+                                    <option value="2000">2000</option>
+                                    <option value="2500">2500</option>
+                                    <option value="3000">3000</option>
+                                    <option value="3500">3500</option>
+                                    <option value="4000">4000</option>
+                                    <option value="4500">4500</option>
+                                    <option value="5000">5000</option>
+                                    <option value="5500">5500</option>
+                                    <option value="6000">6000</option>
+                                    <option value="6500">6500</option>
+                                    <option value="7000">7000</option>
+                                    <option value="7500">7500</option>
+                                    <option value="8000">8000</option>
+                                    <option value="8500">8500</option>
+                                    <option value="9000">9000</option>
+                                    <option value="9500">9500</option>
+                                    <option value="10000">10000</option>
+                                  </select>
                                   {errors.allowance && (
                                     <div className="app__error_message">
                                       Allowance required

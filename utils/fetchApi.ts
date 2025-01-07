@@ -137,6 +137,7 @@ export async function fetchPeriods(perPageCount: number, rangeFrom: number) {
 export async function fetchApplications(
   filters: {
     filterKeyword?: string
+    filterProgram?: string
     filterStatus?: string
   },
   perPageCount: number,
@@ -152,6 +153,11 @@ export async function fetchApplications(
       query = query.or(
         `firstname.ilike.%${filters.filterKeyword}%,middlename.ilike.%${filters.filterKeyword}%,lastname.ilike.%${filters.filterKeyword}%`
       )
+    }
+
+    // filter program
+    if (filters.filterProgram && filters.filterProgram !== '') {
+      query = query.eq('program_id', filters.filterProgram)
     }
 
     // filter status
@@ -227,6 +233,7 @@ export async function fetchGrantees(
     if (filters.filterProgram && filters.filterProgram !== '') {
       query = query.eq('program_id', filters.filterProgram)
     }
+
     // filter institute
     if (filters.filterInstitute && filters.filterInstitute !== '') {
       query = query.eq('institute_id', filters.filterInstitute)
