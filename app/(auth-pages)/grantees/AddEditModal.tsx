@@ -350,20 +350,18 @@ const AddEditModal = ({ hideModal, editData, programId, type }: ModalProps) => {
               </div>
               <div className="app__form_field_container">
                 <div className="w-full">
-                  <div className="app__label_standard">Gender</div>
+                  <div className="app__label_standard">Sex</div>
                   <div>
                     <select
                       {...register('gender', { required: true })}
                       className="app__select_standard"
                     >
-                      <option value="">Select Gender</option>
+                      <option value="">Select Sex</option>
                       <option value="Male">Male</option>
                       <option value="Female">Female</option>
                     </select>
                     {errors.gender && (
-                      <div className="app__error_message">
-                        Gender is required
-                      </div>
+                      <div className="app__error_message">Sex is required</div>
                     )}
                   </div>
                 </div>

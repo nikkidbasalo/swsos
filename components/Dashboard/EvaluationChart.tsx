@@ -25,7 +25,7 @@ export function EvaluationChart({ periodId }: { periodId: number }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Grantes Summary Across All Periods</CardTitle>
+        <CardTitle>Grantees Summary Across All Programs</CardTitle>
       </CardHeader>
       <CardContent>
         <table className="app__table">

@@ -1,7 +1,8 @@
 'use client'
 import { TopBarDark } from '@/components/index'
 import { useSupabase } from '@/context/SupabaseProvider'
-import { ApplicationTypes } from '@/types'
+import { ApplicationTypes, BoardinghouseTypes, ProgramTypes } from '@/types'
+import { fetchBoardinghouse } from '@/utils/fetchApi'
 import { generateRandomAlphaNumber } from '@/utils/text-helper'
 import { PaperClipIcon } from '@heroicons/react/20/solid'
 import Image from 'next/image'
@@ -16,14 +17,19 @@ export default function Page({ params }: { params: { id: string } }) {
   const { supabase } = useSupabase()
   const router = useRouter()
 
+  const [boardinghouses, setBoardinghouses] = useState<
+    BoardinghouseTypes[] | []
+  >([])
   const [saving, setSaving] = useState(false)
   const [refCode, setRefCode] = useState('')
+  const [details, setDetails] = useState<ProgramTypes | null>(null)
 
   const [file, setFile] = useState<File | null>(null)
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0] || null
     setFile(selectedFile)
+    clearErrors('file_path')
   }
 
   const {
@@ -41,8 +47,18 @@ export default function Page({ params }: { params: { id: string } }) {
 
     const emailCheck = await handleCheckEmail(formdata.email)
     if (!emailCheck) return
-    setSaving(true)
 
+    if (!file) {
+      setError('file_path', {
+        type: 'manual',
+        message: 'Requirements are required'
+      })
+      return
+    } else {
+      clearErrors('file_path')
+    }
+
+    setSaving(true)
     void handleCreate(formdata)
   }
 
@@ -211,6 +227,21 @@ export default function Page({ params }: { params: { id: string } }) {
     })()
   }, [router])
 
+  useEffect(() => {
+    ;(async () => {
+      const appartmentsData = await fetchBoardinghouse(999, 0)
+      setBoardinghouses(appartmentsData.data)
+
+      const { data: programDetails } = await supabase
+        .from('sws_programs')
+        .select()
+        .eq('id', programId)
+        .single()
+
+      setDetails(programDetails)
+    })()
+  }, [])
+
   return (
     <div className="app__home">
       <TopBarDark isGuest={isLoggedIn ? false : true} />
@@ -248,8 +279,8 @@ export default function Page({ params }: { params: { id: string } }) {
                         Lot 289, J. Luna St., Maloro, Tangub City, Misamis
                         Occidental 7214
                       </div>
-                      <div className="text-xl font-bold mt-5">
-                        ACADEMIC SCHOLARSHIP APPLICATION FORM
+                      <div className="text-xl font-bold mt-5 uppercase">
+                        {details?.name} APPLICATION FORM
                       </div>
                       <hr className="border-black mt-2" />
                     </td>
@@ -338,7 +369,7 @@ export default function Page({ params }: { params: { id: string } }) {
                               />
                             </td>
                             <td className="font-bold border border-black bg-green-200 p-1">
-                              GENDER
+                              SEX
                             </td>
                             <td className="font-bold border border-black p-1">
                               <select
@@ -442,17 +473,17 @@ export default function Page({ params }: { params: { id: string } }) {
                               BOARDING HOUSE/APPARTMENT ADDRESS
                             </td>
                             <td className="font-bold border border-black p-1">
-                              <input
-                                {...register('present_address', {
-                                  required: true
-                                })}
-                                className="app__input_standard"
-                              />
-                              {errors.present_address && (
-                                <div className="app__error_message">
-                                  Address is required
-                                </div>
-                              )}
+                              <select
+                                {...register('present_address')}
+                                className="app__select_standard"
+                              >
+                                <option value="">Select</option>
+                                {boardinghouses?.map((b, i) => (
+                                  <option key={i} value={b.name}>
+                                    {b.name}
+                                  </option>
+                                ))}
+                              </select>
                             </td>
                           </tr>
                           <tr>
@@ -715,15 +746,19 @@ export default function Page({ params }: { params: { id: string } }) {
                               HONORS RECEIVED
                             </td>
                             <td className="font-bold border border-black p-1">
-                              <input
-                                {...register('shs_honor', { required: true })}
-                                className="app__input_standard"
-                              />
-                              {errors.shs_honor && (
-                                <div className="app__error_message">
-                                  This is required
-                                </div>
-                              )}
+                              <select
+                                {...register('shs_honor')}
+                                className="app__select_standard"
+                              >
+                                <option value="">Select</option>
+                                <option value="With Highest Honors">
+                                  With Highest Honors
+                                </option>
+                                <option value="With High Honors">
+                                  With High Honors
+                                </option>
+                                <option value="With Honors">With Honors</option>
+                              </select>
                             </td>
                           </tr>
                         </tbody>
@@ -860,98 +895,23 @@ export default function Page({ params }: { params: { id: string } }) {
                 <div className="app__form_field_container">
                   <div>
                     <div className="mt-4 font-bold">
-                      ACADEMIC SCHOLARSHIP REQUIREMENTS
+                      {details?.name} SCHOLARSHIP REQUIREMENTS
                     </div>
-                    <div className="ml-6">
-                      <div className="text-gray-700 italic">
-                        For Valedictorian:
-                      </div>
-                      <div className="text-xs text-gray-700 ml-6">
-                        <ul className="app__requirements_ul">
-                          <li>
-                            Accomplished Academic Scholarship Application Form
-                          </li>
-                          <li>
-                            Certificate as Class Valedictorian duly signed by
-                            the School Principal
-                          </li>
-                          <li>
-                            Certificate of General Weighted Average duly signed
-                            by the School Registrar
-                          </li>
-                          <li>
-                            Certificate of Good Moral Character from where the
-                            applicant graduated
-                          </li>
-                          <li>
-                            Certificate of Residency with Recommendation duly
-                            signed by the Brgy. Captain where the applicant
-                            permanently resides.
-                          </li>
-                        </ul>
-                      </div>
+                    <div className="tiptopeditor">
+                      <div
+                        className="text-sm"
+                        dangerouslySetInnerHTML={{
+                          __html:
+                            details?.requirements ||
+                            '<p>No requirements uploaded yet.</p>'
+                        }}
+                      />
                     </div>
-                    <div className="ml-6">
-                      <div className="text-gray-700 italic">
-                        For Salutatorian:
-                      </div>
-                      <div className="text-xs text-gray-700 ml-6">
-                        <ul className="app__requirements_ul">
-                          <li>
-                            Accomplished Academic Scholarship Application Form
-                          </li>
-                          <li>
-                            {' '}
-                            Certificate as Class Valedictorian duly signed by
-                            the School Principal
-                          </li>
-                          <li>
-                            {' '}
-                            Certificate of General Weighted Average duly signed
-                            by the School Registrar
-                          </li>
-                          <li>
-                            {' '}
-                            Certificate of Good Moral Character from where the
-                            applicant graduated
-                          </li>
-                          <li>
-                            {' '}
-                            Certificate of Residency with Recommendation duly
-                            signed by the Brgy. Captain where the applicant
-                            permanently resides.
-                          </li>
-                        </ul>
-                      </div>
-                    </div>
-                    <div className="mt-4 font-bold">
-                      PRESIDENTIAL SCHOLARSHIP REQUIREMENTS
-                    </div>
+                  </div>
+                  <div className="w-full">
                     <div className="text-gray-700 italic text-xs">
-                      (must have at least 1 year in the college but not more
-                      than the number of years required in the program enrolled)
-                    </div>
-                    <div className="text-xs text-gray-700 mt-4 ml-6">
-                      <ul className="app__requirements_ul">
-                        <li>
-                          Accomplished Academic Scholarship Application Form
-                        </li>
-                        <li>
-                          Grade Slip(s) for two (2) consecutive semesters of the
-                          preceding Academic Year with no grade below 87
-                        </li>
-                        <li>
-                          Certificate of General Weighted Average for two (2)
-                          consecutive semesters of the preceding Academic Year
-                          with at least 91%{' '}
-                        </li>
-                        <li>and above duly signed by the College Registrar</li>
-                        <li>
-                          Certificate of Good Moral Character duly signed by the
-                          Prefect of Discipline and Formation/College Guidance
-                          Counselor
-                        </li>
-                      </ul>
+                      (Merge all requirements into single PDF file and upload
+                      below)
                     </div>
                   </div>
                   <div className="w-full">
@@ -960,7 +920,7 @@ export default function Page({ params }: { params: { id: string } }) {
                       <div className="relative">
                         <input
                           type="file"
-                          accept=".pdf, .doc, .docx, .xls, .xlsx, .png, .jpg, .jpeg, .gif"
+                          accept=".pdf"
                           onChange={handleFileChange}
                           className="hidden" // Hides the default file input
                           id="fileUpload"
@@ -976,6 +936,11 @@ export default function Page({ params }: { params: { id: string } }) {
                           </span>
                           <PaperClipIcon className="w-4 h-4" />
                         </label>
+                        {errors.file_path && (
+                          <div className="app__error_message">
+                            {errors.file_path.message}
+                          </div>
+                        )}
 
                         {file && (
                           <span className="mt-1 text-xs text-gray-600 dark:text-gray-400">

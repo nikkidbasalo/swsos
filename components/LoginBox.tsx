@@ -3,7 +3,6 @@ import React, { useState } from 'react'
 
 import { CustomButton } from '@/components/index'
 import { useSupabase } from '@/context/SupabaseProvider'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
 // Supabase auth needs to be triggered client-side
@@ -95,14 +94,14 @@ export default function LoginBox() {
               />
             </div>
 
-            <div className="flex items-center pb-6">
+            {/* <div className="flex items-center pb-6">
               <Link
                 href="/forgotpassword"
                 className="mb-0 mr-2 text-blue-600 text-sm"
               >
                 Forgot your Password?
               </Link>
-            </div>
+            </div> */}
           </form>
         </div>
       </div>

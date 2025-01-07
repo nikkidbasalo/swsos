@@ -9,6 +9,7 @@ import { useForm } from 'react-hook-form'
 import type { ProgramTypes } from '@/types'
 
 // Redux imports
+import Tiptap from '@/components/Tiptap'
 import { updateList } from '@/GlobalRedux/Features/listSlice'
 import { updateResultCounter } from '@/GlobalRedux/Features/resultsCounterSlice'
 import { useDispatch, useSelector } from 'react-redux'
@@ -23,6 +24,8 @@ const AddEditModal = ({ hideModal, editData, type }: ModalProps) => {
   const { setToast } = useFilter()
   const { supabase } = useSupabase()
   const [saving, setSaving] = useState(false)
+
+  const [content, setContent] = useState(editData ? editData.requirements : '')
 
   // Redux staff
   const globallist = useSelector((state: any) => state.list.value)
@@ -68,8 +71,8 @@ const AddEditModal = ({ hideModal, editData, type }: ModalProps) => {
     const newData = {
       name: formdata.name,
       description: formdata.description,
+      requirements: content,
       type,
-      funds: formdata.funds,
       allow_applicants: formdata.allow_applicants
     }
 
@@ -122,13 +125,17 @@ const AddEditModal = ({ hideModal, editData, type }: ModalProps) => {
     }
   }
 
+  const handleContentChange = (reason: any) => {
+    setContent(reason)
+  }
+
   const handleUpdate = async (formdata: ProgramTypes) => {
     if (!editData) return
 
     const newData = {
       name: formdata.name,
       description: formdata.description,
-      funds: formdata.funds,
+      requirements: content,
       allow_applicants: formdata.allow_applicants
     }
 
@@ -181,7 +188,7 @@ const AddEditModal = ({ hideModal, editData, type }: ModalProps) => {
     reset({
       name: editData ? editData.name : '',
       description: editData ? editData.description : '',
-      funds: editData ? editData.funds : '',
+      requirements: editData ? editData.requirements : '',
       allow_applicants: editData ? editData.allow_applicants : false
     })
   }, [editData, reset])
@@ -239,19 +246,14 @@ const AddEditModal = ({ hideModal, editData, type }: ModalProps) => {
               </div>
               <div className="app__form_field_container">
                 <div className="w-full">
-                  <div className="app__label_standard">Total Funds</div>
+                  <div className="app__label_standard">Requirements</div>
                   <div>
-                    <input
-                      {...register('funds', { required: true })}
-                      type="number"
-                      step="any"
-                      className="app__input_standard"
+                    <Tiptap
+                      content={content}
+                      onChange={(newContent: string) =>
+                        handleContentChange(newContent)
+                      }
                     />
-                    {errors.funds && (
-                      <div className="app__error_message">
-                        Funds is required
-                      </div>
-                    )}
                   </div>
                 </div>
               </div>

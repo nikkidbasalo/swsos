@@ -22,6 +22,8 @@ export default function Page({ params }: { params: { id: string } }) {
   const [isFound, setIsFound] = useState(true)
   const [userData, setUserData] = useState<AccountTypes | null>(null)
 
+  const [refresh, setRefresh] = useState(false)
+
   const userId = params.id
   const searchParams = useSearchParams()
   const page = searchParams.get('page')
@@ -137,7 +139,7 @@ export default function Page({ params }: { params: { id: string } }) {
     void fetchAccountDetails()
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [refresh])
 
   if (!isFound) {
     notFound()
@@ -258,7 +260,10 @@ export default function Page({ params }: { params: { id: string } }) {
         {!loading && (
           <div>
             {(!page || page === '') && userData && (
-              <ProfileDashboard userData={userData} />
+              <ProfileDashboard
+                refresh={() => setRefresh(!refresh)}
+                userData={userData}
+              />
             )}
             {page && page === 'grades' && (
               <>

@@ -5,7 +5,6 @@ import { useSupabase } from '@/context/SupabaseProvider'
 import { Menu, Transition } from '@headlessui/react'
 import { LockClosedIcon } from '@heroicons/react/24/solid'
 
-import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { Fragment, useState } from 'react'
 import Avatar from 'react-avatar'
@@ -43,18 +42,7 @@ const UserDropdown = ({ darkMode }: propTypes) => {
       <Menu as="div" className="relative inline-block text-left mr-2">
         <div>
           <Menu.Button className="relative focus:ring-0 focus:outline-none ">
-            {user.avatar_url && user.avatar_url !== '' ? (
-              <div className="w-8 h-8 relative rounded-full flex items-center justify-center bg-black overflow-hidden">
-                <Image
-                  src={user.avatar_url}
-                  width={40}
-                  height={40}
-                  alt="user"
-                />
-              </div>
-            ) : (
-              <Avatar round={true} size="30" name={user.firstname} />
-            )}
+            <Avatar round={true} size="30" name={user?.firstname} />
           </Menu.Button>
         </div>
 
@@ -86,7 +74,7 @@ const UserDropdown = ({ darkMode }: propTypes) => {
                   >
                     <GrDocumentUser className="w-5 h-5" />
                     <div className="text-sm font-semibold text-gray-700">
-                      Account Details
+                      Edit Account
                     </div>
                   </div>
                   <div className="py-2">

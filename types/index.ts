@@ -68,6 +68,7 @@ export interface ProgramTypes {
   type: string
   funds: string
   allow_applicants: boolean
+  requirements: string
   confirmed: string
 }
 export interface LiquidationTypes {
@@ -171,10 +172,42 @@ export interface AccountTypes {
   created_by: string
   status: string
   temp_password: string
+  age: string
+  civil_status: string
+  contact_number: string
+  present_address: string
+  permanent_address: string
+  father: string
+  mother: string
+  guardian: string
+  parent_address: string
+  father_occupation: string
+  mother_occupation: string
+  guardian_occupation: string
+  shs: string
+  shs_principal: string
+  shs_address: string
+  shs_school_type: string
+  shs_year_graduated: string
+  shs_honor: string
+  reference_name_1: string
+  reference_name_2: string
+  reference_name_3: string
+  reference_address_1: string
+  reference_address_2: string
+  reference_address_3: string
+  reference_contact_1: string
+  reference_contact_2: string
+  reference_contact_3: string
   confirmed: string
 }
 
 export interface InstituteTypes {
+  id: string
+  name: string
+}
+
+export interface BoardinghouseTypes {
   id: string
   name: string
 }
@@ -188,8 +221,10 @@ export interface ApplicationTypes {
   middlename: string
   name_ext: string
   birthday: string
-  age: string
   gender: string
+  institute_id: string
+  institute: InstituteTypes
+  age: string
   civil_status: string
   contact_number: string
   present_address: string

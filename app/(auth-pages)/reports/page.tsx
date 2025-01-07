@@ -1,5 +1,4 @@
 'use client'
-import { ChartYearLevel } from '@/components/Dashboard/ChartYearLevel'
 import {
   CustomButton,
   PerPage,
@@ -179,12 +178,24 @@ const Page: React.FC = () => {
       worksheet.addRow(item)
     })
 
+    let filename = 'Grantees'
+    if (filterProgram !== '') {
+      const result = await fetchPrograms('', 999, 0)
+      const find = result.data.find(
+        (program: ProgramTypes) =>
+          program.id.toString() === filterProgram.toString()
+      )
+      if (find) {
+        filename = find.name
+      }
+    }
+
     // Generate the Excel file
     await workbook.xlsx.writeBuffer().then((buffer) => {
       const blob = new Blob([buffer], {
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
       })
-      saveAs(blob, `Summary.xlsx`)
+      saveAs(blob, `${filename}.xlsx`)
     })
     setDownloading(false)
   }
@@ -257,12 +268,6 @@ const Page: React.FC = () => {
               programs={programs}
               institutes={institutes}
             />
-          </div>
-
-          <div>
-            <div className="mx-4 my-4 grid md:grid-cols-2 gap-2">
-              <ChartYearLevel />
-            </div>
           </div>
 
           {/* Export Button */}

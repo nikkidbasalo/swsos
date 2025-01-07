@@ -350,3 +350,48 @@ body {
 .app__requirements_ul {
   @apply list-disc;
 }
+
+.tiptopeditor h1,
+.tiptap h1 {
+  @apply text-2xl font-bold;
+}
+
+.tiptopeditor h2,
+.tiptap h2 {
+  @apply text-xl font-bold;
+}
+
+.tiptopeditor h3,
+.tiptap h3 {
+  @apply text-lg font-bold;
+}
+
+.tiptopeditor h4,
+.tiptap h4 {
+  @apply text-base font-bold;
+}
+
+.tiptopeditor h5,
+.tiptap h5 {
+  @apply text-base font-bold;
+}
+
+.tiptopeditor h6,
+.tiptap h6 {
+  @apply text-base font-bold;
+}
+
+.tiptopeditor ol,
+.tiptap ol,
+.tiptopeditor ul,
+.tiptap ul {
+  @apply ml-10;
+}
+.tiptap ol li,
+.page-content ol li {
+  @apply list-decimal;
+}
+.tiptap ul li,
+.tiptopeditor ul li {
+  @apply list-disc;
+}

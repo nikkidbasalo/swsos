@@ -15,17 +15,23 @@ import { useFilter } from '@/context/FilterContext'
 import { useSupabase } from '@/context/SupabaseProvider'
 import { updateList } from '@/GlobalRedux/Features/listSlice'
 import { updateResultCounter } from '@/GlobalRedux/Features/resultsCounterSlice'
-import { GradeTypes, GranteeSummaryTypes } from '@/types'
-import { fetchEvaluations } from '@/utils/fetchApi'
+import {
+  GradeTypes,
+  GranteeSummaryTypes,
+  ProgramTypes,
+  UserAccessTypes
+} from '@/types'
+import { fetchEvaluations, fetchPrograms } from '@/utils/fetchApi'
 import Excel from 'exceljs'
 import { saveAs } from 'file-saver'
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import EvaluateModal from './EvaluateModal'
 import Filters from './Filters'
 
 const Page: React.FC = () => {
   const { hasAccess, setToast } = useFilter()
-  const { session, supabase } = useSupabase()
+  const { session, supabase, systemAccess } = useSupabase()
 
   const [loading, setLoading] = useState(false)
   const [downloading, setDownloading] = useState(false)
@@ -35,7 +41,11 @@ const Page: React.FC = () => {
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [checkAll, setCheckAll] = useState(false)
 
+  const [showEvaluateModal, setShowEvaluateModal] = useState(false)
+  const [editData, setEditData] = useState<GradeTypes | null>(null)
+
   const [filterStatus, setFilterStatus] = useState<string>('')
+  const [filterPaymentStatus, setFilterPaymentStatus] = useState<string>('')
   const [filterPeriod, setFilterPeriod] = useState<string>('')
   const [filterProgram, setFilterProgram] = useState<string>('')
   const [filterInstitute, setFilterInstitute] = useState<string>('')
@@ -47,6 +57,10 @@ const Page: React.FC = () => {
   const [totalFailed, setTotalFailed] = useState(0)
   const [totalForEvaluation, setTotalForEvaluation] = useState(0)
 
+  const userAccess: UserAccessTypes | undefined = systemAccess.find(
+    (user: UserAccessTypes) => user.user_id === session.user.id
+  )
+
   // Redux staff
   const globallist = useSelector((state: any) => state.list.value)
   const resultsCounter = useSelector((state: any) => state.results.value)
@@ -57,7 +71,15 @@ const Page: React.FC = () => {
 
     try {
       const result = await fetchEvaluations(
-        { filterProgram, filterPeriod, filterStatus, filterInstitute },
+        {
+          filterProgram,
+          filterPeriod,
+          filterStatus,
+          filterInstitute,
+          filterPaymentStatus,
+          filterProgramIds:
+            userAccess && userAccess.program_ids ? userAccess.program_ids : []
+        },
         perPageCount,
         0
       )
@@ -79,7 +101,15 @@ const Page: React.FC = () => {
 
     //All
     const all = await fetchEvaluations(
-      { filterProgram, filterPeriod, filterStatus, filterInstitute },
+      {
+        filterProgram,
+        filterPeriod,
+        filterStatus,
+        filterInstitute,
+        filterPaymentStatus,
+        filterProgramIds:
+          userAccess && userAccess.program_ids ? userAccess.program_ids : []
+      },
       99999,
       0
     )
@@ -103,7 +133,15 @@ const Page: React.FC = () => {
 
     try {
       const result = await fetchEvaluations(
-        { filterProgram, filterPeriod, filterStatus, filterInstitute },
+        {
+          filterProgram,
+          filterPeriod,
+          filterStatus,
+          filterInstitute,
+          filterPaymentStatus,
+          filterProgramIds:
+            userAccess && userAccess.program_ids ? userAccess.program_ids : []
+        },
         perPageCount,
         list.length
       )
@@ -179,12 +217,24 @@ const Page: React.FC = () => {
       worksheet.addRow(item)
     })
 
+    let filename = 'Grantees'
+    if (filterProgram !== '') {
+      const result = await fetchPrograms('', 999, 0)
+      const find = result.data.find(
+        (program: ProgramTypes) =>
+          program.id.toString() === filterProgram.toString()
+      )
+      if (find) {
+        filename = find.name
+      }
+    }
+
     // Generate the Excel file
     await workbook.xlsx.writeBuffer().then((buffer) => {
       const blob = new Blob([buffer], {
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
       })
-      saveAs(blob, `Grantees.xlsx`)
+      saveAs(blob, `${filename}.xlsx`)
     })
     setDownloading(false)
   }
@@ -348,12 +398,24 @@ const Page: React.FC = () => {
     }
   }
 
+  const handleViewDetails = (item: GradeTypes) => {
+    setShowEvaluateModal(true)
+    setEditData(item)
+  }
+
   // Featch data
   useEffect(() => {
     setList([])
     void fetchData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [perPageCount, filterProgram, filterInstitute, filterPeriod, filterStatus])
+  }, [
+    perPageCount,
+    filterProgram,
+    filterInstitute,
+    filterPeriod,
+    filterPaymentStatus,
+    filterStatus
+  ])
 
   const isDataEmpty = !Array.isArray(list) || list.length < 1 || !list
 
@@ -385,6 +447,7 @@ const Page: React.FC = () => {
               setFilterProgram={setFilterProgram}
               setFilterInstitute={setFilterInstitute}
               setFilterStatus={setFilterStatus}
+              setFilterPaymentStatus={setFilterPaymentStatus}
             />
           </div>
 
@@ -491,6 +554,14 @@ const Page: React.FC = () => {
                           <div>
                             {item.user?.email} | {item.user?.gender}
                           </div>
+                          <div>
+                            <CustomButton
+                              containerStyles="app__btn_green"
+                              title="Evaluate"
+                              btnType="button"
+                              handleClick={() => handleViewDetails(item)}
+                            />
+                          </div>
                         </div>
                       </td>
 
@@ -546,6 +617,14 @@ const Page: React.FC = () => {
           {/* Show More */}
           {resultsCounter.results > resultsCounter.showing && !loading && (
             <ShowMore handleShowMore={handleShowMore} />
+          )}
+
+          {/* Tracker Modal */}
+          {showEvaluateModal && editData && (
+            <EvaluateModal
+              grantee={editData}
+              hideModal={() => setShowEvaluateModal(false)}
+            />
           )}
         </div>
       </div>

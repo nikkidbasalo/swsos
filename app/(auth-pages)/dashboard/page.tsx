@@ -5,6 +5,7 @@ import TwoColTableLoading from '@/components/Loading/TwoColTableLoading'
 import { useSupabase } from '@/context/SupabaseProvider'
 import { AccountTypes } from '@/types'
 import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 
 export default function Page() {
   const { session, systemUsers } = useSupabase()
@@ -14,11 +15,13 @@ export default function Page() {
     (u: { id: string }) => u.id === session.user.id
   )
 
-  if (user.type === 'Scholar') {
-    router.push(`/profile/${session.user.id}`)
-  } else {
-    router.push(`/`)
-  }
+  useEffect(() => {
+    if (user?.type === 'Scholar') {
+      router.push(`/profile/${session.user.id}`)
+    } else {
+      router.push(`/`)
+    }
+  }, [user])
 
   return (
     <>

@@ -228,7 +228,34 @@ const Page: React.FC = () => {
       const { error: dbError } = await supabase.from('sws_users').insert({
         ...newData,
         applicant_id: Number(formdata.id),
-        id: response.data.insert_id
+        id: response.data.insert_id,
+        age: formdata.age,
+        civil_status: formdata.civil_status,
+        contact_number: formdata.contact_number,
+        present_address: formdata.present_address,
+        permanent_address: formdata.permanent_address,
+        father: formdata.father,
+        mother: formdata.mother,
+        guardian: formdata.guardian,
+        parent_address: formdata.parent_address,
+        father_occupation: formdata.father_occupation,
+        mother_occupation: formdata.mother_occupation,
+        guardian_occupation: formdata.guardian_occupation,
+        shs: formdata.shs,
+        shs_principal: formdata.shs_principal,
+        shs_address: formdata.shs_address,
+        shs_school_type: formdata.shs_school_type,
+        shs_year_graduated: formdata.shs_year_graduated,
+        shs_honor: formdata.shs_honor,
+        reference_name_1: formdata.reference_name_1,
+        reference_name_2: formdata.reference_name_2,
+        reference_name_3: formdata.reference_name_3,
+        reference_address_1: formdata.reference_address_1,
+        reference_address_2: formdata.reference_address_2,
+        reference_address_3: formdata.reference_address_3,
+        reference_contact_1: formdata.reference_contact_1,
+        reference_contact_2: formdata.reference_contact_2,
+        reference_contact_3: formdata.reference_contact_3
       })
 
       if (dbError) {
@@ -374,6 +401,12 @@ const Page: React.FC = () => {
                         <div>
                           {item.email} | {item.gender} | {item.civil_status}
                         </div>
+                        <div>
+                          Application Code:{' '}
+                          <span className="font-bold">
+                            {item.reference_code}
+                          </span>
+                        </div>
                       </td>
                       <td className="app__td">
                         {item.status === 'Approved' && (
@@ -400,6 +433,11 @@ const Page: React.FC = () => {
                         </div>
                         <div>
                           Guardian: {item.guardian} | {item.guardian_occupation}
+                        </div>
+                        <div>
+                          SHS: {item.shs}({item.shs_school_type}) -{' '}
+                          {item.shs_address} - {item.shs_honor}(
+                          {item.shs_year_graduated})
                         </div>
                         <div>
                           References 1: {item.reference_name_1} |{' '}

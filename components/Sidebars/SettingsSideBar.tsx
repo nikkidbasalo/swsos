@@ -15,7 +15,7 @@ const SettingsSideBar = () => {
         <li>
           <div className="flex items-center text-gray-500 items-centers space-x-1 px-2">
             <Cog6ToothIcon className="w-4 h-4" />
-            <span>Homepage</span>
+            <span>System</span>
           </div>
         </li>
         <li>
@@ -40,6 +40,20 @@ const SettingsSideBar = () => {
             }`}
           >
             <span className="flex-1 ml-3 whitespace-nowrap">Institutes</span>
+          </Link>
+        </li>
+        <li>
+          <Link
+            href="/settings/boardinghouses"
+            className={`app__menu_link ${
+              currentRoute === '/settings/boardinghouses'
+                ? 'app_menu_link_active'
+                : ''
+            }`}
+          >
+            <span className="flex-1 ml-3 whitespace-nowrap">
+              Boarding House/Appartments
+            </span>
           </Link>
         </li>
         <li className="pt-5">

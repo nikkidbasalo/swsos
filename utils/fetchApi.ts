@@ -316,10 +316,12 @@ export async function fetchAllowances(
 
 export async function fetchEvaluations(
   filters: {
+    filterProgramIds?: string[]
     filterProgram?: string
     filterInstitute?: string
     filterPeriod?: string
     filterStatus?: string
+    filterPaymentStatus?: string
   },
   perPageCount: number,
   rangeFrom: number
@@ -352,6 +354,11 @@ export async function fetchEvaluations(
       query = query.eq('program_id', filters.filterProgram)
     }
 
+    // filter program ids
+    if (filters.filterProgramIds) {
+      query = query.in('program_id', filters.filterProgramIds)
+    }
+
     // filter period
     if (filters.filterPeriod && filters.filterPeriod !== '') {
       query = query.eq('evaluation_period_id', filters.filterPeriod)
@@ -359,6 +366,16 @@ export async function fetchEvaluations(
     // filter status
     if (filters.filterStatus && filters.filterStatus !== '') {
       query = query.eq('status', filters.filterStatus)
+    }
+
+    // filter Payment Status
+    if (filters.filterPaymentStatus) {
+      if (filters.filterPaymentStatus === 'Paid') {
+        query = query.eq('is_paid', true)
+      }
+      if (filters.filterPaymentStatus === 'Unpaid') {
+        query = query.eq('is_paid', false)
+      }
     }
 
     if (filters.filterInstitute && filters.filterInstitute !== '') {
@@ -421,6 +438,36 @@ export async function fetchAnnoucements(
 export async function fetchInstitutes(perPageCount: number, rangeFrom: number) {
   try {
     let query = supabase.from('sws_institutes').select('*', { count: 'exact' })
+
+    // Per Page from context
+    const from = rangeFrom
+    const to = from + (perPageCount - 1)
+
+    // Per Page from context
+    query = query.range(from, to)
+
+    // Order By
+    query = query.order('id', { ascending: false })
+
+    const { data, error, count } = await query
+
+    if (error) {
+      throw new Error(error.message)
+    }
+    return { data, count }
+  } catch (error) {
+    console.error('fetch institutes error', error)
+    return { data: [], count: 0 }
+  }
+}
+export async function fetchBoardinghouse(
+  perPageCount: number,
+  rangeFrom: number
+) {
+  try {
+    let query = supabase
+      .from('sws_boardinghouses')
+      .select('*', { count: 'exact' })
 
     // Per Page from context
     const from = rangeFrom

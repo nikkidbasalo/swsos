@@ -1,8 +1,9 @@
 'use client'
 import {
   CustomButton,
+  DeleteModal,
   PerPage,
-  ProgramsSideBar,
+  SettingsSideBar,
   ShowMore,
   Sidebar,
   TableRowLoading,
@@ -10,17 +11,19 @@ import {
   Unauthorized
 } from '@/components/index'
 import TopBar from '@/components/TopBar'
-import { programsTypes, superAdmins } from '@/constants'
+import { superAdmins } from '@/constants'
 import { useFilter } from '@/context/FilterContext'
 import { useSupabase } from '@/context/SupabaseProvider'
 import { updateList } from '@/GlobalRedux/Features/listSlice'
 import { updateResultCounter } from '@/GlobalRedux/Features/resultsCounterSlice'
-import { ProgramTypes } from '@/types'
-import { fetchPrograms } from '@/utils/fetchApi'
+import { BoardinghouseTypes } from '@/types'
+import { fetchBoardinghouse } from '@/utils/fetchApi'
 import { Menu, Transition } from '@headlessui/react'
-import { ChevronDownIcon, PencilSquareIcon } from '@heroicons/react/20/solid'
-import Link from 'next/link'
-import { notFound, useSearchParams } from 'next/navigation'
+import {
+  ChevronDownIcon,
+  PencilSquareIcon,
+  TrashIcon
+} from '@heroicons/react/20/solid'
 import React, { Fragment, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import AddEditModal from './AddEditModal'
@@ -29,33 +32,29 @@ const Page: React.FC = () => {
   const { hasAccess } = useFilter()
   const { session } = useSupabase()
 
-  const searchParams = useSearchParams()
-  const type = searchParams.get('type') // Get the "page" query parameter
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [selectedId, setSelectedId] = useState<string>('')
 
   const [loading, setLoading] = useState(false)
   const [showAddModal, setShowAddModal] = useState(false)
 
-  const [list, setList] = useState<ProgramTypes[]>([])
+  const [list, setList] = useState<BoardinghouseTypes[]>([])
 
   const [perPageCount, setPerPageCount] = useState<number>(10)
-  const [editData, setEditData] = useState<ProgramTypes | null>(null)
+  const [showingCount, setShowingCount] = useState<number>(0)
+  const [resultsCount, setResultsCount] = useState<number>(0)
+  const [editData, setEditData] = useState<BoardinghouseTypes | null>(null)
 
   // Redux staff
   const globallist = useSelector((state: any) => state.list.value)
   const resultsCounter = useSelector((state: any) => state.results.value)
   const dispatch = useDispatch()
 
-  if (!type || !programsTypes[type]) {
-    return notFound()
-  }
-
-  const title = programsTypes[type] // URL param
-
   const fetchData = async () => {
     setLoading(true)
 
     try {
-      const result = await fetchPrograms(type, perPageCount, 0)
+      const result = await fetchBoardinghouse(perPageCount, 0)
       // update the list in redux
       dispatch(updateList(result.data))
 
@@ -78,7 +77,7 @@ const Page: React.FC = () => {
     setLoading(true)
 
     try {
-      const result = await fetchPrograms(type, perPageCount, list.length)
+      const result = await fetchBoardinghouse(perPageCount, list.length)
 
       // update the list in redux
       const newList = [...list, ...result.data]
@@ -98,12 +97,17 @@ const Page: React.FC = () => {
     }
   }
 
+  const handleDelete = (id: string) => {
+    setSelectedId(id)
+    setShowDeleteModal(true)
+  }
+
   const handleAdd = () => {
     setShowAddModal(true)
     setEditData(null)
   }
 
-  const handleEdit = (item: ProgramTypes) => {
+  const handleEdit = (item: BoardinghouseTypes) => {
     setShowAddModal(true)
     setEditData(item)
   }
@@ -118,31 +122,27 @@ const Page: React.FC = () => {
     setList([])
     void fetchData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [perPageCount, type])
+  }, [perPageCount])
 
   const isDataEmpty = !Array.isArray(list) || list.length < 1 || !list
 
   // Check access from permission settings or Super Admins
-  if (
-    !hasAccess('staff') &&
-    !hasAccess('settings') &&
-    !superAdmins.includes(session.user.email)
-  )
+  if (!hasAccess('settings') && !superAdmins.includes(session.user.email))
     return <Unauthorized />
 
   return (
     <>
       <Sidebar>
-        <ProgramsSideBar />
+        <SettingsSideBar />
       </Sidebar>
       <TopBar />
       <div className="app__main">
         <div>
           <div className="app__title">
-            <Title title={title} />
+            <Title title="Boarding House/Appartments" />
             <CustomButton
               containerStyles="app__btn_green"
-              title="Create Scholarship"
+              title="Create Boarding House/Appartment"
               btnType="button"
               handleClick={handleAdd}
             />
@@ -162,10 +162,7 @@ const Page: React.FC = () => {
               <thead className="app__thead">
                 <tr>
                   <th className="app__th pl-4"></th>
-                  <th className="app__th w-32"></th>
-                  <th className="app__th">Scholarship Program</th>
-                  <th className="app__th">Module</th>
-                  <th className="app__th">Allow Applicants</th>
+                  <th className="app__th">Boarding House/Appartment</th>
                 </tr>
               </thead>
               <tbody>
@@ -203,27 +200,24 @@ const Page: React.FC = () => {
                                     <span>Edit</span>
                                   </div>
                                 </Menu.Item>
+                                <Menu.Item>
+                                  <div
+                                    onClick={() => handleDelete(item.id)}
+                                    className="app__dropdown_item"
+                                  >
+                                    <TrashIcon className="w-4 h-4" />
+                                    <span>Delete</span>
+                                  </div>
+                                </Menu.Item>
                               </div>
                             </Menu.Items>
                           </Transition>
                         </Menu>
                       </td>
-                      <th className="app__th_firstcol">
-                        <Link
-                          href={`/grantees?ref=${item.id}&type=${type}&program=${item.name}`}
-                          className="app__btn_green"
-                        >
-                          View Grantees
-                        </Link>
-                      </th>
-                      <td className="app__td">{item.name}</td>
-                      <td className="app__td">{item.type}</td>
-                      <td className="app__td">
-                        {item.allow_applicants ? 'Yes' : 'No'}
-                      </td>
+                      <th className="app__th_firstcol">{item.name}</th>
                     </tr>
                   ))}
-                {loading && <TableRowLoading cols={6} rows={2} />}
+                {loading && <TableRowLoading cols={2} rows={2} />}
               </tbody>
             </table>
             {!loading && isDataEmpty && (
@@ -236,10 +230,22 @@ const Page: React.FC = () => {
             <ShowMore handleShowMore={handleShowMore} />
           )}
 
+          {/* Delete Modal */}
+          {showDeleteModal && (
+            <DeleteModal
+              table="sws_boardinghouses"
+              selectedId={selectedId}
+              showingCount={showingCount}
+              setShowingCount={setShowingCount}
+              resultsCount={resultsCount}
+              setResultsCount={setResultsCount}
+              hideModal={() => setShowDeleteModal(false)}
+            />
+          )}
+
           {/* Add/Edit Modal */}
           {showAddModal && (
             <AddEditModal
-              type={type}
               editData={editData}
               hideModal={() => setShowAddModal(false)}
             />

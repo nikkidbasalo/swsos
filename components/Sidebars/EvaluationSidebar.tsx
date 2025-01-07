@@ -31,7 +31,7 @@ const EvaluationSidebar = () => {
             <span className="flex-1 ml-3 whitespace-nowrap">Dashboard</span>
           </Link>
         </li>
-        <li>
+        {/* <li>
           <Link
             href="/evaluation"
             className={`app__menu_link ${
@@ -40,7 +40,7 @@ const EvaluationSidebar = () => {
           >
             <span className="flex-1 ml-3 whitespace-nowrap">Evaluations</span>
           </Link>
-        </li>
+        </li> */}
         <li>
           <Link
             href="/evaluationreports"
