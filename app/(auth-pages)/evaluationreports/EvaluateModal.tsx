@@ -265,7 +265,7 @@ export default function EvaluateModal({ hideModal, grantee }: ModalProps) {
                         {grades?.map((item, index) => (
                           <tr key={index} className="app__tr">
                             <td className="app__td">
-                              {item.period.description}
+                              {item.period.description} {item.period.year}
                             </td>
                             <td className="app__td">
                               {item.file_path && (
@@ -344,7 +344,7 @@ export default function EvaluateModal({ hideModal, grantee }: ModalProps) {
                                     </option>
                                     {grades?.map((p, i) => (
                                       <option key={i} value={p.id}>
-                                        {p.period.description}
+                                        {p.period.description} {p.period.year}
                                       </option>
                                     ))}
                                   </select>

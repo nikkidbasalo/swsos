@@ -158,7 +158,7 @@ const Page: React.FC = () => {
         firstname: `${item.user?.firstname}`,
         middlename: `${item.user?.middlename || ''}`,
         program: `${item.program?.name}`,
-        period: `${item.period?.description}`,
+        period: `${item.period?.description} ${item.period?.year}`,
         institute: `${item.user?.institute?.name || ''}`,
         allowance: `${item.allowance ?? ''}`,
         allowance_type: `${item.allowance_type ?? ''}`,

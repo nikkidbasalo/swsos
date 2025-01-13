@@ -262,7 +262,7 @@ export default function ScholarDashboard({
                         {allowances?.map((item, index) => (
                           <tr key={index} className="app__tr">
                             <td className="app__td">
-                              {item.period.description}
+                              {item.period.description} {item.period.year}
                             </td>
                             <td className="app__td">
                               {item.status === 'Passed' && (
@@ -306,7 +306,7 @@ export default function ScholarDashboard({
                           ?.map((item, index) => (
                             <tr key={index} className="app__tr">
                               <td className="app__td">
-                                {item.period.description}
+                                {item.period.description} {item.period.year}
                               </td>
                               <td className="app__td">
                                 {Number(item.allowance).toLocaleString(

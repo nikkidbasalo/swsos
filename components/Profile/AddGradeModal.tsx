@@ -263,7 +263,7 @@ const AddGradeModal = ({ hideModal, editData, userData }: ModalProps) => {
                           <option value="">Choose Evaluation Period</option>
                           {periods?.map((p, i) => (
                             <option key={i} value={p.id}>
-                              {p.description}
+                              {p.description} {p.year}
                             </option>
                           ))}
                         </select>

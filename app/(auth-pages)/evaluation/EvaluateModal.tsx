@@ -264,7 +264,7 @@ export default function EvaluateModal({ hideModal, grantee }: ModalProps) {
                         {grades?.map((item, index) => (
                           <tr key={index} className="app__tr">
                             <td className="app__td">
-                              {item.period.description}
+                              {item.period.description} {item.period.year}
                             </td>
                             <td className="app__td">
                               {item.file_path && (

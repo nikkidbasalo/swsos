@@ -5,6 +5,8 @@ import { ApplicationTypes, BoardinghouseTypes, ProgramTypes } from '@/types'
 import { fetchBoardinghouse } from '@/utils/fetchApi'
 import { generateRandomAlphaNumber } from '@/utils/text-helper'
 import { PaperClipIcon } from '@heroicons/react/20/solid'
+import Excel from 'exceljs'
+import { saveAs } from 'file-saver'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -13,6 +15,7 @@ import { useForm } from 'react-hook-form'
 export default function Page({ params }: { params: { id: string } }) {
   const programId = params.id
   const [isLoggedIn, setLoggedIn] = useState(false)
+  const [downloading, setDownloading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const { supabase } = useSupabase()
   const router = useRouter()
@@ -23,6 +26,8 @@ export default function Page({ params }: { params: { id: string } }) {
   const [saving, setSaving] = useState(false)
   const [refCode, setRefCode] = useState('')
   const [details, setDetails] = useState<ProgramTypes | null>(null)
+
+  const [applicationDetails, setApplicationDetails] = useState<any>(null)
 
   const [file, setFile] = useState<File | null>(null)
 
@@ -92,11 +97,11 @@ export default function Page({ params }: { params: { id: string } }) {
         program_id: programId,
         status: 'Pending Approval',
         reference_code: randomCode,
-        tcgc_id: formdata.tcgc_id,
         lastname: formdata.lastname,
         firstname: formdata.firstname,
         middlename: formdata.middlename,
         name_ext: formdata.name_ext,
+        tcgc_id: formdata.tcgc_id,
         birthday: formdata.birthday,
         email: formdata.email,
         age: formdata.age,
@@ -131,6 +136,8 @@ export default function Page({ params }: { params: { id: string } }) {
         file_path: filePath,
         temporary_password: tempPassword
       }
+
+      setApplicationDetails(newData)
 
       const { data, error } = await supabase
         .from('sws_applications')
@@ -221,6 +228,117 @@ export default function Page({ params }: { params: { id: string } }) {
     }
   }
 
+  const handleDownloadExcel = async () => {
+    setDownloading(true)
+
+    // Create a new workbook and add a worksheet
+    const workbook = new Excel.Workbook()
+    const worksheet = workbook.addWorksheet('Sheet 1')
+
+    // Add data to the worksheet
+    worksheet.columns = [
+      { header: 'reference_code', key: 'reference_code', width: 20 },
+      { header: 'last name', key: 'lastname', width: 20 },
+      { header: 'first name', key: 'firstname', width: 20 },
+      { header: 'middle name', key: 'middlename', width: 20 },
+      { header: 'ext', key: 'name_ext', width: 20 },
+      { header: 'tcgc id', key: 'tcgc_id', width: 20 },
+      { header: 'birthday', key: 'birthday', width: 20 },
+      { header: 'email', key: 'email', width: 20 },
+      { header: 'age', key: 'age', width: 20 },
+      { header: 'gender', key: 'gender', width: 20 },
+      { header: 'civil status', key: 'civil_status', width: 20 },
+      { header: 'contact number', key: 'contact_number', width: 20 },
+      { header: 'present address', key: 'present_address', width: 20 },
+      {
+        header: 'present address_others',
+        key: 'present_address_others',
+        width: 20
+      },
+      { header: 'permanent address', key: 'permanent_address', width: 20 },
+      { header: 'father', key: 'father', width: 20 },
+      { header: 'mother', key: 'mother', width: 20 },
+      { header: 'guardian', key: 'guardian', width: 20 },
+      { header: 'parent address', key: 'parent_address', width: 20 },
+      { header: 'father occupation', key: 'father_occupation', width: 20 },
+      { header: 'mother occupation', key: 'mother_occupation', width: 20 },
+      { header: 'guardian occupation', key: 'guardian_occupation', width: 20 },
+      { header: 'shs', key: 'shs', width: 20 },
+      { header: 'shs principal', key: 'shs_principal', width: 20 },
+      { header: 'shs address', key: 'shs_address', width: 20 },
+      { header: 'shs school_type', key: 'shs_school_type', width: 20 },
+      { header: 'shs year graduated', key: 'shs_year_graduated', width: 20 },
+      { header: 'shs honor', key: 'shs_honor', width: 20 },
+      { header: 'reference name 1', key: 'reference_name_1', width: 20 },
+      { header: 'reference name 2', key: 'reference_name_2', width: 20 },
+      { header: 'reference name 3', key: 'reference_name_3', width: 20 },
+      { header: 'reference address 1', key: 'reference_address_1', width: 20 },
+      { header: 'reference address 2', key: 'reference_address_2', width: 20 },
+      { header: 'reference address 3', key: 'reference_address_3', width: 20 },
+      { header: 'reference contact 1', key: 'reference_contact_1', width: 20 },
+      { header: 'reference contact 2', key: 'reference_contact_2', width: 20 },
+      { header: 'reference contact 3', key: 'reference_contact_3', width: 20 }
+      // Add more columns based on your data structure
+    ]
+
+    const details: ApplicationTypes = applicationDetails
+
+    // Data for the Excel file
+    const data: any[] = []
+    data.push({
+      reference_code: details.reference_code,
+      lastname: details.lastname,
+      firstname: details.firstname,
+      middlename: details.middlename,
+      name_ext: details.name_ext,
+      tcgc_id: details.tcgc_id,
+      birthday: details.birthday,
+      email: details.email,
+      age: details.age,
+      gender: details.gender,
+      civil_status: details.civil_status,
+      contact_number: details.contact_number,
+      present_address: details.present_address,
+      present_address_others: details.present_address_others,
+      permanent_address: details.permanent_address,
+      father: details.father,
+      mother: details.mother,
+      guardian: details.guardian,
+      parent_address: details.parent_address,
+      father_occupation: details.father_occupation,
+      mother_occupation: details.mother_occupation,
+      guardian_occupation: details.guardian_occupation,
+      shs: details.shs,
+      shs_principal: details.shs_principal,
+      shs_address: details.shs_address,
+      shs_school_type: details.shs_school_type,
+      shs_year_graduated: details.shs_year_graduated,
+      shs_honor: details.shs_honor,
+      reference_name_1: details.reference_name_1,
+      reference_name_2: details.reference_name_2,
+      reference_name_3: details.reference_name_3,
+      reference_address_1: details.reference_address_1,
+      reference_address_2: details.reference_address_2,
+      reference_address_3: details.reference_address_3,
+      reference_contact_1: details.reference_contact_1,
+      reference_contact_2: details.reference_contact_2,
+      reference_contact_3: details.reference_contact_3
+    })
+
+    data.forEach((item) => {
+      worksheet.addRow(item)
+    })
+
+    // Generate the Excel file
+    await workbook.xlsx.writeBuffer().then((buffer) => {
+      const blob = new Blob([buffer], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      })
+      saveAs(blob, `Applicant Details.xlsx`)
+    })
+    setDownloading(false)
+  }
+
   useEffect(() => {
     ;(async () => {
       const { data } = await supabase.auth.getSession()
@@ -258,9 +376,17 @@ export default function Page({ params }: { params: { id: string } }) {
                 Application successfully submitted. Your Application Code is{' '}
                 <span className="font-bold text-lg">{refCode}</span>
               </div>
-              <div className="mt-2 italic">
+              <div className="mt-2 italic text-xs">
                 Please take note of this reference code, as it will be used to
                 track the status of your application.
+              </div>
+              <div className="mt-2 italic">
+                <span
+                  className="text-blue-600 font-medium cursor-pointer"
+                  onClick={handleDownloadExcel}
+                >
+                  Download a Copy
+                </span>
               </div>
             </div>
           )}
@@ -745,13 +871,10 @@ export default function Page({ params }: { params: { id: string } }) {
                                 className="app__select_standard"
                               >
                                 <option value="">Select</option>
-                                <option value="With Highest Honors">
-                                  With Highest Honors
+                                <option value="Validictorian">
+                                  Validictorian
                                 </option>
-                                <option value="With High Honors">
-                                  With High Honors
-                                </option>
-                                <option value="With Honors">With Honors</option>
+                                <option value="Salutarian">Salutarian</option>
                               </select>
                             </td>
                           </tr>

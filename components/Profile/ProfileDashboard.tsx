@@ -281,7 +281,7 @@ export default function ProfileDashboard({
                         {allowances?.map((item, index) => (
                           <tr key={index} className="app__tr">
                             <td className="app__td">
-                              {item.period.description}
+                              {item.period?.description} {item.period?.year}
                             </td>
                             <td className="app__td">
                               {item.status === 'Passed' && (
