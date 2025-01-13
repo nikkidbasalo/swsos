@@ -25,6 +25,8 @@ const AddGradeModal = ({ hideModal, editData, userData }: ModalProps) => {
   const { supabase, session } = useSupabase()
   const [saving, setSaving] = useState(false)
 
+  const [requirements, setRequirements] = useState('')
+
   const [periods, setPeriods] = useState<EvaluationPeriodTypes[]>([])
 
   // Redux staff
@@ -44,10 +46,13 @@ const AddGradeModal = ({ hideModal, editData, userData }: ModalProps) => {
     formState: { errors },
     reset,
     setError,
+    watch,
     handleSubmit
   } = useForm<GradeTypes>({
     mode: 'onSubmit'
   })
+
+  const watchedPeriod = watch('period_id')
 
   const onSubmit = async (formdata: GradeTypes) => {
     if (saving) return
@@ -221,6 +226,13 @@ const AddGradeModal = ({ hideModal, editData, userData }: ModalProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // get requirements
+  useEffect(() => {
+    const filtered = periods.find((p) => p.id.toString() === watchedPeriod)
+    console.log('filtered', filtered)
+    setRequirements(filtered?.requirements || '')
+  }, [watchedPeriod])
+
   return (
     <>
       <div className="app__modal_wrapper">
@@ -265,6 +277,23 @@ const AddGradeModal = ({ hideModal, editData, userData }: ModalProps) => {
                   </div>
                 </div>
               </div>
+              {requirements !== '' && (
+                <div className="app__form_field_container">
+                  <div>
+                    <div className="mt-4 font-medium italic text-gray-600">
+                      REQUIREMENTS:
+                    </div>
+                    <div className="tiptopeditor mt-2">
+                      <div
+                        className="text-sm text-gray-600"
+                        dangerouslySetInnerHTML={{
+                          __html: requirements
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
               <div className="app__form_field_container">
                 <div className="w-full">
                   <div className="mt-2 flex flex-col space-y-2 items-start">

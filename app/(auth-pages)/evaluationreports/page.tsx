@@ -567,7 +567,9 @@ const Page: React.FC = () => {
 
                       <td className="app__td">{item.program?.name}</td>
                       <td className="app__td">{item.user?.institute?.name}</td>
-                      <td className="app__td">{item.period?.description}</td>
+                      <td className="app__td">
+                        {item.period?.description} {item.period?.year}
+                      </td>
                       <td className="app__td">
                         <div>
                           <span className="font-bold">

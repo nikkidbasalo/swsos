@@ -29,6 +29,8 @@ const UserDropdown = ({ darkMode }: propTypes) => {
     const { error } = await supabase.auth.signOut()
 
     if (!error) {
+      // router.push(`/profile/${signInData.user.id}`)
+      await supabase.auth.refreshSession()
       router.push('/')
     }
   }

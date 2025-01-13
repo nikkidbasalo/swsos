@@ -234,6 +234,7 @@ const Page: React.FC = () => {
         civil_status: formdata.civil_status,
         contact_number: formdata.contact_number,
         present_address: formdata.present_address,
+        present_address_others: formdata.present_address_others,
         permanent_address: formdata.permanent_address,
         father: formdata.father,
         mother: formdata.mother,
@@ -427,6 +428,11 @@ const Page: React.FC = () => {
                       <td className="app__td">
                         <div>TCGC ID No: {item.tcgc_id}</div>
                         <div>Contact #: {item.contact_number}</div>
+                        <div>Present Address: {item.present_address}</div>
+                        <div>
+                          Present Address (Others):{' '}
+                          {item.present_address_others}
+                        </div>
                         <div>Permanent Address: {item.permanent_address}</div>
                         <div>
                           Mother: {item.mother} | {item.mother_occupation}

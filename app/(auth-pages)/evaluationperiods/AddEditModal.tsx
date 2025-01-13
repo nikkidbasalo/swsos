@@ -9,6 +9,7 @@ import { useForm } from 'react-hook-form'
 import type { EvaluationPeriodTypes } from '@/types'
 
 // Redux imports
+import Tiptap from '@/components/Tiptap'
 import { updateList } from '@/GlobalRedux/Features/listSlice'
 import { updateResultCounter } from '@/GlobalRedux/Features/resultsCounterSlice'
 import { useDispatch, useSelector } from 'react-redux'
@@ -22,6 +23,8 @@ const AddEditModal = ({ hideModal, editData }: ModalProps) => {
   const { setToast } = useFilter()
   const { supabase } = useSupabase()
   const [saving, setSaving] = useState(false)
+
+  const [content, setContent] = useState(editData ? editData.requirements : '')
 
   // Redux staff
   const globallist = useSelector((state: any) => state.list.value)
@@ -53,8 +56,10 @@ const AddEditModal = ({ hideModal, editData }: ModalProps) => {
     try {
       const newData = {
         description: formdata.description,
+        year: formdata.year,
         release_schedule: formdata.release_schedule,
         deadline: formdata.deadline,
+        requirements: content,
         allow_upload: formdata.allow_upload
       }
 
@@ -112,8 +117,10 @@ const AddEditModal = ({ hideModal, editData }: ModalProps) => {
     try {
       const newData = {
         description: formdata.description,
+        year: formdata.year,
         release_schedule: formdata.release_schedule,
         deadline: formdata.deadline,
+        requirements: content,
         allow_upload: formdata.allow_upload
       }
 
@@ -160,12 +167,18 @@ const AddEditModal = ({ hideModal, editData }: ModalProps) => {
     }
   }
 
+  const handleContentChange = (reason: any) => {
+    setContent(reason)
+  }
+
   // manually set the defaultValues of use-form-hook whenever the component receives new props.
   useEffect(() => {
     reset({
       description: editData ? editData.description : '',
+      year: editData ? editData.year : '',
       deadline: editData ? editData.deadline : '',
       release_schedule: editData ? editData.release_schedule : '',
+      requirements: editData ? editData.requirements : '',
       allow_upload: editData ? editData.allow_upload : false
     })
   }, [editData, reset])
@@ -206,6 +219,28 @@ const AddEditModal = ({ hideModal, editData }: ModalProps) => {
               </div>
               <div className="app__form_field_container">
                 <div className="w-full">
+                  <div className="app__label_standard">Academic Year</div>
+                  <div>
+                    <select
+                      {...register('year', { required: true })}
+                      className="app__select_standard"
+                    >
+                      <option value="">Select Year</option>
+                      <option value="2024-2025">2024-2025</option>
+                      <option value="2025-2026">2025-2026</option>
+                      <option value="2026-2026">2026-2026</option>
+                      <option value="2027-2028">2027-2028</option>
+                    </select>
+                    {errors.year && (
+                      <div className="app__error_message">
+                        Academic Year is required
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div className="app__form_field_container">
+                <div className="w-full">
                   <div className="app__label_standard">
                     Deadline for Requirements Submission{' '}
                   </div>
@@ -230,6 +265,19 @@ const AddEditModal = ({ hideModal, editData }: ModalProps) => {
                     <input
                       {...register('release_schedule')}
                       className="app__input_standard"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="app__form_field_container">
+                <div className="w-full">
+                  <div className="app__label_standard">Requirements</div>
+                  <div>
+                    <Tiptap
+                      content={content}
+                      onChange={(newContent: string) =>
+                        handleContentChange(newContent)
+                      }
                     />
                   </div>
                 </div>

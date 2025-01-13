@@ -60,7 +60,7 @@ const Filters = ({
             >
               <option value="">Choose Status</option>
               <option value="Active">Active</option>
-              <option value="Archived">Archived</option>
+              <option value="Inactive">Archived</option>
             </select>
           </div>
         </form>

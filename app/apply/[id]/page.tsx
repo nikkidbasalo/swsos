@@ -37,10 +37,13 @@ export default function Page({ params }: { params: { id: string } }) {
     formState: { errors },
     setError,
     clearErrors,
+    watch,
     handleSubmit
   } = useForm<ApplicationTypes>({
     mode: 'onSubmit'
   })
+
+  const watchedPresentAddress = watch('present_address')
 
   const onSubmit = async (formdata: ApplicationTypes) => {
     if (saving) return
@@ -101,6 +104,7 @@ export default function Page({ params }: { params: { id: string } }) {
         civil_status: formdata.civil_status,
         contact_number: formdata.contact_number,
         present_address: formdata.present_address,
+        present_address_others: formdata.present_address_others,
         permanent_address: formdata.permanent_address,
         father: formdata.father,
         mother: formdata.mother,
@@ -496,7 +500,15 @@ export default function Page({ params }: { params: { id: string } }) {
                                     {b.name}
                                   </option>
                                 ))}
+                                <option value="Others">Others</option>
                               </select>
+                              {watchedPresentAddress === 'Others' && (
+                                <input
+                                  {...register('present_address_others')}
+                                  placeholder="Please specify"
+                                  className="app__input_standard"
+                                />
+                              )}
                             </td>
                           </tr>
                           <tr>

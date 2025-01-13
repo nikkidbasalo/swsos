@@ -13,6 +13,32 @@ import { GranteeTypes, ProgramTypes } from '@/types'
 import { fetchGrantees, fetchPrograms } from '@/utils/fetchApi'
 import { useEffect, useState } from 'react'
 
+const colors = [
+  '#1a237e', // Dark Blue
+  '#3949ab', // Medium Dark Blue
+  '#5c6bc0', // Medium Blue
+  '#7986cb', // Light Blue
+
+  '#212121', // Dark Gray
+  '#424242', // Medium Dark Gray
+  '#616161', // Medium Gray
+  '#9e9e9e', // Light Gray
+
+  '#4a148c', // Dark Purple
+  '#6a1b9a', // Medium Dark Purple
+  '#8e24aa', // Medium Purple
+  '#ab47bc', // Light Purple
+
+  '#283593', // Dark Blue
+  '#3f51b5', // Medium Blue
+  '#7986cb', // Light Blue
+  '#263238', // Dark Gray
+
+  '#757575', // Medium Gray
+  '#bdbdbd', // Light Gray
+  '#6a1b9a' // Medium Purple
+]
+
 export function ChartYearLevel() {
   const { supabase } = useSupabase()
 
@@ -36,6 +62,8 @@ export function ChartYearLevel() {
     type ChartConfig = Record<string, { label: string; color: string }>
     const chartConfigData: ChartConfig = {}
 
+    const assignedColors = new Set()
+
     programs.forEach((p) => {
       const first = results.filter(
         (g) =>
@@ -58,14 +86,26 @@ export function ChartYearLevel() {
           g.program_id?.toString() === p.id?.toString()
       ).length
 
-      firstYearData[p.name] = first
-      secondYearData[p.name] = second
-      thirdYearData[p.name] = third
-      fourthYearData[p.name] = fourth
+      if (first > 0 || second > 0 || third > 0 || fourth > 0) {
+        firstYearData[p.name] = first
+        secondYearData[p.name] = second
+        thirdYearData[p.name] = third
+        fourthYearData[p.name] = fourth
 
-      chartConfigData[p.name] = {
-        label: p.name,
-        color: '#2563eb'
+        let uniqueColor
+        // Find a color that hasn't been assigned yet
+        do {
+          uniqueColor = colors[Math.floor(Math.random() * colors.length)]
+        } while (assignedColors.has(uniqueColor))
+
+        // Add the color to the assigned set
+        assignedColors.add(uniqueColor)
+
+        // Assign the unique color to the program
+        chartConfigData[p.name] = {
+          label: p.name,
+          color: uniqueColor
+        }
       }
     })
 
@@ -87,6 +127,7 @@ export function ChartYearLevel() {
 
     setDataSets(chartData)
     setLabels(chartConfig)
+    console.log('chartConfig', chartConfig)
   }
 
   // Featch data
@@ -122,6 +163,17 @@ export function ChartYearLevel() {
             ))}
           </BarChart>
         </ChartContainer>
+        <div className="space-x-3">
+          {Object.keys(labels).map((key) => (
+            <div key={key} className="inline-flex space-x-1">
+              <div className="text-xs">{labels[key].label}</div>
+              <div
+                className="w-4 h-4"
+                style={{ backgroundColor: `${labels[key].color}` }}
+              ></div>
+            </div>
+          ))}
+        </div>
       </CardContent>
     </Card>
   )

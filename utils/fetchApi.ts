@@ -225,8 +225,6 @@ export async function fetchGrantees(
     // filter status
     if (filters.filterStatus && filters.filterStatus !== '') {
       query = query.eq('status', filters.filterStatus)
-    } else {
-      query = query.eq('status', 'Active')
     }
 
     // filter program

@@ -122,14 +122,15 @@ export default function Grades({ userData }: { userData: AccountTypes }) {
           <div>
             <div className="app__title">
               <div className="flex-1">&nbsp;</div>
-              {session.user.id === userData.id && (
-                <CustomButton
-                  containerStyles="app__btn_green"
-                  title="Upload Requirements"
-                  btnType="button"
-                  handleClick={handleAdd}
-                />
-              )}
+              {userData.status === 'Active' &&
+                session.user.id === userData.id && (
+                  <CustomButton
+                    containerStyles="app__btn_green"
+                    title="Upload Requirements"
+                    btnType="button"
+                    handleClick={handleAdd}
+                  />
+                )}
             </div>
 
             {/* Per Page */}

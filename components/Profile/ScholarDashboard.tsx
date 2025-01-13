@@ -63,6 +63,22 @@ export default function ScholarDashboard({
                   </div>
                 </div>
                 <div className="inline-flex flex-col text-center border-r px-2 space-y-2">
+                  <div className="text-xs text-gray-500">
+                    Scholarship Status
+                  </div>
+                  <div className="text-xs text-gray-700 font-bold">
+                    {userData.status === 'Inactive' ? (
+                      <span className="app__status_container_red">
+                        Inactive
+                      </span>
+                    ) : (
+                      <span className="app__status_container_green">
+                        Active
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <div className="inline-flex flex-col text-center border-r px-2 space-y-2">
                   <div className="text-xs text-gray-500">Sex</div>
                   <div className="text-xs text-gray-700 font-bold">
                     {userData.gender}

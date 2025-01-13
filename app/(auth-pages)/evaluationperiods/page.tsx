@@ -210,7 +210,7 @@ const Page: React.FC = () => {
               <thead className="app__thead">
                 <tr>
                   <th className="app__th pl-4"></th>
-                  <th className="app__th">Description</th>
+                  <th className="app__th">Description / Academmic Year</th>
                   <th className="app__th">
                     Deadline of Requirements Submission
                   </th>
@@ -258,7 +258,9 @@ const Page: React.FC = () => {
                           </Transition>
                         </Menu>
                       </td>
-                      <td className="app__td">{item.description}</td>
+                      <td className="app__td">
+                        {item.description} {item.year}
+                      </td>
                       <td className="app__td">
                         {format(new Date(item.deadline), 'MMMM dd, yyyy')}
                       </td>

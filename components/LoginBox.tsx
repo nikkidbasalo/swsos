@@ -27,7 +27,7 @@ export default function LoginBox() {
       .from('sws_users')
       .select()
       .eq('email', email)
-      .eq('status', 'Active')
+    // .eq('status', 'Active')
 
     if (userError) console.error(userError)
 

@@ -80,6 +80,22 @@ export default function ProfileDashboard({
                   </div>
                 </div>
                 <div className="inline-flex flex-col text-center border-r px-2 space-y-2">
+                  <div className="text-xs text-gray-500">
+                    Scholarship Status
+                  </div>
+                  <div className="text-xs text-gray-700 font-bold">
+                    {userData.status === 'Inactive' ? (
+                      <span className="app__status_container_red">
+                        Inactive
+                      </span>
+                    ) : (
+                      <span className="app__status_container_green">
+                        Active
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <div className="inline-flex flex-col text-center border-r px-2 space-y-2">
                   <div className="text-xs text-gray-500">Sex</div>
                   <div className="text-xs text-gray-700 font-bold">
                     {userData.gender}
@@ -245,7 +261,9 @@ export default function ProfileDashboard({
                           )
                           .map((item, index) => (
                             <tr key={index} className="app__tr">
-                              <td className="app__td">{item.description}</td>
+                              <td className="app__td">
+                                {item.description} {item.year}
+                              </td>
                               <td className="app__td">
                                 <span className="app__status_orange">
                                   No Grades Submitted
@@ -307,7 +325,7 @@ export default function ProfileDashboard({
                           ?.map((item, index) => (
                             <tr key={index} className="app__tr">
                               <td className="app__td">
-                                {item.period.description}
+                                {item.period.description} {item.period.year}
                               </td>
                               <td className="app__td">
                                 {Number(item.allowance).toLocaleString(

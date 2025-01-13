@@ -102,6 +102,8 @@ export interface EvaluationPeriodTypes {
   id: string
   description: string
   release_schedule: string
+  requirements: string
+  year: string
   allow_upload: boolean
   deadline: string
   confirmed: string
@@ -180,6 +182,7 @@ export interface AccountTypes {
   civil_status: string
   contact_number: string
   present_address: string
+  present_address_others: string
   permanent_address: string
   father: string
   mother: string
@@ -237,6 +240,7 @@ export interface ApplicationTypes {
   mother: string
   guardian: string
   parent_address: string
+  present_address_others: string
   father_occupation: string
   mother_occupation: string
   tcgc_id: string

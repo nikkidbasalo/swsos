@@ -186,7 +186,7 @@ const Page: React.FC = () => {
     if (!editData) return
     try {
       const newData = {
-        status: 'Archived'
+        status: 'Inactive'
       }
 
       const { error } = await supabase
@@ -330,7 +330,7 @@ const Page: React.FC = () => {
                                     <span>Edit</span>
                                   </div>
                                 </Menu.Item>
-                                {item.status === 'Archived' && (
+                                {item.status === 'Inactive' && (
                                   <Menu.Item>
                                     <div
                                       onClick={() => handleActivate(item)}
@@ -369,7 +369,7 @@ const Page: React.FC = () => {
                             {item.status === 'Active' && (
                               <span className="app__status_green">Active</span>
                             )}
-                            {item.status === 'Archived' && (
+                            {item.status === 'Inactive' && (
                               <span className="app__status_orange">
                                 Archived
                               </span>
