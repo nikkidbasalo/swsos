@@ -36,7 +36,7 @@ export default function ScholarDashboard({
 
       setPeriods(periodsData)
     })()
-  })
+  }, [])
 
   return (
     <>
@@ -63,7 +63,7 @@ export default function ScholarDashboard({
                   </div>
                 </div>
                 <div className="inline-flex flex-col text-center border-r px-2 space-y-2">
-                  <div className="text-xs text-gray-500">Gender</div>
+                  <div className="text-xs text-gray-500">Sex</div>
                   <div className="text-xs text-gray-700 font-bold">
                     {userData.gender}
                   </div>
@@ -221,7 +221,7 @@ export default function ScholarDashboard({
                         {periods
                           ?.filter(
                             (period) =>
-                              !allowances.some(
+                              !allowances?.some(
                                 (allowance) =>
                                   allowance.evaluation_period_id === period.id
                               )
