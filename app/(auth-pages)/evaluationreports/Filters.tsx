@@ -43,7 +43,7 @@ const Filters = ({
   const handleApply = () => {
     if (
       paymentStatus.trim() === '' &&
-      status.trim() === '' &&
+      period.trim() === '' &&
       status.trim() === '' &&
       selectedInstitute.trim() === '' &&
       selectedProgram.trim() === ''

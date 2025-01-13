@@ -52,7 +52,10 @@ const AddEditModal = ({ hideModal, editData }: ModalProps) => {
   const handleCreate = async (formdata: EvaluationPeriodTypes) => {
     try {
       const newData = {
-        description: formdata.description
+        description: formdata.description,
+        release_schedule: formdata.release_schedule,
+        deadline: formdata.deadline,
+        allow_upload: formdata.allow_upload
       }
 
       const { data, error } = await supabase
@@ -108,7 +111,10 @@ const AddEditModal = ({ hideModal, editData }: ModalProps) => {
 
     try {
       const newData = {
-        description: formdata.description
+        description: formdata.description,
+        release_schedule: formdata.release_schedule,
+        deadline: formdata.deadline,
+        allow_upload: formdata.allow_upload
       }
 
       const { error } = await supabase
@@ -157,7 +163,10 @@ const AddEditModal = ({ hideModal, editData }: ModalProps) => {
   // manually set the defaultValues of use-form-hook whenever the component receives new props.
   useEffect(() => {
     reset({
-      description: editData ? editData.description : ''
+      description: editData ? editData.description : '',
+      deadline: editData ? editData.deadline : '',
+      release_schedule: editData ? editData.release_schedule : '',
+      allow_upload: editData ? editData.allow_upload : false
     })
   }, [editData, reset])
 
@@ -192,6 +201,50 @@ const AddEditModal = ({ hideModal, editData }: ModalProps) => {
                         Description is required
                       </div>
                     )}
+                  </div>
+                </div>
+              </div>
+              <div className="app__form_field_container">
+                <div className="w-full">
+                  <div className="app__label_standard">
+                    Deadline for Requirements Submission{' '}
+                  </div>
+                  <div>
+                    <input
+                      type="date"
+                      {...register('deadline', { required: true })}
+                      className="app__input_standard"
+                    />
+                    {errors.deadline && (
+                      <div className="app__error_message">
+                        Deadline is required
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div className="app__form_field_container">
+                <div className="w-full">
+                  <div className="app__label_standard">Released Schedule</div>
+                  <div>
+                    <input
+                      {...register('release_schedule')}
+                      className="app__input_standard"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="app__form_field_container">
+                <div className="w-full">
+                  <div className="app__label_standard">
+                    <label className="flex items-center space-x-1">
+                      <input
+                        {...register('allow_upload')}
+                        type="checkbox"
+                        className=""
+                      />
+                      <span className="font-normal">Allow Uploading</span>
+                    </label>
                   </div>
                 </div>
               </div>

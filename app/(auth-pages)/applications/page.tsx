@@ -425,6 +425,7 @@ const Page: React.FC = () => {
                       </td>
                       <td className="app__td">{item.program?.name}</td>
                       <td className="app__td">
+                        <div>TCGC ID No: {item.tcgc_id}</div>
                         <div>Contact #: {item.contact_number}</div>
                         <div>Permanent Address: {item.permanent_address}</div>
                         <div>

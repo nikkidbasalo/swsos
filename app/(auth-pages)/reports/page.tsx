@@ -133,7 +133,7 @@ const Page: React.FC = () => {
       { header: 'Lastname', key: 'lastname', width: 20 },
       { header: 'Firstname', key: 'firstname', width: 20 },
       { header: 'Middlename', key: 'middlename', width: 20 },
-      { header: 'Gender', key: 'gender', width: 20 },
+      { header: 'Sex', key: 'gender', width: 20 },
       { header: 'Year Level', key: 'year', width: 20 },
       { header: 'Program', key: 'program', width: 20 },
       { header: 'Institute', key: 'institute', width: 20 },
@@ -298,7 +298,7 @@ const Page: React.FC = () => {
                   <th className="app__th pl-4">Scholar</th>
                   <th className="app__th">Program</th>
                   <th className="app__th">Institute</th>
-                  <th className="app__th">Gender</th>
+                  <th className="app__th">Sex</th>
                   <th className="app__th">Year Level</th>
                 </tr>
               </thead>

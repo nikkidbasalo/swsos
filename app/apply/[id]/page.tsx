@@ -89,6 +89,7 @@ export default function Page({ params }: { params: { id: string } }) {
         program_id: programId,
         status: 'Pending Approval',
         reference_code: randomCode,
+        tcgc_id: formdata.tcgc_id,
         lastname: formdata.lastname,
         firstname: formdata.firstname,
         middlename: formdata.middlename,
@@ -249,8 +250,14 @@ export default function Page({ params }: { params: { id: string } }) {
         <div className="bg-white mx-1 w-full md:w-[700px] rounded-lg border mb-20">
           {submitted && (
             <div className="text-gray-700 p-4">
-              Application successfully submitted. Your Application Code is{' '}
-              <span className="font-bold text-lg">{refCode}</span>
+              <div>
+                Application successfully submitted. Your Application Code is{' '}
+                <span className="font-bold text-lg">{refCode}</span>
+              </div>
+              <div className="mt-2 italic">
+                Please take note of this reference code, as it will be used to
+                track the status of your application.
+              </div>
             </div>
           )}
           {!submitted && (
@@ -416,10 +423,7 @@ export default function Page({ params }: { params: { id: string } }) {
                             <td className="font-bold border border-black bg-green-200 p-1">
                               EMAIL
                             </td>
-                            <td
-                              colSpan={3}
-                              className="font-bold border border-black p-1"
-                            >
+                            <td className="font-bold border border-black p-1">
                               <input
                                 {...register('email', {
                                   required: 'Email is required'
@@ -432,6 +436,15 @@ export default function Page({ params }: { params: { id: string } }) {
                                   {errors.email.message}
                                 </div>
                               )}
+                            </td>
+                            <td className="font-bold border border-black bg-green-200 p-1">
+                              TCGC ID Number
+                            </td>
+                            <td className="font-bold border border-black p-1">
+                              <input
+                                {...register('tcgc_id')}
+                                className="app__select_standard"
+                              />
                             </td>
                           </tr>
                         </tbody>

@@ -1,6 +1,7 @@
 'use client'
 import {
   CustomButton,
+  DeleteModal,
   PerPage,
   ProgramsSideBar,
   ShowMore,
@@ -19,6 +20,7 @@ import { ProgramTypes } from '@/types'
 import { fetchPrograms } from '@/utils/fetchApi'
 import { Menu, Transition } from '@headlessui/react'
 import { ChevronDownIcon, PencilSquareIcon } from '@heroicons/react/20/solid'
+import { TrashIcon } from 'lucide-react'
 import Link from 'next/link'
 import { notFound, useSearchParams } from 'next/navigation'
 import React, { Fragment, useEffect, useState } from 'react'
@@ -32,11 +34,16 @@ const Page: React.FC = () => {
   const searchParams = useSearchParams()
   const type = searchParams.get('type') // Get the "page" query parameter
 
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [selectedId, setSelectedId] = useState<string>('')
+
   const [loading, setLoading] = useState(false)
   const [showAddModal, setShowAddModal] = useState(false)
 
   const [list, setList] = useState<ProgramTypes[]>([])
 
+  const [showingCount, setShowingCount] = useState<number>(0)
+  const [resultsCount, setResultsCount] = useState<number>(0)
   const [perPageCount, setPerPageCount] = useState<number>(10)
   const [editData, setEditData] = useState<ProgramTypes | null>(null)
 
@@ -96,6 +103,11 @@ const Page: React.FC = () => {
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleDelete = (id: string) => {
+    setSelectedId(id)
+    setShowDeleteModal(true)
   }
 
   const handleAdd = () => {
@@ -203,6 +215,15 @@ const Page: React.FC = () => {
                                     <span>Edit</span>
                                   </div>
                                 </Menu.Item>
+                                <Menu.Item>
+                                  <div
+                                    onClick={() => handleDelete(item.id)}
+                                    className="app__dropdown_item"
+                                  >
+                                    <TrashIcon className="w-4 h-4" />
+                                    <span>Delete</span>
+                                  </div>
+                                </Menu.Item>
                               </div>
                             </Menu.Items>
                           </Transition>
@@ -234,6 +255,19 @@ const Page: React.FC = () => {
           {/* Show More */}
           {resultsCounter.results > resultsCounter.showing && !loading && (
             <ShowMore handleShowMore={handleShowMore} />
+          )}
+
+          {/* Delete Modal */}
+          {showDeleteModal && (
+            <DeleteModal
+              table="sws_programs"
+              selectedId={selectedId}
+              showingCount={showingCount}
+              setShowingCount={setShowingCount}
+              resultsCount={resultsCount}
+              setResultsCount={setResultsCount}
+              hideModal={() => setShowDeleteModal(false)}
+            />
           )}
 
           {/* Add/Edit Modal */}

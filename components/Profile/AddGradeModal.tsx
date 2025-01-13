@@ -1,7 +1,7 @@
 import { CustomButton } from '@/components/index'
 import { useFilter } from '@/context/FilterContext'
 import { useSupabase } from '@/context/SupabaseProvider'
-import { fetchPeriods, logError } from '@/utils/fetchApi'
+import { logError } from '@/utils/fetchApi'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
@@ -211,8 +211,12 @@ const AddGradeModal = ({ hideModal, editData, userData }: ModalProps) => {
   // Featch data
   useEffect(() => {
     ;(async () => {
-      const result = await fetchPeriods(999, 0)
-      setPeriods(result.data)
+      const { data: periodsData } = await supabase
+        .from('sws_evaluation_periods')
+        .select()
+        .eq('allow_upload', true)
+
+      setPeriods(periodsData)
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -223,7 +227,7 @@ const AddGradeModal = ({ hideModal, editData, userData }: ModalProps) => {
         <div className="app__modal_wrapper2">
           <div className="app__modal_wrapper3">
             <div className="app__modal_header">
-              <h5 className="app__modal_header_text">Grade Details</h5>
+              <h5 className="app__modal_header_text">Requirements</h5>
               <CustomButton
                 containerStyles="app__btn_gray"
                 title="Close"

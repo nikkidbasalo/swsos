@@ -5,10 +5,9 @@ import { AccountTypes, EvaluationPeriodTypes, GradeTypes } from '@/types'
 import { format } from 'date-fns'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import Title from '../Title'
 import ProfileDetails from './ProfileDetails'
 
-export default function ProfileDashboard({
+export default function ScholarDashboard({
   userData,
   refresh
 }: {
@@ -21,10 +20,6 @@ export default function ProfileDashboard({
   const [periods, setPeriods] = useState<EvaluationPeriodTypes[] | []>([])
 
   const { supabase } = useSupabase()
-
-  const handleEdit = () => {
-    setShowEditModal(true)
-  }
 
   useEffect(() => {
     ;(async () => {
@@ -46,21 +41,9 @@ export default function ProfileDashboard({
   return (
     <>
       <div>
-        <div className="app__title">
-          <Title title="Profile" />
-        </div>
-
         {/* Main Content */}
-        <div className="w-full px-2 pt-4 bg-gray-100">
-          <div className="container mx-auto p-2 lg:grid lg:grid-cols-1 lg:gap-2">
-            <div className="px-2 mb-2 text-right">
-              <span
-                onClick={handleEdit}
-                className="text-sm font-semibold text-blue-600 cursor-pointer"
-              >
-                Edit Profile
-              </span>
-            </div>
+        <div className="w-full px-2 pt-10">
+          <div className="container mx-auto p-2 lg:grid lg:grid-cols-2 lg:gap-2">
             <div className="bg-white p-4 mb-4 rounded-md shadow-md text-gray-600">
               <div className="text-sm font-semibold px-2 mb-2 text-gray-600">
                 Personal Information

@@ -81,6 +81,7 @@ export interface GradeTypes {
   id: string
   grade_id: string
   period_id: string
+  evaluation_period_id: string
   period: EvaluationPeriodTypes
   user_id: string
   user: GranteeTypes
@@ -100,6 +101,9 @@ export interface GradeTypes {
 export interface EvaluationPeriodTypes {
   id: string
   description: string
+  release_schedule: string
+  allow_upload: boolean
+  deadline: string
   confirmed: string
 }
 
@@ -235,6 +239,7 @@ export interface ApplicationTypes {
   parent_address: string
   father_occupation: string
   mother_occupation: string
+  tcgc_id: string
   guardian_occupation: string
   shs: string
   shs_principal: string

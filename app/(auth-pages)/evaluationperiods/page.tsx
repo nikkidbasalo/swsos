@@ -19,13 +19,14 @@ import { EvaluationPeriodTypes } from '@/types'
 import { fetchPeriods } from '@/utils/fetchApi'
 import { Menu, Transition } from '@headlessui/react'
 import { ChevronDownIcon, PencilSquareIcon } from '@heroicons/react/20/solid'
+import { format } from 'date-fns'
 import React, { Fragment, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import AddEditModal from './AddEditModal'
 
 const Page: React.FC = () => {
-  const { hasAccess } = useFilter()
-  const { session } = useSupabase()
+  const { hasAccess, setToast } = useFilter()
+  const { session, supabase } = useSupabase()
 
   const [loading, setLoading] = useState(false)
   const [showAddModal, setShowAddModal] = useState(false)
@@ -105,6 +106,55 @@ const Page: React.FC = () => {
     setEditData(item)
   }
 
+  const handleNotify = async (item: EvaluationPeriodTypes) => {
+    //
+    try {
+      const userIds: string[] = []
+
+      // Approvers
+      const { data, error } = await supabase
+        .from('sws_grades')
+        .select()
+        .eq('evaluation_period_id', item.id)
+        .eq('status', 'Passed')
+
+      if (error) {
+        throw new Error(error.message)
+      }
+
+      data.forEach((item: any) => {
+        userIds.push(item.user_id)
+      })
+
+      const notificationData: any[] = []
+
+      userIds.forEach((userId) => {
+        notificationData.push({
+          message: `Your scholarship allowance for ${item.description} is scheduled to be release on ${item.release_schedule}.`,
+          url: `/profile/${userId}`,
+          type: 'Scholarship Allowance',
+          user_id: userId
+        })
+      })
+
+      if (notificationData.length > 0) {
+        // insert to notifications
+        const { error: error3 } = await supabase
+          .from('sws_notifications')
+          .insert(notificationData)
+
+        if (error3) {
+          throw new Error(error3.message)
+        }
+
+        // pop up the success message
+        setToast('success', 'Notification successfully sent')
+      }
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
   // Update list whenever list in redux updates
   useEffect(() => {
     setList(globallist)
@@ -161,6 +211,11 @@ const Page: React.FC = () => {
                 <tr>
                   <th className="app__th pl-4"></th>
                   <th className="app__th">Description</th>
+                  <th className="app__th">
+                    Deadline of Requirements Submission
+                  </th>
+                  <th className="app__th">Allowance Release Schedule</th>
+                  <th className="app__th">Uploading (Open/Close)</th>
                 </tr>
               </thead>
               <tbody>
@@ -204,9 +259,30 @@ const Page: React.FC = () => {
                         </Menu>
                       </td>
                       <td className="app__td">{item.description}</td>
+                      <td className="app__td">
+                        {format(new Date(item.deadline), 'MMMM dd, yyyy')}
+                      </td>
+                      <td className="app__td">
+                        <div>{item.release_schedule}</div>
+                        <div className="mt-1">
+                          <CustomButton
+                            containerStyles="app__btn_green"
+                            title="Send Notification to Scholars"
+                            btnType="button"
+                            handleClick={() => handleNotify(item)}
+                          />
+                        </div>
+                      </td>
+                      <td className="app__td">
+                        {item.allow_upload ? (
+                          <span className="app__status_green">Open</span>
+                        ) : (
+                          <span className="app__status_red">Closed</span>
+                        )}
+                      </td>
                     </tr>
                   ))}
-                {loading && <TableRowLoading cols={2} rows={2} />}
+                {loading && <TableRowLoading cols={5} rows={2} />}
               </tbody>
             </table>
             {!loading && isDataEmpty && (

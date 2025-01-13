@@ -125,7 +125,7 @@ export default function Grades({ userData }: { userData: AccountTypes }) {
               {session.user.id === userData.id && (
                 <CustomButton
                   containerStyles="app__btn_green"
-                  title="Upload Grade"
+                  title="Upload Requirements"
                   btnType="button"
                   handleClick={handleAdd}
                 />

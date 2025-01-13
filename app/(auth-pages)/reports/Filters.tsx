@@ -128,7 +128,7 @@ const Filters = ({
               onChange={(e) => setGender(e.target.value)}
               className="app__filter_select"
             >
-              <option value="">Choose Gender</option>
+              <option value="">Choose Sex</option>
               <option value="Male">Male</option>
               <option value="Female">Female</option>
             </select>
