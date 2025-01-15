@@ -70,49 +70,53 @@ export default function ScholarDashboard({
                     {userData.email}
                   </div>
                 </div>
-                <div className="inline-flex flex-col text-center border-r px-2 space-y-2">
-                  <div className="text-xs text-gray-500">
-                    Scholarship Status
+                {userData.program_id && (
+                  <div className="inline-flex flex-col text-center border-r px-2 space-y-2">
+                    <div className="text-xs text-gray-500">
+                      Scholarship Status
+                    </div>
+                    <div className="text-xs text-gray-700 font-bold">
+                      {userData.status === 'Inactive' ? (
+                        <span className="app__status_container_red">
+                          Inactive
+                        </span>
+                      ) : (
+                        <span className="app__status_container_green">
+                          Active
+                        </span>
+                      )}
+                    </div>
                   </div>
-                  <div className="text-xs text-gray-700 font-bold">
-                    {userData.status === 'Inactive' ? (
-                      <span className="app__status_container_red">
-                        Inactive
-                      </span>
-                    ) : (
-                      <span className="app__status_container_green">
-                        Active
-                      </span>
-                    )}
-                  </div>
-                </div>
+                )}
               </div>
-              <div className="items-center mt-4">
-                <div className="inline-flex flex-col text-center border-r px-2 space-y-2">
-                  <div className="text-xs text-gray-500">Sex</div>
-                  <div className="text-xs text-gray-700 font-bold">
-                    {userData.gender}
+              {userData.program_id && (
+                <div className="items-center mt-4">
+                  <div className="inline-flex flex-col text-center border-r px-2 space-y-2">
+                    <div className="text-xs text-gray-500">Sex</div>
+                    <div className="text-xs text-gray-700 font-bold">
+                      {userData.gender}
+                    </div>
+                  </div>
+                  <div className="inline-flex flex-col text-center border-r px-2 space-y-2">
+                    <div className="text-xs text-gray-500">Birth Date</div>
+                    <div className="text-xs text-gray-700 font-bold">
+                      {userData.birthday}
+                    </div>
+                  </div>
+                  <div className="inline-flex flex-col text-center border-r px-2 space-y-2">
+                    <div className="text-xs text-gray-500">Age</div>
+                    <div className="text-xs text-gray-700 font-bold">
+                      {userData.age}
+                    </div>
+                  </div>
+                  <div className="inline-flex flex-col text-center border-r px-2 space-y-2">
+                    <div className="text-xs text-gray-500">Contact Number</div>
+                    <div className="text-xs text-gray-700 font-bold">
+                      {userData.contact_number}
+                    </div>
                   </div>
                 </div>
-                <div className="inline-flex flex-col text-center border-r px-2 space-y-2">
-                  <div className="text-xs text-gray-500">Birth Date</div>
-                  <div className="text-xs text-gray-700 font-bold">
-                    {userData.birthday}
-                  </div>
-                </div>
-                <div className="inline-flex flex-col text-center border-r px-2 space-y-2">
-                  <div className="text-xs text-gray-500">Age</div>
-                  <div className="text-xs text-gray-700 font-bold">
-                    {userData.age}
-                  </div>
-                </div>
-                <div className="inline-flex flex-col text-center border-r px-2 space-y-2">
-                  <div className="text-xs text-gray-500">Contact Number</div>
-                  <div className="text-xs text-gray-700 font-bold">
-                    {userData.contact_number}
-                  </div>
-                </div>
-              </div>
+              )}
             </div>
             {userData.program_id && (
               <>
