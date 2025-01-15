@@ -27,6 +27,8 @@ const AddGradeModal = ({ hideModal, editData, userData }: ModalProps) => {
 
   const [requirements, setRequirements] = useState('')
 
+  const [otherAccounts, setOtherAccounts] = useState<AccountTypes[] | []>([])
+
   const [periods, setPeriods] = useState<EvaluationPeriodTypes[]>([])
 
   // Redux staff
@@ -86,7 +88,7 @@ const AddGradeModal = ({ hideModal, editData, userData }: ModalProps) => {
         user_id: session.user.id,
         evaluation_period_id: formdata.period_id,
         file_path: filePath,
-        program_id: userData.program_id
+        program_id: formdata.program_id
       }
 
       const { data, error } = await supabase
@@ -222,6 +224,13 @@ const AddGradeModal = ({ hideModal, editData, userData }: ModalProps) => {
         .eq('allow_upload', true)
 
       setPeriods(periodsData)
+
+      const { data: usersData } = await supabase
+        .from('sws_users')
+        .select('*,program:program_id(*)')
+        .or(`id.eq.${userData.id},user_id.eq.${userData.id}`)
+
+      setOtherAccounts(usersData)
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -229,7 +238,7 @@ const AddGradeModal = ({ hideModal, editData, userData }: ModalProps) => {
   // get requirements
   useEffect(() => {
     const filtered = periods.find((p) => p.id.toString() === watchedPeriod)
-    console.log('filtered', filtered)
+
     setRequirements(filtered?.requirements || '')
   }, [watchedPeriod])
 
@@ -249,6 +258,34 @@ const AddGradeModal = ({ hideModal, editData, userData }: ModalProps) => {
               />
             </div>
             <form onSubmit={handleSubmit(onSubmit)} className="app__modal_body">
+              <div className="app__form_field_container">
+                <div className="w-full">
+                  <div className="app__label_standard">Scholarship Program</div>
+                  <div>
+                    {editData && <span>{editData.program.name}</span>}
+                    {!editData && (
+                      <>
+                        <select
+                          {...register('program_id', { required: true })}
+                          className="app__input_standard"
+                        >
+                          <option value="">Choose Program</option>
+                          {otherAccounts?.map((p, i) => (
+                            <option key={i} value={p.program_id}>
+                              {p.program.name}
+                            </option>
+                          ))}
+                        </select>
+                        {errors.period_id && (
+                          <div className="app__error_message">
+                            Scholarship Program is required
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
               <div className="app__form_field_container">
                 <div className="w-full">
                   <div className="app__label_standard">Evaluation Period</div>

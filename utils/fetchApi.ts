@@ -48,7 +48,7 @@ export async function fetchGrades(
   try {
     let query = supabase
       .from('sws_grades')
-      .select('*,period:evaluation_period_id(*)', {
+      .select('*,period:evaluation_period_id(*),program:program_id(*)', {
         count: 'exact'
       })
       .eq('user_id', userId)
@@ -581,8 +581,11 @@ export async function fetchAccounts(
   rangeFrom: number
 ) {
   try {
-    let query = supabase.from('sws_users').select('*', { count: 'exact' })
-    // .neq('email', 'berlcamp@gmail.com')
+    let query = supabase
+      .from('sws_users')
+      .select('*', { count: 'exact' })
+      // .neq('email', 'berlcamp@gmail.com')
+      .is('user_id', null)
 
     // filter status
     if (filters.filterStatus && filters.filterStatus !== '') {

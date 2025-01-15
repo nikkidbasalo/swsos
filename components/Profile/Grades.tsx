@@ -148,6 +148,7 @@ export default function Grades({ userData }: { userData: AccountTypes }) {
                   <tr>
                     <th className="app__th pl-4"></th>
                     <th className="app__th">Evaluation Period</th>
+                    <th className="app__th">Scholarship Program</th>
                     <th className="app__th">Attachment</th>
                   </tr>
                 </thead>
@@ -191,7 +192,8 @@ export default function Grades({ userData }: { userData: AccountTypes }) {
                             </Transition>
                           </Menu>
                         </td>
-                        <td className="app__td">{item.period.description}</td>
+                        <td className="app__td">{item.period?.description}</td>
+                        <td className="app__td">{item.program?.name}</td>
                         <td className="app__td">
                           {item.file_path && (
                             <Link

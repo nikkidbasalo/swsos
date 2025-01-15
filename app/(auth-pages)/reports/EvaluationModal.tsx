@@ -3,7 +3,7 @@
 import { CustomButton } from '@/components/index'
 import { useFilter } from '@/context/FilterContext'
 import { useSupabase } from '@/context/SupabaseProvider'
-import { GradeTypes, GranteeTypes } from '@/types'
+import { AccountTypes, GradeTypes } from '@/types'
 import { fetchGrades } from '@/utils/fetchApi'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
@@ -11,7 +11,7 @@ import { useForm } from 'react-hook-form'
 
 interface ModalProps {
   hideModal: () => void
-  grantee: GranteeTypes
+  grantee: AccountTypes
 }
 
 export default function EvaluateModal({ hideModal, grantee }: ModalProps) {

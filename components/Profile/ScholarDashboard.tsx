@@ -17,6 +17,7 @@ export default function ScholarDashboard({
   //
   const [showEditModal, setShowEditModal] = useState(false)
   const [allowances, setAllowances] = useState<GradeTypes[] | []>([])
+  const [otherAccounts, setOtherAccounts] = useState<AccountTypes[] | []>([])
   const [periods, setPeriods] = useState<EvaluationPeriodTypes[] | []>([])
 
   const { supabase } = useSupabase()
@@ -35,6 +36,13 @@ export default function ScholarDashboard({
         .select()
 
       setPeriods(periodsData)
+
+      const { data: usersData } = await supabase
+        .from('sws_users')
+        .select('*,program:program_id(*)')
+        .or(`id.eq.${userData.id},user_id.eq.${userData.id}`)
+
+      setOtherAccounts(usersData)
     })()
   }, [])
 
@@ -78,6 +86,8 @@ export default function ScholarDashboard({
                     )}
                   </div>
                 </div>
+              </div>
+              <div className="items-center mt-4">
                 <div className="inline-flex flex-col text-center border-r px-2 space-y-2">
                   <div className="text-xs text-gray-500">Sex</div>
                   <div className="text-xs text-gray-700 font-bold">
@@ -118,9 +128,11 @@ export default function ScholarDashboard({
                       </div>
                     </div>
                     <div className="inline-flex flex-col text-center border-r px-2 space-y-2">
-                      <div className="text-xs text-gray-500">Program</div>
+                      <div className="text-xs text-gray-500">Programs</div>
                       <div className="text-xs text-gray-700 font-bold">
-                        {userData.program?.name}
+                        {otherAccounts?.map((user, i) => (
+                          <div key={i}>{user.program?.name}</div>
+                        ))}
                       </div>
                     </div>
                     <div className="inline-flex flex-col text-center border-r px-2 space-y-2">
@@ -190,10 +202,10 @@ export default function ScholarDashboard({
                 </div>
                 <div className="bg-white p-4 mb-4 rounded-md shadow-md text-gray-600">
                   <div className="text-sm font-semibold px-2 mb-2 text-gray-600">
-                    Other Information
+                    References Information
                   </div>
                   <div className="items-center">
-                    <div className="inline-flex flex-col text-center border-r px-2 space-y-2">
+                    <div className="inline-flex flex-col text-center px-2 space-y-2">
                       <div className="text-xs text-gray-500">Reference 1</div>
                       <div className="text-xs text-gray-700 font-bold">
                         {userData.reference_name_1} |{' '}
@@ -201,7 +213,9 @@ export default function ScholarDashboard({
                         {userData.reference_contact_1}
                       </div>
                     </div>
-                    <div className="inline-flex flex-col text-center border-r px-2 space-y-2">
+                  </div>
+                  <div className="items-center mt-2">
+                    <div className="inline-flex flex-col text-center px-2 space-y-2">
                       <div className="text-xs text-gray-500">Reference 2</div>
                       <div className="text-xs text-gray-700 font-bold">
                         {userData.reference_name_2} |{' '}
@@ -209,7 +223,9 @@ export default function ScholarDashboard({
                         {userData.reference_contact_2}
                       </div>
                     </div>
-                    <div className="inline-flex flex-col text-center border-r px-2 space-y-2">
+                  </div>
+                  <div className="items-center mt-2">
+                    <div className="inline-flex flex-col text-center px-2 space-y-2">
                       <div className="text-xs text-gray-500">Reference 3</div>
                       <div className="text-xs text-gray-700 font-bold">
                         {userData.reference_name_3} |{' '}

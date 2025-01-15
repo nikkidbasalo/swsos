@@ -15,14 +15,18 @@ import { useFilter } from '@/context/FilterContext'
 import { useSupabase } from '@/context/SupabaseProvider'
 import { updateList } from '@/GlobalRedux/Features/listSlice'
 import { updateResultCounter } from '@/GlobalRedux/Features/resultsCounterSlice'
-import { GranteeTypes, InstituteTypes, ProgramTypes } from '@/types'
+import { AccountTypes, InstituteTypes, ProgramTypes } from '@/types'
 import { fetchGrantees, fetchInstitutes, fetchPrograms } from '@/utils/fetchApi'
+import { Menu, Transition } from '@headlessui/react'
+import { PencilSquareIcon } from '@heroicons/react/20/solid'
 import Excel from 'exceljs'
 import { saveAs } from 'file-saver'
-import React, { useEffect, useState } from 'react'
+import { ChevronDownIcon } from 'lucide-react'
+import React, { Fragment, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import EvaluationModal from './EvaluationModal'
 import Filters from './Filters'
+import ProgramsModal from './ProgramsModal'
 
 const Page: React.FC = () => {
   const { hasAccess } = useFilter()
@@ -31,6 +35,8 @@ const Page: React.FC = () => {
   const [loading, setLoading] = useState(false)
   const [downloading, setDownloading] = useState(false)
   const [showEvaluationModal, setShowEvaluationModal] = useState(false)
+
+  const [showProgramsModal, setShowProgramsModal] = useState(false)
 
   const [programs, setPrograms] = useState<ProgramTypes[]>([])
   const [institutes, setInstitutes] = useState<InstituteTypes[]>([])
@@ -42,8 +48,8 @@ const Page: React.FC = () => {
   const [filterYear, setFilterYear] = useState<string>('')
   const [filterGender, setFilterGender] = useState<string>('')
 
-  const [list, setList] = useState<GranteeTypes[]>([])
-  const [editData, setEditData] = useState<GranteeTypes | null>(null)
+  const [list, setList] = useState<AccountTypes[]>([])
+  const [editData, setEditData] = useState<AccountTypes | null>(null)
 
   const [perPageCount, setPerPageCount] = useState<number>(10)
 
@@ -158,7 +164,7 @@ const Page: React.FC = () => {
       0
     )
 
-    const results: GranteeTypes[] = result.data
+    const results: AccountTypes[] = result.data
 
     // Data for the Excel file
     const data: any[] = []
@@ -203,7 +209,7 @@ const Page: React.FC = () => {
     setDownloading(false)
   }
 
-  const handleViewDetails = (item: GranteeTypes) => {
+  const handleViewDetails = (item: AccountTypes) => {
     setShowEvaluationModal(true)
     setEditData(item)
   }
@@ -312,7 +318,47 @@ const Page: React.FC = () => {
                 {!isDataEmpty &&
                   list.map((item, index) => (
                     <tr key={index} className="app__tr">
-                      <th className="app__tdapp__th_firstcol"></th>
+                      <td className="w-6 pl-4 app__td">
+                        <Menu as="div" className="app__menu_container">
+                          <div>
+                            <Menu.Button className="app__dropdown_btn">
+                              <ChevronDownIcon
+                                className="h-5 w-5"
+                                aria-hidden="true"
+                              />
+                            </Menu.Button>
+                          </div>
+
+                          <Transition
+                            as={Fragment}
+                            enter="transition ease-out duration-100"
+                            enterFrom="transform opacity-0 scale-95"
+                            enterTo="transform opacity-100 scale-100"
+                            leave="transition ease-in duration-75"
+                            leaveFrom="transform opacity-100 scale-100"
+                            leaveTo="transform opacity-0 scale-95"
+                          >
+                            <Menu.Items className="app__dropdown_items">
+                              <div className="py-1">
+                                <Menu.Item>
+                                  <div
+                                    onClick={() => {
+                                      setEditData(item)
+                                      setShowProgramsModal(true)
+                                    }}
+                                    className="app__dropdown_item"
+                                  >
+                                    <PencilSquareIcon className="w-4 h-4" />
+                                    <span>
+                                      Add to another scholarship program
+                                    </span>
+                                  </div>
+                                </Menu.Item>
+                              </div>
+                            </Menu.Items>
+                          </Transition>
+                        </Menu>
+                      </td>
                       <td className="app__td">
                         <div className="space-y-1">
                           <div className="font-bold">
@@ -356,11 +402,19 @@ const Page: React.FC = () => {
             <ShowMore handleShowMore={handleShowMore} />
           )}
 
-          {/* Tracker Modal */}
+          {/* Details Modal */}
           {showEvaluationModal && editData && (
             <EvaluationModal
               grantee={editData}
               hideModal={() => setShowEvaluationModal(false)}
+            />
+          )}
+
+          {/* Programs Modal */}
+          {showProgramsModal && editData && (
+            <ProgramsModal
+              grantee={editData}
+              hideModal={() => setShowProgramsModal(false)}
             />
           )}
         </div>

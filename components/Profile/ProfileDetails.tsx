@@ -98,6 +98,18 @@ const ProfileDetails = ({ hideModal, userData, refresh }: ModalProps) => {
         throw new Error(error.message)
       }
 
+      const { error: error2 } = await supabase
+        .from('sws_users')
+        .update(newData)
+        .eq('user_id', userData.id)
+
+      if (error2) {
+        setToast(
+          'error',
+          'Saving failed, please reload the page and try again.'
+        )
+        throw new Error(error2.message)
+      }
       // pop up the success message
       setToast('success', 'Successfully saved.')
 
