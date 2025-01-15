@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 'use client'
 import { useFilter } from '@/context/FilterContext'
-import { useSupabase } from '@/context/SupabaseProvider'
 import {
   AcademicCapIcon,
   ChartBarIcon,
@@ -14,7 +13,10 @@ import Link from 'next/link'
 
 const MainMenu = () => {
   const { hasAccess } = useFilter()
-  const { session }: { session: any } = useSupabase()
+
+  if (!hasAccess) {
+    return
+  }
 
   return (
     <div className="py-1 relative">

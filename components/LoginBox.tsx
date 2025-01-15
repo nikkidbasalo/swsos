@@ -50,7 +50,7 @@ export default function LoginBox() {
         setError('Credentials provided is incorrect.')
         setSigningIn(false)
       } else {
-        await supabase.auth.refreshSession()
+        // await supabase.auth.refreshSession()
         // router.push(`/profile/${signInData.user.id}`)
 
         router.push('/dashboard')
