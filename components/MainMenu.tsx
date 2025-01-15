@@ -14,10 +14,6 @@ import Link from 'next/link'
 const MainMenu = () => {
   const { hasAccess } = useFilter()
 
-  if (!hasAccess) {
-    return
-  }
-
   return (
     <div className="py-1 relative">
       <div className="px-6 mt-2 text-gray-700 text-xl font-semibold">Menu</div>
