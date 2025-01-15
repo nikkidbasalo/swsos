@@ -30,7 +30,9 @@ export default function Announcements() {
           list.map((item, index) => (
             <Fragment key={index}>
               <div className="font-bold">{item.title}</div>
-              <div className="text-sm">{item.description}</div>
+              <div className="text-sm whitespace-pre-line">
+                {item.description}
+              </div>
             </Fragment>
           ))}
       </div>

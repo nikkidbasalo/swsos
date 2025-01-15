@@ -200,9 +200,9 @@ const AddEditModal = ({ hideModal, editData }: ModalProps) => {
                 <div className="w-full">
                   <div className="app__label_standard">Description</div>
                   <div>
-                    <input
+                    <textarea
                       {...register('description', { required: true })}
-                      className="app__input_standard"
+                      className="app__input_standard h-32"
                     />
                     {errors.description && (
                       <div className="app__error_message">

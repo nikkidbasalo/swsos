@@ -28,11 +28,11 @@ const UserDropdown = ({ darkMode }: propTypes) => {
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut()
 
-    // if (!error) {
-    //   // router.push(`/profile/${signInData.user.id}`)
-    await supabase.auth.refreshSession()
-    router.push('/')
-    // }
+    if (!error) {
+      //   // router.push(`/profile/${signInData.user.id}`)
+      await supabase.auth.refreshSession()
+      router.push('/')
+    }
   }
 
   const user: AccountTypes = systemUsers.find(

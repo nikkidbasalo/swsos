@@ -230,298 +230,323 @@ const ProfileDetails = ({ hideModal, userData, refresh }: ModalProps) => {
                         </div>
                       </div>
                     </div>
-                    <div className="app__form_field_container">
-                      <div className="w-full">
-                        <div className="app__label_standard">
-                          Boarding House/Appartment (if applicable):
+                    {userData.program_id && (
+                      <>
+                        <div className="app__form_field_container">
+                          <div className="w-full">
+                            <div className="app__label_standard">
+                              Boarding House/Appartment (if applicable):
+                            </div>
+                            <div>
+                              <select
+                                {...register('present_address')}
+                                className="app__select_standard"
+                              >
+                                <option value="">Select</option>
+                                {boardinghouses?.map((b, i) => (
+                                  <option key={i} value={b.name}>
+                                    {b.name}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+                          </div>
                         </div>
-                        <div>
-                          <select
-                            {...register('present_address')}
-                            className="app__select_standard"
-                          >
-                            <option value="">Select</option>
-                            {boardinghouses?.map((b, i) => (
-                              <option key={i} value={b.name}>
-                                {b.name}
-                              </option>
-                            ))}
-                          </select>
+                        <div className="app__form_field_container">
+                          <div className="w-full">
+                            <div className="app__label_standard">
+                              Permanent Address:
+                            </div>
+                            <div>
+                              <input
+                                {...register('permanent_address')}
+                                className="app__input_standard"
+                              />
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                    <div className="app__form_field_container">
-                      <div className="w-full">
-                        <div className="app__label_standard">
-                          Permanent Address:
+                        <div className="app__form_field_container">
+                          <div className="w-full">
+                            <div className="app__label_standard">
+                              Year Level:
+                            </div>
+                            <div>
+                              <select
+                                {...register('year_level_status')}
+                                className="app__select_standard"
+                              >
+                                <option value="">Select</option>
+                                <option value="1st Year">1st Year</option>
+                                <option value="2nd Year">2nd Year</option>
+                                <option value="3rd Year">3rd Year</option>
+                                <option value="4th Year">4th Year</option>
+                              </select>
+                            </div>
+                          </div>
                         </div>
-                        <div>
-                          <input
-                            {...register('permanent_address')}
-                            className="app__input_standard"
-                          />
+                        <div className="app__form_field_container">
+                          <div className="w-full">
+                            <div className="app__label_standard">
+                              Institute:
+                            </div>
+                            <div>
+                              <select
+                                {...register('institute_id')}
+                                className="app__select_standard"
+                              >
+                                <option value="">Select Institute</option>
+                                {institutes?.map((institute) => (
+                                  <option
+                                    key={institute.id}
+                                    value={institute.id}
+                                  >
+                                    {institute.name}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                    <div className="app__form_field_container">
-                      <div className="w-full">
-                        <div className="app__label_standard">Year Level:</div>
-                        <div>
-                          <select
-                            {...register('year_level_status')}
-                            className="app__select_standard"
-                          >
-                            <option value="">Select</option>
-                            <option value="1st Year">1st Year</option>
-                            <option value="2nd Year">2nd Year</option>
-                            <option value="3rd Year">3rd Year</option>
-                            <option value="4th Year">4th Year</option>
-                          </select>
+                        <div className="app__form_field_container">
+                          <div className="w-full">
+                            <div className="app__label_standard">
+                              HIGH SCHOOL INFORMATION{' '}
+                              <span className="text-xs">
+                                (for Entrance Scholarship Applicants Only)
+                              </span>
+                            </div>
+                            <div className="flex space-x-2">
+                              <input
+                                placeholder="Senior High School"
+                                {...register('shs')}
+                                className="app__input_standard"
+                              />
+                              <input
+                                placeholder="Address"
+                                {...register('shs_address')}
+                                className="app__input_standard"
+                              />
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                    <div className="app__form_field_container">
-                      <div className="w-full">
-                        <div className="app__label_standard">Institute:</div>
-                        <div>
-                          <select
-                            {...register('institute_id')}
-                            className="app__select_standard"
-                          >
-                            <option value="">Select Institute</option>
-                            {institutes?.map((institute) => (
-                              <option key={institute.id} value={institute.id}>
-                                {institute.name}
-                              </option>
-                            ))}
-                          </select>
+                        <div className="app__form_field_container">
+                          <div className="w-full">
+                            <div className="app__label_standard">
+                              SHS - Year Graduated
+                            </div>
+                            <div className="flex space-x-2">
+                              <input
+                                placeholder="SHS - Year Graduated"
+                                {...register('shs_year_graduated')}
+                                className="app__input_standard"
+                              />
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                    <div className="app__form_field_container">
-                      <div className="w-full">
-                        <div className="app__label_standard">
-                          HIGH SCHOOL INFORMATION{' '}
-                          <span className="text-xs">
-                            (for Entrance Scholarship Applicants Only)
-                          </span>
+                        <div className="app__form_field_container">
+                          <div className="w-full">
+                            <div className="app__label_standard">Father:</div>
+                            <div className="flex space-x-2">
+                              <input
+                                placeholder="Father Name"
+                                {...register('father')}
+                                className="app__input_standard"
+                              />
+                              <input
+                                placeholder="Occupation"
+                                {...register('father_occupation')}
+                                className="app__input_standard"
+                              />
+                            </div>
+                          </div>
                         </div>
-                        <div className="flex space-x-2">
-                          <input
-                            placeholder="Senior High School"
-                            {...register('shs')}
-                            className="app__input_standard"
-                          />
-                          <input
-                            placeholder="Address"
-                            {...register('shs_address')}
-                            className="app__input_standard"
-                          />
+                        <div className="app__form_field_container">
+                          <div className="w-full">
+                            <div className="app__label_standard">Mother:</div>
+                            <div className="flex space-x-2">
+                              <input
+                                placeholder="Mother Name"
+                                {...register('mother')}
+                                className="app__input_standard"
+                              />
+                              <input
+                                placeholder="Occupation"
+                                {...register('mother_occupation')}
+                                className="app__input_standard"
+                              />
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                    <div className="app__form_field_container">
-                      <div className="w-full">
-                        <div className="app__label_standard">
-                          SHS - Year Graduated
+                        <div className="app__form_field_container">
+                          <div className="w-full">
+                            <div className="app__label_standard">Guardian:</div>
+                            <div className="flex space-x-2">
+                              <input
+                                placeholder="Guardian Name"
+                                {...register('guardian')}
+                                className="app__input_standard"
+                              />
+                              <input
+                                placeholder="Occupation"
+                                {...register('guardian_occupation')}
+                                className="app__input_standard"
+                              />
+                            </div>
+                          </div>
                         </div>
-                        <div className="flex space-x-2">
-                          <input
-                            placeholder="SHS - Year Graduated"
-                            {...register('shs_year_graduated')}
-                            className="app__input_standard"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                    <div className="app__form_field_container">
-                      <div className="w-full">
-                        <div className="app__label_standard">Father:</div>
-                        <div className="flex space-x-2">
-                          <input
-                            placeholder="Father Name"
-                            {...register('father')}
-                            className="app__input_standard"
-                          />
-                          <input
-                            placeholder="Occupation"
-                            {...register('father_occupation')}
-                            className="app__input_standard"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                    <div className="app__form_field_container">
-                      <div className="w-full">
-                        <div className="app__label_standard">Mother:</div>
-                        <div className="flex space-x-2">
-                          <input
-                            placeholder="Mother Name"
-                            {...register('mother')}
-                            className="app__input_standard"
-                          />
-                          <input
-                            placeholder="Occupation"
-                            {...register('mother_occupation')}
-                            className="app__input_standard"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                    <div className="app__form_field_container">
-                      <div className="w-full">
-                        <div className="app__label_standard">Guardian:</div>
-                        <div className="flex space-x-2">
-                          <input
-                            placeholder="Guardian Name"
-                            {...register('guardian')}
-                            className="app__input_standard"
-                          />
-                          <input
-                            placeholder="Occupation"
-                            {...register('guardian_occupation')}
-                            className="app__input_standard"
-                          />
-                        </div>
-                      </div>
-                    </div>
+                      </>
+                    )}
                   </div>
                   {/* End First Column */}
                   {/* Begin Second Column */}
                   <div>
-                    <div className="app__form_field_container">
-                      <div className="w-full">
-                        <div className="app__label_standard">Birth Date:</div>
-                        <div>
-                          <input
-                            {...register('birthday')}
-                            type="date"
-                            className="app__input_standard"
-                          />
+                    {userData.program_id && (
+                      <>
+                        <div className="app__form_field_container">
+                          <div className="w-full">
+                            <div className="app__label_standard">
+                              Birth Date:
+                            </div>
+                            <div>
+                              <input
+                                {...register('birthday')}
+                                type="date"
+                                className="app__input_standard"
+                              />
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                    <div className="app__form_field_container">
-                      <div className="w-full">
-                        <div className="app__label_standard">Age:</div>
-                        <div>
-                          <input
-                            {...register('age')}
-                            className="app__input_standard"
-                          />
+                        <div className="app__form_field_container">
+                          <div className="w-full">
+                            <div className="app__label_standard">Age:</div>
+                            <div>
+                              <input
+                                {...register('age')}
+                                className="app__input_standard"
+                              />
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                    <div className="app__form_field_container">
-                      <div className="w-full">
-                        <div className="app__label_standard">Sex:</div>
-                        <div>
-                          <select
-                            {...register('gender')}
-                            className="app__select_standard"
-                          >
-                            <option value="">Select</option>
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                          </select>
+                        <div className="app__form_field_container">
+                          <div className="w-full">
+                            <div className="app__label_standard">Sex:</div>
+                            <div>
+                              <select
+                                {...register('gender')}
+                                className="app__select_standard"
+                              >
+                                <option value="">Select</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                              </select>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                    <div className="app__form_field_container">
-                      <div className="w-full">
-                        <div className="app__label_standard">Civil Status:</div>
-                        <div>
-                          <select
-                            {...register('civil_status')}
-                            className="app__select_standard"
-                          >
-                            <option value="Single">Single</option>
-                            <option value="Married">Married</option>
-                            <option value="Separated">Separated</option>
-                            <option value="Widowed">Widowed</option>
-                          </select>
+                        <div className="app__form_field_container">
+                          <div className="w-full">
+                            <div className="app__label_standard">
+                              Civil Status:
+                            </div>
+                            <div>
+                              <select
+                                {...register('civil_status')}
+                                className="app__select_standard"
+                              >
+                                <option value="Single">Single</option>
+                                <option value="Married">Married</option>
+                                <option value="Separated">Separated</option>
+                                <option value="Widowed">Widowed</option>
+                              </select>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                    <div className="app__form_field_container">
-                      <div className="w-full">
-                        <div className="app__label_standard">
-                          Contact Number:
+                        <div className="app__form_field_container">
+                          <div className="w-full">
+                            <div className="app__label_standard">
+                              Contact Number:
+                            </div>
+                            <div>
+                              <input
+                                {...register('contact_number')}
+                                className="app__input_standard"
+                              />
+                            </div>
+                          </div>
                         </div>
-                        <div>
-                          <input
-                            {...register('contact_number')}
-                            className="app__input_standard"
-                          />
+                        <div className="app__form_field_container">
+                          <div className="w-full">
+                            <div className="app__label_standard">
+                              Reference 1:
+                            </div>
+                            <div className="flex space-x-2">
+                              <input
+                                placeholder="Reference Name"
+                                {...register('reference_name_1')}
+                                className="app__input_standard"
+                              />
+                              <input
+                                placeholder="Address"
+                                {...register('reference_address_1')}
+                                className="app__input_standard"
+                              />
+                              <input
+                                placeholder="Address"
+                                {...register('reference_contact_1')}
+                                className="app__input_standard"
+                              />
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                    <div className="app__form_field_container">
-                      <div className="w-full">
-                        <div className="app__label_standard">Reference 1:</div>
-                        <div className="flex space-x-2">
-                          <input
-                            placeholder="Reference Name"
-                            {...register('reference_name_1')}
-                            className="app__input_standard"
-                          />
-                          <input
-                            placeholder="Address"
-                            {...register('reference_address_1')}
-                            className="app__input_standard"
-                          />
-                          <input
-                            placeholder="Address"
-                            {...register('reference_contact_1')}
-                            className="app__input_standard"
-                          />
+                        <div className="app__form_field_container">
+                          <div className="w-full">
+                            <div className="app__label_standard">
+                              Reference 2:
+                            </div>
+                            <div className="flex space-x-2">
+                              <input
+                                placeholder="Reference Name"
+                                {...register('reference_name_2')}
+                                className="app__input_standard"
+                              />
+                              <input
+                                placeholder="Address"
+                                {...register('reference_address_2')}
+                                className="app__input_standard"
+                              />
+                              <input
+                                placeholder="Address"
+                                {...register('reference_contact_2')}
+                                className="app__input_standard"
+                              />
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                    <div className="app__form_field_container">
-                      <div className="w-full">
-                        <div className="app__label_standard">Reference 2:</div>
-                        <div className="flex space-x-2">
-                          <input
-                            placeholder="Reference Name"
-                            {...register('reference_name_2')}
-                            className="app__input_standard"
-                          />
-                          <input
-                            placeholder="Address"
-                            {...register('reference_address_2')}
-                            className="app__input_standard"
-                          />
-                          <input
-                            placeholder="Address"
-                            {...register('reference_contact_2')}
-                            className="app__input_standard"
-                          />
+                        <div className="app__form_field_container">
+                          <div className="w-full">
+                            <div className="app__label_standard">
+                              Reference 3:
+                            </div>
+                            <div className="flex space-x-2">
+                              <input
+                                placeholder="Reference Name"
+                                {...register('reference_name_3')}
+                                className="app__input_standard"
+                              />
+                              <input
+                                placeholder="Address"
+                                {...register('reference_address_3')}
+                                className="app__input_standard"
+                              />
+                              <input
+                                placeholder="Address"
+                                {...register('reference_contact_3')}
+                                className="app__input_standard"
+                              />
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                    <div className="app__form_field_container">
-                      <div className="w-full">
-                        <div className="app__label_standard">Reference 3:</div>
-                        <div className="flex space-x-2">
-                          <input
-                            placeholder="Reference Name"
-                            {...register('reference_name_3')}
-                            className="app__input_standard"
-                          />
-                          <input
-                            placeholder="Address"
-                            {...register('reference_address_3')}
-                            className="app__input_standard"
-                          />
-                          <input
-                            placeholder="Address"
-                            {...register('reference_contact_3')}
-                            className="app__input_standard"
-                          />
-                        </div>
-                      </div>
-                    </div>
+                      </>
+                    )}
                   </div>
                   {/* End Second Column */}
                 </div>

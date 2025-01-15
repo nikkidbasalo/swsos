@@ -2,7 +2,9 @@
 
 import { useFilter } from '@/context/FilterContext'
 import { useSupabase } from '@/context/SupabaseProvider'
+import { EyeSlashIcon } from '@heroicons/react/20/solid'
 import axios from 'axios'
+import { EyeIcon } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 
@@ -22,6 +24,16 @@ export default function LoginSettings({ userId }: { userId: string }) {
 
   const { setToast } = useFilter()
   const { supabase, session } = useSupabase()
+
+  const [showPassword, setShowPassword] = useState(false)
+  const [showFirstPassword, setShowFirstPassword] = useState(false)
+
+  const toggleFirstPasswordVisibility = () => {
+    setShowFirstPassword(!showFirstPassword)
+  }
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword)
+  }
 
   const handlePasswordChange = async (data: {
     newPassword: string
@@ -94,13 +106,27 @@ export default function LoginSettings({ userId }: { userId: string }) {
       <form onSubmit={handleSubmit(handlePasswordChange)}>
         <div className="mb-4">
           <label className="app__label_standard">New Password</label>
-          <input
-            type="password"
-            className="app__input_standard"
-            {...register('newPassword', {
-              required: 'New password is required'
-            })}
-          />
+          <div className="relative">
+            <input
+              type={showFirstPassword ? 'text' : 'password'}
+              {...register('newPassword', {
+                required: 'New password is required'
+              })}
+              className="app__input_standard w-full pr-10"
+            />
+            <button
+              type="button"
+              onClick={toggleFirstPasswordVisibility}
+              className="absolute inset-y-0 right-0 flex items-center pr-3"
+              aria-label="Toggle password visibility"
+            >
+              {showFirstPassword ? (
+                <EyeSlashIcon className="h-5 w-5 text-gray-500" />
+              ) : (
+                <EyeIcon className="h-5 w-5 text-gray-500" />
+              )}
+            </button>
+          </div>
           {errors.newPassword && (
             <p className="text-red-500 text-xs">{errors.newPassword.message}</p>
           )}
@@ -108,13 +134,27 @@ export default function LoginSettings({ userId }: { userId: string }) {
 
         <div className="mb-4">
           <label className="app__label_standard">Confirm New Password</label>
-          <input
-            type="password"
-            className="app__input_standard"
-            {...register('confirmPassword', {
-              required: 'Please confirm your password'
-            })}
-          />
+          <div className="relative">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              {...register('confirmPassword', {
+                required: 'Please confirm your password'
+              })}
+              className="app__input_standard w-full pr-10"
+            />
+            <button
+              type="button"
+              onClick={togglePasswordVisibility}
+              className="absolute inset-y-0 right-0 flex items-center pr-3"
+              aria-label="Toggle password visibility"
+            >
+              {showPassword ? (
+                <EyeSlashIcon className="h-5 w-5 text-gray-500" />
+              ) : (
+                <EyeIcon className="h-5 w-5 text-gray-500" />
+              )}
+            </button>
+          </div>
           {errors.confirmPassword && (
             <p className="text-red-500 text-xs">
               {errors.confirmPassword.message}
