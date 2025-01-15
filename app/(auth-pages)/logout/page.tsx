@@ -15,7 +15,7 @@ export default function Page() {
 
     if (!error) {
       //   // router.push(`/profile/${signInData.user.id}`)
-      // await supabase.auth.refreshSession()
+      await supabase.auth.refreshSession()
       router.push('/')
     }
   }
