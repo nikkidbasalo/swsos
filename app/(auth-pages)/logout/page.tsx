@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 'use client'
+import { Sidebar } from '@/components'
+import TwoColTableLoading from '@/components/Loading/TwoColTableLoading'
 import { useSupabase } from '@/context/SupabaseProvider'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
@@ -21,4 +23,15 @@ export default function Page() {
   useEffect(() => {
     void handleLogout()
   }, [])
+
+  return (
+    <>
+      <Sidebar>
+        <></>
+      </Sidebar>
+      <div>
+        <TwoColTableLoading />
+      </div>
+    </>
+  )
 }
