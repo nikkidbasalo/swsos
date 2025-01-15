@@ -51,9 +51,9 @@ export default function LoginBox() {
         setSigningIn(false)
       } else {
         // await supabase.auth.refreshSession()
-        // router.push(`/profile/${signInData.user.id}`)
+        router.push(`/profile/${signInData.user.id}`)
 
-        router.push('/dashboard')
+        // router.push('/dashboard')
       }
     } else {
       setError('This is account is currently inactive.')
