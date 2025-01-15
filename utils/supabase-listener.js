@@ -21,10 +21,6 @@ export default function SupabaseListener({ serverAccessToken }) {
         // https://beta.nextjs.org/docs/data-fetching/mutating
         router.refresh()
       }
-      if (event === 'SIGNED_OUT') {
-        // Redirect to homepage or login page on logout
-        router.push('/')
-      }
     })
 
     return () => {
