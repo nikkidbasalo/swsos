@@ -26,6 +26,8 @@ const ProgramsModal = ({ hideModal, grantee }: ModalProps) => {
   const [programs, setPrograms] = useState<ProgramTypes[]>([])
   const [institutes, setInstitutes] = useState<InstituteTypes[]>([])
 
+  const [otherAccounts, setOtherAccounts] = useState<AccountTypes[] | []>([])
+
   // Redux staff
   const globallist = useSelector((state: any) => state.list.value)
   const dispatch = useDispatch()
@@ -47,7 +49,6 @@ const ProgramsModal = ({ hideModal, grantee }: ModalProps) => {
 
   const handleCreate = async (formdata: AccountTypes) => {
     // zz
-    const tempPassword = Math.floor(Math.random() * 8999) + 1000
 
     const newData = {
       id: uuidv4(),
@@ -134,10 +135,16 @@ const ProgramsModal = ({ hideModal, grantee }: ModalProps) => {
 
       const institutesData = await fetchInstitutes(999, 0)
       setInstitutes(institutesData.data)
+
+      const { data: usersData } = await supabase
+        .from('sws_users')
+        .select('*,program:program_id(*)')
+        .eq('email', grantee.email)
+      setOtherAccounts(usersData)
     })()
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [grantee])
 
   return (
     <>
@@ -170,11 +177,18 @@ const ProgramsModal = ({ hideModal, grantee }: ModalProps) => {
                       className="app__select_standard"
                     >
                       <option value="">Select</option>
-                      {programs?.map((p, i) => (
-                        <option key={i} value={p.id}>
-                          {p.name}
-                        </option>
-                      ))}
+                      {programs
+                        ?.filter(
+                          (program) =>
+                            !otherAccounts?.some(
+                              (acct) => acct.program_id === program.id
+                            )
+                        )
+                        .map((p, i) => (
+                          <option key={i} value={p.id}>
+                            {p.name}
+                          </option>
+                        ))}
                     </select>
                     {errors.program_id && (
                       <div className="app__error_message">

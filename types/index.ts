@@ -206,6 +206,7 @@ export interface AccountTypes {
   reference_contact_1: string
   reference_contact_2: string
   reference_contact_3: string
+  user_id: string
   confirmed: string
 }
 
