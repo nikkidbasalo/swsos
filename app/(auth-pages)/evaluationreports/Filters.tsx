@@ -28,6 +28,7 @@ const Filters = ({
   const [period, setPeriod] = useState<string>('')
   const [selectedProgram, setSelectedProgram] = useState<string>('')
   const [selectedInstitute, setSelectedInstitute] = useState<string>('')
+
   const [status, setStatus] = useState<string>('')
   const [paymentStatus, setPaymentStatus] = useState<string>('')
 

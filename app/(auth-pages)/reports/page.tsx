@@ -35,6 +35,7 @@ const Page: React.FC = () => {
   const [programs, setPrograms] = useState<ProgramTypes[]>([])
   const [institutes, setInstitutes] = useState<InstituteTypes[]>([])
 
+  const [filterStatus, setFilterStatus] = useState<string>('')
   const [filterKeyword, setFilterKeyword] = useState<string>('')
   const [filterProgram, setFilterProgram] = useState<string>('')
   const [filterInstitute, setFilterInstitute] = useState<string>('')
@@ -61,6 +62,7 @@ const Page: React.FC = () => {
           filterKeyword,
           filterGender,
           filterYear,
+          filterStatus,
           filterInstitute
         },
         '',
@@ -95,6 +97,7 @@ const Page: React.FC = () => {
           filterKeyword,
           filterGender,
           filterYear,
+          filterStatus,
           filterInstitute
         },
         '',
@@ -232,7 +235,8 @@ const Page: React.FC = () => {
     filterInstitute,
     filterKeyword,
     filterYear,
-    filterGender
+    filterGender,
+    filterStatus
   ])
 
   const isDataEmpty = !Array.isArray(list) || list.length < 1 || !list
@@ -265,6 +269,7 @@ const Page: React.FC = () => {
               setFilterGender={setFilterGender}
               setFilterYear={setFilterYear}
               setFilterInstitute={setFilterInstitute}
+              setFilterStatus={setFilterStatus}
               programs={programs}
               institutes={institutes}
             />
@@ -300,6 +305,7 @@ const Page: React.FC = () => {
                   <th className="app__th">Institute</th>
                   <th className="app__th">Sex</th>
                   <th className="app__th">Year Level</th>
+                  <th className="app__th">Status</th>
                 </tr>
               </thead>
               <tbody>
@@ -316,7 +322,7 @@ const Page: React.FC = () => {
                           <div>
                             <CustomButton
                               containerStyles="app__btn_green"
-                              title="View Evaluation Results"
+                              title="View Details"
                               btnType="button"
                               handleClick={() => handleViewDetails(item)}
                             />
@@ -327,9 +333,17 @@ const Page: React.FC = () => {
                       <td className="app__td">{item.institute?.name}</td>
                       <td className="app__td">{item.gender}</td>
                       <td className="app__td">{item.year_level_status}</td>
+                      <td className="app__td">
+                        {item.status === 'Active' && (
+                          <span className="app__status_green">Active</span>
+                        )}
+                        {item.status === 'Inactive' && (
+                          <span className="app__status_red">Inactive</span>
+                        )}
+                      </td>
                     </tr>
                   ))}
-                {loading && <TableRowLoading cols={6} rows={2} />}
+                {loading && <TableRowLoading cols={7} rows={2} />}
               </tbody>
             </table>
             {!loading && isDataEmpty && (

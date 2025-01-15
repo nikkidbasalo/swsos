@@ -9,6 +9,7 @@ interface FilterTypes {
   setFilterGender: (gender: string) => void
   setFilterYear: (year: string) => void
   setFilterInstitute: (year: string) => void
+  setFilterStatus: (year: string) => void
   programs: ProgramTypes[]
   institutes: InstituteTypes[]
 }
@@ -19,6 +20,7 @@ const Filters = ({
   setFilterGender,
   setFilterYear,
   setFilterInstitute,
+  setFilterStatus,
   programs,
   institutes
 }: FilterTypes) => {
@@ -26,6 +28,7 @@ const Filters = ({
   const [gender, setGender] = useState<string>('')
   const [year, setYear] = useState<string>('')
   const [selectedProgram, setSelectedProgram] = useState<string>('')
+  const [selectedStatus, setSelectedStatus] = useState<string>('')
   const [selectedInstitute, setSelectedInstitute] = useState<string>('')
 
   const handleApply = () => {
@@ -33,6 +36,7 @@ const Filters = ({
       keyword.trim() === '' &&
       selectedProgram.trim() === '' &&
       selectedInstitute.trim() === '' &&
+      selectedStatus.trim() === '' &&
       gender.trim() === '' &&
       year.trim() === ''
     )
@@ -41,6 +45,7 @@ const Filters = ({
     setFilterKeyword(keyword) // pass keyword to parent
     setFilterProgram(selectedProgram) // pass keyword to parent
     setFilterInstitute(selectedInstitute) // pass keyword to parent
+    setFilterStatus(selectedStatus) // pass keyword to parent
     setFilterGender(gender) // pass  to parent
     setFilterYear(year) // pass  to parent
   }
@@ -52,6 +57,7 @@ const Filters = ({
       keyword.trim() === '' &&
       selectedProgram.trim() === '' &&
       selectedInstitute.trim() === '' &&
+      selectedStatus.trim() === '' &&
       gender.trim() === '' &&
       year.trim() === ''
     )
@@ -60,6 +66,7 @@ const Filters = ({
     setFilterKeyword(keyword) // pass keyword to parent
     setFilterProgram(selectedProgram) // pass keyword to parent
     setFilterInstitute(selectedInstitute) // pass keyword to parent
+    setFilterStatus(selectedStatus) // pass keyword to parent
     setFilterGender(gender) // pass  to parent
     setFilterYear(year) // pass  to parent
   }
@@ -72,6 +79,8 @@ const Filters = ({
     setSelectedProgram('')
     setFilterInstitute('')
     setSelectedInstitute('')
+    setFilterStatus('')
+    setSelectedStatus('')
     setFilterYear('')
     setYear('')
     setFilterGender('')
@@ -131,6 +140,18 @@ const Filters = ({
               <option value="">Choose Sex</option>
               <option value="Male">Male</option>
               <option value="Female">Female</option>
+            </select>
+          </div>
+          <div className="app__filter_container">
+            <TagIcon className="w-4 h-4 mr-1 text-gray-500" />
+            <select
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              className="app__filter_select"
+            >
+              <option value="">Choose Status</option>
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
             </select>
           </div>
           <div className="app__filter_container">

@@ -23,7 +23,6 @@ export default function Page() {
       const { data } = await supabase.auth.getSession()
       if (data.session) {
         setLoggedIn(true)
-        setLoading(false)
 
         const { data: userData, error } = await supabase
           .from('sws_users')
@@ -33,10 +32,11 @@ export default function Page() {
           .eq('id', data.session.user.id)
           .limit(1)
           .maybeSingle()
-        console.log(data)
+
         if (data) {
           setUserData(userData)
         }
+        setLoading(false)
       } else {
         setLoggedIn(false)
         setLoading(false)
