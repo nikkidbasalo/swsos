@@ -286,3 +286,15 @@ export interface GranteeSummaryTypes {
   total_paid: string
   total_unpaid: string
 }
+
+export interface StudentTypes {
+  id: string
+  id_number: string
+  program: string
+  year_level: string
+  lastname: string
+  firstname: string
+  middlename: string
+  status: string
+  confirm: string
+}

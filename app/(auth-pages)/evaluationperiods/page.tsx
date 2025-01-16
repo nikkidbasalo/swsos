@@ -1,6 +1,7 @@
 'use client'
 import {
   CustomButton,
+  DeleteModal,
   PerPage,
   ShowMore,
   Sidebar,
@@ -20,6 +21,7 @@ import { fetchPeriods } from '@/utils/fetchApi'
 import { Menu, Transition } from '@headlessui/react'
 import { ChevronDownIcon, PencilSquareIcon } from '@heroicons/react/20/solid'
 import { format } from 'date-fns'
+import { TrashIcon } from 'lucide-react'
 import React, { Fragment, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import AddEditModal from './AddEditModal'
@@ -99,6 +101,11 @@ const Page: React.FC = () => {
   const handleAdd = () => {
     setShowAddModal(true)
     setEditData(null)
+  }
+
+  const handleDelete = (id: string) => {
+    setSelectedId(id)
+    setShowDeleteModal(true)
   }
 
   const handleEdit = (item: EvaluationPeriodTypes) => {
@@ -216,6 +223,7 @@ const Page: React.FC = () => {
                   </th>
                   <th className="app__th">Allowance Release Schedule</th>
                   <th className="app__th">Uploading (Open/Close)</th>
+                  <th className="app__th">Requirements</th>
                 </tr>
               </thead>
               <tbody>
@@ -253,6 +261,15 @@ const Page: React.FC = () => {
                                     <span>Edit</span>
                                   </div>
                                 </Menu.Item>
+                                <Menu.Item>
+                                  <div
+                                    onClick={() => handleDelete(item.id)}
+                                    className="app__dropdown_item"
+                                  >
+                                    <TrashIcon className="w-4 h-4" />
+                                    <span>Delete</span>
+                                  </div>
+                                </Menu.Item>
                               </div>
                             </Menu.Items>
                           </Transition>
@@ -282,9 +299,19 @@ const Page: React.FC = () => {
                           <span className="app__status_red">Closed</span>
                         )}
                       </td>
+                      <td className="app__td">
+                        <div className="tiptopeditor mt-2">
+                          <div
+                            className="text-sm text-gray-600"
+                            dangerouslySetInnerHTML={{
+                              __html: item.requirements
+                            }}
+                          />
+                        </div>
+                      </td>
                     </tr>
                   ))}
-                {loading && <TableRowLoading cols={5} rows={2} />}
+                {loading && <TableRowLoading cols={6} rows={2} />}
               </tbody>
             </table>
             {!loading && isDataEmpty && (
@@ -302,6 +329,19 @@ const Page: React.FC = () => {
             <AddEditModal
               editData={editData}
               hideModal={() => setShowAddModal(false)}
+            />
+          )}
+
+          {/* Delete Modal */}
+          {showDeleteModal && (
+            <DeleteModal
+              table="sws_evaluation_periods"
+              selectedId={selectedId}
+              showingCount={showingCount}
+              setShowingCount={setShowingCount}
+              resultsCount={resultsCount}
+              setResultsCount={setResultsCount}
+              hideModal={() => setShowDeleteModal(false)}
             />
           )}
         </div>

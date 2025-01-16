@@ -1,6 +1,7 @@
 'use client'
 import {
   ConfirmModal,
+  CustomButton,
   PerPage,
   ShowMore,
   Sidebar,
@@ -23,6 +24,8 @@ import {
   ChevronDownIcon,
   TrashIcon
 } from '@heroicons/react/20/solid'
+import Excel from 'exceljs'
+import { saveAs } from 'file-saver'
 import Link from 'next/link'
 import React, { Fragment, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -37,6 +40,7 @@ const Page: React.FC = () => {
   const [loading, setLoading] = useState(false)
   const [showDisapproveModal, setShowDisapproveModal] = useState(false)
   const [showApproveModal, setShowApproveModal] = useState(false)
+  const [downloading, setDownloading] = useState(false)
 
   const [refresh, setRefresh] = useState(false)
   const [selectedItem, setSelectedItem] = useState<ApplicationTypes>()
@@ -203,6 +207,115 @@ const Page: React.FC = () => {
     }
   }
 
+  const handleDownloadExcel = async (details: ApplicationTypes) => {
+    setDownloading(true)
+
+    // Create a new workbook and add a worksheet
+    const workbook = new Excel.Workbook()
+    const worksheet = workbook.addWorksheet('Sheet 1')
+
+    // Add data to the worksheet
+    worksheet.columns = [
+      { header: 'reference_code', key: 'reference_code', width: 20 },
+      { header: 'last name', key: 'lastname', width: 20 },
+      { header: 'first name', key: 'firstname', width: 20 },
+      { header: 'middle name', key: 'middlename', width: 20 },
+      { header: 'ext', key: 'name_ext', width: 20 },
+      { header: 'tcgc id', key: 'tcgc_id', width: 20 },
+      { header: 'birthday', key: 'birthday', width: 20 },
+      { header: 'email', key: 'email', width: 20 },
+      { header: 'age', key: 'age', width: 20 },
+      { header: 'gender', key: 'gender', width: 20 },
+      { header: 'civil status', key: 'civil_status', width: 20 },
+      { header: 'contact number', key: 'contact_number', width: 20 },
+      { header: 'present address', key: 'present_address', width: 20 },
+      {
+        header: 'present address_others',
+        key: 'present_address_others',
+        width: 20
+      },
+      { header: 'permanent address', key: 'permanent_address', width: 20 },
+      { header: 'father', key: 'father', width: 20 },
+      { header: 'mother', key: 'mother', width: 20 },
+      { header: 'guardian', key: 'guardian', width: 20 },
+      { header: 'parent address', key: 'parent_address', width: 20 },
+      { header: 'father occupation', key: 'father_occupation', width: 20 },
+      { header: 'mother occupation', key: 'mother_occupation', width: 20 },
+      { header: 'guardian occupation', key: 'guardian_occupation', width: 20 },
+      { header: 'shs', key: 'shs', width: 20 },
+      { header: 'shs principal', key: 'shs_principal', width: 20 },
+      { header: 'shs address', key: 'shs_address', width: 20 },
+      { header: 'shs school_type', key: 'shs_school_type', width: 20 },
+      { header: 'shs year graduated', key: 'shs_year_graduated', width: 20 },
+      { header: 'shs honor', key: 'shs_honor', width: 20 },
+      { header: 'reference name 1', key: 'reference_name_1', width: 20 },
+      { header: 'reference name 2', key: 'reference_name_2', width: 20 },
+      { header: 'reference name 3', key: 'reference_name_3', width: 20 },
+      { header: 'reference address 1', key: 'reference_address_1', width: 20 },
+      { header: 'reference address 2', key: 'reference_address_2', width: 20 },
+      { header: 'reference address 3', key: 'reference_address_3', width: 20 },
+      { header: 'reference contact 1', key: 'reference_contact_1', width: 20 },
+      { header: 'reference contact 2', key: 'reference_contact_2', width: 20 },
+      { header: 'reference contact 3', key: 'reference_contact_3', width: 20 }
+      // Add more columns based on your data structure
+    ]
+
+    // Data for the Excel file
+    const data: any[] = []
+    data.push({
+      reference_code: details.reference_code,
+      lastname: details.lastname,
+      firstname: details.firstname,
+      middlename: details.middlename,
+      name_ext: details.name_ext,
+      tcgc_id: details.tcgc_id,
+      birthday: details.birthday,
+      email: details.email,
+      age: details.age,
+      gender: details.gender,
+      civil_status: details.civil_status,
+      contact_number: details.contact_number,
+      present_address: details.present_address,
+      present_address_others: details.present_address_others,
+      permanent_address: details.permanent_address,
+      father: details.father,
+      mother: details.mother,
+      guardian: details.guardian,
+      parent_address: details.parent_address,
+      father_occupation: details.father_occupation,
+      mother_occupation: details.mother_occupation,
+      guardian_occupation: details.guardian_occupation,
+      shs: details.shs,
+      shs_principal: details.shs_principal,
+      shs_address: details.shs_address,
+      shs_school_type: details.shs_school_type,
+      shs_year_graduated: details.shs_year_graduated,
+      shs_honor: details.shs_honor,
+      reference_name_1: details.reference_name_1,
+      reference_name_2: details.reference_name_2,
+      reference_name_3: details.reference_name_3,
+      reference_address_1: details.reference_address_1,
+      reference_address_2: details.reference_address_2,
+      reference_address_3: details.reference_address_3,
+      reference_contact_1: details.reference_contact_1,
+      reference_contact_2: details.reference_contact_2,
+      reference_contact_3: details.reference_contact_3
+    })
+
+    data.forEach((item) => {
+      worksheet.addRow(item)
+    })
+
+    // Generate the Excel file
+    await workbook.xlsx.writeBuffer().then((buffer) => {
+      const blob = new Blob([buffer], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      })
+      saveAs(blob, `Applicant Details.xlsx`)
+    })
+    setDownloading(false)
+  }
+
   const addAccount = async (
     formdata: ApplicationTypes
   ): Promise<{ error?: string }> => {
@@ -273,6 +386,127 @@ const Page: React.FC = () => {
     }
   }
 
+  const handleDownloadData = async () => {
+    setDownloading(true)
+
+    // Create a new workbook and add a worksheet
+    const workbook = new Excel.Workbook()
+    const worksheet = workbook.addWorksheet('Sheet 1')
+
+    // Add data to the worksheet
+    worksheet.columns = [
+      { header: 'No', key: 'no', width: 20 },
+      { header: 'reference_code', key: 'reference_code', width: 20 },
+      { header: 'last name', key: 'lastname', width: 20 },
+      { header: 'first name', key: 'firstname', width: 20 },
+      { header: 'middle name', key: 'middlename', width: 20 },
+      { header: 'ext', key: 'name_ext', width: 20 },
+      { header: 'tcgc id', key: 'tcgc_id', width: 20 },
+      { header: 'birthday', key: 'birthday', width: 20 },
+      { header: 'email', key: 'email', width: 20 },
+      { header: 'age', key: 'age', width: 20 },
+      { header: 'gender', key: 'gender', width: 20 },
+      { header: 'civil status', key: 'civil_status', width: 20 },
+      { header: 'contact number', key: 'contact_number', width: 20 },
+      { header: 'present address', key: 'present_address', width: 20 },
+      {
+        header: 'present address_others',
+        key: 'present_address_others',
+        width: 20
+      },
+      { header: 'permanent address', key: 'permanent_address', width: 20 },
+      { header: 'father', key: 'father', width: 20 },
+      { header: 'mother', key: 'mother', width: 20 },
+      { header: 'guardian', key: 'guardian', width: 20 },
+      { header: 'parent address', key: 'parent_address', width: 20 },
+      { header: 'father occupation', key: 'father_occupation', width: 20 },
+      { header: 'mother occupation', key: 'mother_occupation', width: 20 },
+      { header: 'guardian occupation', key: 'guardian_occupation', width: 20 },
+      { header: 'shs', key: 'shs', width: 20 },
+      { header: 'shs principal', key: 'shs_principal', width: 20 },
+      { header: 'shs address', key: 'shs_address', width: 20 },
+      { header: 'shs school_type', key: 'shs_school_type', width: 20 },
+      { header: 'shs year graduated', key: 'shs_year_graduated', width: 20 },
+      { header: 'shs honor', key: 'shs_honor', width: 20 },
+      { header: 'reference name 1', key: 'reference_name_1', width: 20 },
+      { header: 'reference name 2', key: 'reference_name_2', width: 20 },
+      { header: 'reference name 3', key: 'reference_name_3', width: 20 },
+      { header: 'reference address 1', key: 'reference_address_1', width: 20 },
+      { header: 'reference address 2', key: 'reference_address_2', width: 20 },
+      { header: 'reference address 3', key: 'reference_address_3', width: 20 },
+      { header: 'reference contact 1', key: 'reference_contact_1', width: 20 },
+      { header: 'reference contact 2', key: 'reference_contact_2', width: 20 },
+      { header: 'reference contact 3', key: 'reference_contact_3', width: 20 }
+      // Add more columns based on your data structure
+    ]
+
+    const result = await fetchApplications(
+      { filterStatus, filterKeyword, filterProgram },
+      99999,
+      0
+    )
+
+    const results: ApplicationTypes[] = result.data
+
+    // Data for the Excel file
+    const data: any[] = []
+    results.forEach((details, index) => {
+      data.push({
+        no: index + 1,
+        reference_code: details.reference_code,
+        lastname: details.lastname,
+        firstname: details.firstname,
+        middlename: details.middlename,
+        name_ext: details.name_ext,
+        tcgc_id: details.tcgc_id,
+        birthday: details.birthday,
+        email: details.email,
+        age: details.age,
+        gender: details.gender,
+        civil_status: details.civil_status,
+        contact_number: details.contact_number,
+        present_address: details.present_address,
+        present_address_others: details.present_address_others,
+        permanent_address: details.permanent_address,
+        father: details.father,
+        mother: details.mother,
+        guardian: details.guardian,
+        parent_address: details.parent_address,
+        father_occupation: details.father_occupation,
+        mother_occupation: details.mother_occupation,
+        guardian_occupation: details.guardian_occupation,
+        shs: details.shs,
+        shs_principal: details.shs_principal,
+        shs_address: details.shs_address,
+        shs_school_type: details.shs_school_type,
+        shs_year_graduated: details.shs_year_graduated,
+        shs_honor: details.shs_honor,
+        reference_name_1: details.reference_name_1,
+        reference_name_2: details.reference_name_2,
+        reference_name_3: details.reference_name_3,
+        reference_address_1: details.reference_address_1,
+        reference_address_2: details.reference_address_2,
+        reference_address_3: details.reference_address_3,
+        reference_contact_1: details.reference_contact_1,
+        reference_contact_2: details.reference_contact_2,
+        reference_contact_3: details.reference_contact_3
+      })
+    })
+
+    data.forEach((item) => {
+      worksheet.addRow(item)
+    })
+
+    // Generate the Excel file
+    await workbook.xlsx.writeBuffer().then((buffer) => {
+      const blob = new Blob([buffer], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      })
+      saveAs(blob, `Applicants.xlsx`)
+    })
+    setDownloading(false)
+  }
+
   // Update list whenever list in redux updates
   useEffect(() => {
     setList(globallist)
@@ -321,6 +555,19 @@ const Page: React.FC = () => {
               setFilterProgram={setFilterProgram}
               setFilterStatus={setFilterStatus}
             />
+          </div>
+
+          {/* Export Button */}
+          <div className="mx-4 mb-2 flex justify-end items-end space-x-2">
+            <div className="space-x-2">
+              <CustomButton
+                containerStyles="app__btn_blue"
+                isDisabled={downloading}
+                title={downloading ? 'Downloading...' : 'Export To Excel'}
+                btnType="button"
+                handleClick={handleDownloadData}
+              />
+            </div>
           </div>
 
           {/* Per Page */}
@@ -409,6 +656,14 @@ const Page: React.FC = () => {
                           <span className="font-bold">
                             {item.reference_code}
                           </span>
+                        </div>
+                        <div className="mt-2">
+                          <CustomButton
+                            containerStyles="app__btn_green"
+                            title="Download Details"
+                            btnType="button"
+                            handleClick={() => handleDownloadExcel(item)}
+                          />
                         </div>
                       </td>
                       <td className="app__td">

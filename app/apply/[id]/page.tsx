@@ -17,6 +17,9 @@ export default function Page({ params }: { params: { id: string } }) {
   const [isLoggedIn, setLoggedIn] = useState(false)
   const [downloading, setDownloading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [isVerified, setIsVerified] = useState(false)
+  const [notFound, setNotFound] = useState(false)
+  const [idNumber, setIdNumber] = useState('')
   const { supabase } = useSupabase()
   const router = useRouter()
 
@@ -339,6 +342,25 @@ export default function Page({ params }: { params: { id: string } }) {
     setDownloading(false)
   }
 
+  const handleVerify = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+
+    const { data } = await supabase
+      .from('sws_students')
+      .select()
+      .eq('id_number', idNumber)
+      .limit(1)
+      .single()
+
+    if (data) {
+      setIsVerified(true)
+      setNotFound(false)
+    } else {
+      setNotFound(true)
+      setIsVerified(false)
+    }
+  }
+
   useEffect(() => {
     ;(async () => {
       const { data } = await supabase.auth.getSession()
@@ -390,7 +412,46 @@ export default function Page({ params }: { params: { id: string } }) {
               </div>
             </div>
           )}
-          {!submitted && (
+          {!submitted && !isVerified && (
+            <div>
+              <div className="my-10">
+                <div className="text-xl text-center">
+                  Enter your TCGC ID Number for verification
+                </div>
+                <form onSubmit={handleVerify}>
+                  <div className="flex items-center space-x-2 justify-center mt-4">
+                    <input
+                      type="text"
+                      value={idNumber}
+                      onChange={(e) => setIdNumber(e.target.value)}
+                      className="border outline-none px-2 py-2 text-sm w-72"
+                      placeholder="ID Number"
+                    />
+                    <button
+                      className="bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-500 border border-emerald-600 font-bold px-8 py-2 text-sm text-white rounded-sm"
+                      type="submit"
+                    >
+                      Submit
+                    </button>
+                  </div>
+                </form>
+              </div>
+              <div className="w-full px-10 my-10 pb-20">
+                {notFound && (
+                  <>
+                    <div className="text-center mb-2">
+                      <div>
+                        <span className="text-red-500 text-lg">
+                          ID Number does not exist.
+                        </span>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+          {!submitted && isVerified && (
             <form onSubmit={handleSubmit(onSubmit)}>
               <table className="w-full">
                 <tbody>

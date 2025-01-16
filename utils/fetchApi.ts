@@ -187,6 +187,52 @@ export async function fetchApplications(
   }
 }
 
+export async function fetchStudents(
+  filters: {
+    filterKeyword?: string
+    filterProgram?: string
+    filterStatus?: string
+  },
+  perPageCount: number,
+  rangeFrom: number
+) {
+  try {
+    let query = supabase.from('sws_students').select('*', { count: 'exact' })
+
+    if (filters.filterKeyword && filters.filterKeyword !== '') {
+      // Search match
+      query = query.or(
+        `firstname.ilike.%${filters.filterKeyword}%,middlename.ilike.%${filters.filterKeyword}%,lastname.ilike.%${filters.filterKeyword}%`
+      )
+    }
+
+    // filter status
+    if (filters.filterStatus && filters.filterStatus !== '') {
+      query = query.eq('status', filters.filterStatus)
+    }
+
+    // Per Page from context
+    const from = rangeFrom
+    const to = from + (perPageCount - 1)
+
+    // Per Page from context
+    query = query.range(from, to)
+
+    // Order By
+    query = query.order('id', { ascending: false })
+
+    const { data, error, count } = await query
+
+    if (error) {
+      throw new Error(error.message)
+    }
+    return { data, count }
+  } catch (error) {
+    console.error('fetch students error', error)
+    return { data: [], count: 0 }
+  }
+}
+
 export async function fetchGrantees(
   filters: {
     filterProgramIds?: string[]

@@ -307,7 +307,7 @@ export default function ScholarDashboard({
                   </div>
                 </div>
 
-                <div className="bg-white p-4 mb-4 rounded-md shadow-md text-gray-600">
+                <div className="bg-white p-4 mb-4 rounded-md shadow-md text-gray-600 col-span-2">
                   <div className="text-sm font-semibold px-2 mb-2 text-gray-600">
                     Allowances Released/Schedule
                   </div>
@@ -318,6 +318,7 @@ export default function ScholarDashboard({
                           <th className="app__th">Period</th>
                           <th className="app__th">Amount</th>
                           <th className="app__th">Release Schedule</th>
+                          <th className="app__th">Requirements</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -340,6 +341,16 @@ export default function ScholarDashboard({
                               </td>
                               <td className="app__td">
                                 {item.period.release_schedule}
+                              </td>
+                              <td className="app__td">
+                                <div className="tiptopeditor mt-2">
+                                  <div
+                                    className="text-sm text-gray-600"
+                                    dangerouslySetInnerHTML={{
+                                      __html: item.period.requirements
+                                    }}
+                                  />
+                                </div>
                               </td>
                             </tr>
                           ))}
