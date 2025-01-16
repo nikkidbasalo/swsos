@@ -29,7 +29,11 @@ const Page: React.FC = () => {
 
   const [loading, setLoading] = useState(false)
   const [showImportModal, setShowImportModal] = useState(false)
+  const [downloading, setDownloading] = useState(false)
 
+  const [checkAll, setCheckAll] = useState(false)
+  const [selectedItems, setSelectedItems] = useState<StudentTypes[]>([])
+  const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [refresh, setRefresh] = useState(false)
   const [selectedItem, setSelectedItem] = useState<StudentTypes>()
   const [filterKeyword, setFilterKeyword] = useState<string>('')
@@ -105,6 +109,65 @@ const Page: React.FC = () => {
     }
   }
 
+  const deleteSelected = async () => {
+    setDownloading(true)
+    const ids = selectedItems.map((obj) => obj.id)
+    try {
+      const { error } = await supabase
+        .from('sws_students')
+        .delete()
+        .in('id', ids)
+
+      if (error) throw new Error(error.message)
+
+      // pop up the success message
+      setToast('success', 'Successfully deleted')
+
+      // Append new data in redux
+      const items = [...globallist]
+      const updatedArray = items.filter(
+        (obj: StudentTypes) =>
+          !selectedItems.find((o) => o.id.toString() === obj.id.toString())
+      )
+      dispatch(updateList(updatedArray))
+    } catch (error) {
+      // pop up the error  message
+      setToast('error', 'Something went wrong')
+    } finally {
+      setDownloading(false)
+    }
+  }
+
+  // Function to handle checkbox change event
+  const handleCheckboxChange = (id: string) => {
+    if (selectedIds.length > 0 && selectedIds.includes(id)) {
+      // If item is already selected, remove it
+      const ids = selectedIds.filter((selectedId) => selectedId !== id)
+      setSelectedIds(ids)
+      const items = list.filter((item) => ids.includes(item.id.toString()))
+      setSelectedItems(items)
+    } else {
+      // If item is not selected, add it
+      const ids = [...selectedIds, id]
+      setSelectedIds(ids)
+      const items = list.filter((item) => ids.includes(item.id.toString()))
+      setSelectedItems(items)
+    }
+  }
+
+  const handleCheckAllChange = () => {
+    setCheckAll(!checkAll)
+    if (!checkAll) {
+      const ids = list.map((obj) => obj.id.toString())
+      setSelectedIds([...ids])
+      const items = list.filter((item) => ids.includes(item.id.toString()))
+      setSelectedItems(items)
+    } else {
+      setSelectedIds([])
+      setSelectedItems([])
+    }
+  }
+
   // Update list whenever list in redux updates
   useEffect(() => {
     setList(globallist)
@@ -162,6 +225,19 @@ const Page: React.FC = () => {
             />
           </div>
 
+          {/* Export Button */}
+          <div className="mx-4 mb-4 flex justify-end items-end space-x-2">
+            {selectedItems.length > 0 && (
+              <CustomButton
+                containerStyles="app__btn_orange"
+                isDisabled={downloading}
+                title={downloading ? 'Deleting...' : 'Delete Selected'}
+                btnType="button"
+                handleClick={deleteSelected}
+              />
+            )}
+          </div>
+
           {/* Per Page */}
           <PerPage
             showingCount={resultsCounter.showing}
@@ -175,19 +251,36 @@ const Page: React.FC = () => {
             <table className="app__table">
               <thead className="app__thead">
                 <tr>
-                  <th className="app__th pl-4"></th>
+                  <th className="app__th pl-4">
+                    <input
+                      type="checkbox"
+                      checked={checkAll}
+                      onChange={handleCheckAllChange}
+                    />
+                  </th>
                   <th className="app__th">ID Number</th>
                   <th className="app__th">Fullname</th>
                   <th className="app__th">Year Level</th>
                   <th className="app__th">Program</th>
-                  <th className="app__th">Status</th>
+                  {/* <th className="app__th">Status</th> */}
                 </tr>
               </thead>
               <tbody>
                 {!isDataEmpty &&
                   list.map((item, index) => (
-                    <tr key={index} className="app__tr">
-                      <td className="w-6 pl-4 app__td"></td>
+                    <tr
+                      key={index}
+                      onClick={() => handleCheckboxChange(item.id.toString())}
+                      className="app__tr cursor-pointer"
+                    >
+                      <td className="hidden md:table-cell app__td">
+                        <input
+                          type="checkbox"
+                          value={item.id.toString()}
+                          checked={selectedIds.includes(item.id.toString())}
+                          readOnly
+                        />
+                      </td>
                       <td className="app__td">{item.id_number}</td>
                       <td className="app__td">
                         <div className="font-bold">
@@ -196,14 +289,14 @@ const Page: React.FC = () => {
                       </td>
                       <td className="app__td">{item.year_level}</td>
                       <td className="app__td">{item.program}</td>
-                      <td className="app__td">
+                      {/* <td className="app__td">
                         {item.status === 'Active' && (
                           <span className="app__status_green">Active</span>
                         )}
                         {item.status === 'Inactive' && (
                           <span className="app__status_orange">Inactive</span>
                         )}
-                      </td>
+                      </td> */}
                     </tr>
                   ))}
                 {loading && <TableRowLoading cols={5} rows={2} />}
