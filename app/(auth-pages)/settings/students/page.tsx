@@ -179,6 +179,7 @@ const Page: React.FC = () => {
                   <th className="app__th">Fullname</th>
                   <th className="app__th">Year Level</th>
                   <th className="app__th">Program</th>
+                  <th className="app__th">Status</th>
                 </tr>
               </thead>
               <tbody>
@@ -191,6 +192,8 @@ const Page: React.FC = () => {
                           {item.lastname}, {item.firstname} {item.middlename}
                         </div>
                       </td>
+                      <td className="app__td">{item.year_level}</td>
+                      <td className="app__td">{item.program}</td>
                       <td className="app__td">
                         {item.status === 'Active' && (
                           <span className="app__status_green">Active</span>
@@ -199,8 +202,6 @@ const Page: React.FC = () => {
                           <span className="app__status_orange">Inactive</span>
                         )}
                       </td>
-                      <td className="app__td">{item.year_level}</td>
-                      <td className="app__td">{item.program}</td>
                     </tr>
                   ))}
                 {loading && <TableRowLoading cols={5} rows={2} />}
