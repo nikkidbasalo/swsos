@@ -176,6 +176,7 @@ const Page: React.FC = () => {
               <thead className="app__thead">
                 <tr>
                   <th className="app__th pl-4"></th>
+                  <th className="app__th">ID Number</th>
                   <th className="app__th">Fullname</th>
                   <th className="app__th">Year Level</th>
                   <th className="app__th">Program</th>
@@ -187,6 +188,7 @@ const Page: React.FC = () => {
                   list.map((item, index) => (
                     <tr key={index} className="app__tr">
                       <td className="w-6 pl-4 app__td"></td>
+                      <td className="app__td">{item.id_number}</td>
                       <td className="app__td">
                         <div className="font-bold">
                           {item.lastname}, {item.firstname} {item.middlename}
