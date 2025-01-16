@@ -322,38 +322,33 @@ export default function ScholarDashboard({
                         </tr>
                       </thead>
                       <tbody>
-                        {allowances
-                          ?.filter((a) => a.is_paid === true)
-                          ?.map((item, index) => (
-                            <tr key={index} className="app__tr">
-                              <td className="app__td">
-                                {item.period.description} {item.period.year}
-                              </td>
-                              <td className="app__td">
-                                {Number(item.allowance).toLocaleString(
-                                  'en-US',
-                                  {
-                                    minimumFractionDigits: 2,
-                                    maximumFractionDigits: 2
-                                  }
-                                )}{' '}
-                                {item.allowance_type}
-                              </td>
-                              <td className="app__td">
-                                {item.period.release_schedule}
-                              </td>
-                              <td className="app__td">
-                                <div className="tiptopeditor mt-2">
-                                  <div
-                                    className="text-sm text-gray-600"
-                                    dangerouslySetInnerHTML={{
-                                      __html: item.period.requirements
-                                    }}
-                                  />
-                                </div>
-                              </td>
-                            </tr>
-                          ))}
+                        {allowances?.map((item, index) => (
+                          <tr key={index} className="app__tr">
+                            <td className="app__td">
+                              {item.period.description} {item.period.year}
+                            </td>
+                            <td className="app__td">
+                              {Number(item.allowance).toLocaleString('en-US', {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                              })}{' '}
+                              {item.allowance_type}
+                            </td>
+                            <td className="app__td">
+                              {item.period.release_schedule}
+                            </td>
+                            <td className="app__td">
+                              <div className="tiptopeditor mt-2">
+                                <div
+                                  className="text-sm text-gray-600"
+                                  dangerouslySetInnerHTML={{
+                                    __html: item.period.requirements
+                                  }}
+                                />
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
                       </tbody>
                     </table>
                   </div>
